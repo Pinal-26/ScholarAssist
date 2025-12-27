@@ -46,7 +46,7 @@ export default function Home() {
 
           <button
             className={`nav-btn ${active === "contact" ? "active" : ""}`}
-            onClick={() => scrollTo("contact")}
+            onClick={() => scrollTo("footer-bottom")}
           >
             Contact
           </button>
@@ -188,7 +188,7 @@ export default function Home() {
       
 
       {/* ================= FOOTER ================= */}
-      <footer className="footer-main">
+      <footer  className="footer-main">
         <div className="footer-grid">
           
           {/* Address */}
@@ -257,7 +257,7 @@ export default function Home() {
       </footer>
 
       {/* ================= COPYRIGHT ================= */}
-      <div className="footer-bottom">
+      <div id="footer-bottom">
         <p>
           © 2025 Website Managed & Maintained by <b>ScholarAssist Team</b> |
           Building digital solutions for education access

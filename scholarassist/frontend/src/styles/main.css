@@ -411,7 +411,7 @@ body {
 }
 
 /* ================= COPYRIGHT BAR ================= */
-.footer-bottom {
+#footer-bottom {
   background: #dbeafe;               /* light blue */
   text-align: center;
   padding: 15px;
