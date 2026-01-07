@@ -1,29 +1,41 @@
 package com.scholarassist.controller;
 
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import org.springframework.web.bind.annotation.*;
-
+import com.scholarassist.dto.LoginRequest;
+import com.scholarassist.dto.UserResponse;
 import com.scholarassist.entity.User;
-import com.scholarassist.repository.UserRepository;
+import com.scholarassist.service.UserService;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
-    private final UserRepository repo;
+    @Autowired
+    private UserService userService;
 
-    public UserController(UserRepository repo) {
-        this.repo = repo;
-    }
+   @PostMapping("/register")
+public UserResponse register(@RequestBody User user) {
 
-    @PostMapping
-    public User addUser(@RequestBody User user) {
-        return repo.save(user);
-    }
+    User saved = userService.registerUser(user);
 
-    @GetMapping
-    public List<User> getUsers() {
-        return repo.findAll();
+    UserResponse res = new UserResponse();
+    res.setId(saved.getId());
+    res.setName(saved.getName());
+    res.setEmail(saved.getEmail());
+
+    return res;
+}
+
+
+    @PostMapping("/login")
+    public User login(@RequestBody LoginRequest request) {
+        return userService.login(request.getEmail(), request.getPassword());
     }
 }
