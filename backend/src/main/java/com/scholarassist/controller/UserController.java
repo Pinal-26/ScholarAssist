@@ -1,6 +1,7 @@
 package com.scholarassist.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,21 +22,28 @@ public class UserController {
     private UserService userService;
 
    @PostMapping("/register")
-public UserResponse register(@RequestBody User user) {
+public ResponseEntity<?> register(@RequestBody User user) {
+
+    System.out.println("REGISTER API HIT");  // 👈 ADD THIS
 
     User saved = userService.registerUser(user);
-
-    UserResponse res = new UserResponse();
-    res.setId(saved.getId());
-    res.setName(saved.getName());
-    res.setEmail(saved.getEmail());
-
-    return res;
+    return ResponseEntity.ok(saved);
 }
 
 
+
+
     @PostMapping("/login")
-    public User login(@RequestBody LoginRequest request) {
-        return userService.login(request.getEmail(), request.getPassword());
-    }
+public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+
+    User user = userService.login(req.getEmail(), req.getPassword());
+
+    UserResponse res = new UserResponse();
+    res.setId(user.getId());
+    res.setName(user.getName());
+    res.setEmail(user.getEmail());
+
+    return ResponseEntity.ok(res);
+}
+
 }
