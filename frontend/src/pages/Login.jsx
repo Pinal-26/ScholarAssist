@@ -1,13 +1,45 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import "../styles/authSplit.css";
-
+import { useEffect } from "react";
 export default function Login() {
+    const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
+useEffect(() => {
+  localStorage.removeItem("user");
+}, []);
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch("http://localhost:8080/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData)
+    });
+
+    if (!res.ok) {
+      throw new Error("Invalid email or password");
+    }
+const user = await res.json();
+
+// ✅ overwrite old user
+localStorage.setItem("user", JSON.stringify(user));
+
+    alert("Login successful");
     navigate("/dashboard");
-  };
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
 
   // ✅ GOOGLE LOGIN HANDLER
   const handleGoogleLogin = () => {
@@ -29,20 +61,34 @@ export default function Login() {
             </p>
 
             <form onSubmit={handleSubmit}>
-              <label>Email Address</label>
-              <input type="email" placeholder="Enter your email" required />
+  <label>Email Address</label>
+  <input
+    type="email"
+    placeholder="Enter your email"
+    required
+    onChange={(e) =>
+      setFormData({ ...formData, email: e.target.value })
+    }
+  />
 
-              <div className="password-row">
-                <label>Password</label>
-                <span className="forgot">Forgot Password?</span>
-              </div>
+  <div className="password-row">
+    <label>Password</label>
+    <span className="forgot">Forgot Password?</span>
+  </div>
 
-              <input type="password" placeholder="Enter your password" required />
+  <input
+    type="password"
+    placeholder="Enter your password"
+    required
+    onChange={(e) =>
+      setFormData({ ...formData, password: e.target.value })
+    }
+  />
 
-              <button type="submit" className="sign-btn">
-                Sign In
-              </button>
-            </form>
+  <button type="submit" className="sign-btn">
+    Sign In
+  </button>
+</form>
 
             {/* 🔹 OR Divider */}
             <div className="divider">

@@ -1,3 +1,7 @@
+body, #root {
+  pointer-events: auto !important;
+}
+
 .App {
   min-height: 100vh;
   display: flex;

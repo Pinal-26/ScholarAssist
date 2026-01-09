@@ -1,9 +1,31 @@
 import { NavLink } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import scholarships from "../data/scholarships";
 
 export default function Dashboard() {
+  const [profile, setProfile] = useState(null);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) return;
+
+    fetch(`http://localhost:8080/api/profile/${user.id}`)
+      .then(res => res.json())
+      .then(data => setProfile(data))
+      .catch(err => console.error("Profile fetch error:", err));
+  }, []);
+  console.log("PROFILE FROM API:", profile);
+
   const navigate = useNavigate();
+  const [user, setUser] = useState(() => {
+  const stored = localStorage.getItem("user");
+  
+  return stored ? JSON.parse(stored) : null;
+});
+
+
+
 
 // Dummy profile completion (you can change later)
 const profileCompletion = 0;
@@ -13,7 +35,7 @@ const profileCompletion = 0;
       {/* ================= DASHBOARD NAVBAR ================= */}
       <nav className="dash-navbar">
         <div className="dash-logo">
-          Scholar<span>Assist</span>
+          🎓 <span>ScholarAssist</span>
         </div>
 
         <div className="dash-nav-links">
@@ -39,7 +61,9 @@ const profileCompletion = 0;
       <div className="dashboard-container">
         {/* ================= HEADER ================= */}
         <div className="dashboard-header">
-          <h2>Welcome back, John Doe!</h2>
+          <h1>
+          Welcome back, {user ? user.name : "User"}!
+        </h1>
           <p>Discover scholarships tailored to your profile</p>
         </div>
 

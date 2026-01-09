@@ -1,37 +1,123 @@
 import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
 import "../styles/profile.css";
 
 export default function Profile() {
+
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // ================= STATE =================
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [pincode, setPincode] = useState("");
+
+  const [institution, setInstitution] = useState("");
+  const [course, setCourse] = useState("");
+  const [gpa, setGpa] = useState("");
+  const [graduationYear, setGraduationYear] = useState("");
+
+  const [tenthPercentage, setTenthPercentage] = useState("");
+  const [twelfthPercentage, setTwelfthPercentage] = useState("");
+  const [parentIncome, setParentIncome] = useState("");
+  const [caste, setCaste] = useState("");
+  const [locality, setLocality] = useState("");
+
+  // ================= LOAD PROFILE =================
+  useEffect(() => {
+  if (!user) return;
+
+  fetch(`http://localhost:8080/api/profile/${user.id}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data) return;
+
+      setFirstName(prev => prev || data.firstName || "");
+      setLastName(prev => prev || data.lastName || "");
+      setPhone(prev => prev || data.phone || "");
+
+      setStreet(prev => prev || data.street || "");
+      setCity(prev => prev || data.city || "");
+      setState(prev => prev || data.state || "");
+      setPincode(prev => prev || data.pincode || "");
+
+      setInstitution(prev => prev || data.institution || "");
+      setCourse(prev => prev || data.course || "");
+      setGpa(prev => prev || data.gpa || "");
+      setGraduationYear(prev => prev || data.graduationYear || "");
+
+      setTenthPercentage(prev => prev || data.tenthPercentage || "");
+      setTwelfthPercentage(prev => prev || data.twelfthPercentage || "");
+      setParentIncome(prev => prev || data.parentIncome || "");
+      setCaste(prev => prev || data.caste || "");
+      setLocality(prev => prev || data.locality || "");
+    });
+}, [user]);
+
+
+  // ================= SAVE PROFILE =================
+  const handleSave = async () => {
+  console.log("Saving profile for user:", user.id);
+
+  const res = await fetch("http://localhost:8080/api/profile", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: user.id,
+      firstName,
+      lastName,
+      phone,
+      street,
+      city,
+      state,
+      pincode,
+      institution,
+      course,
+      gpa,
+      graduationYear,
+      tenthPercentage,
+      twelfthPercentage,
+      parentIncome,
+      caste,
+      locality
+    })
+  });
+
+  console.log("STATUS:", res.status);
+
+  if (res.ok) {
+    alert("Profile saved successfully");
+  } else {
+    alert("Save failed");
+  }
+};
+
   return (
     <>
       {/* ================= DASHBOARD NAVBAR ================= */}
       <nav className="dash-navbar">
         <div className="dash-logo">
-          Scholar<span>Assist</span>
+          🎓 <span>ScholarAssist</span>
         </div>
 
         <div className="dash-nav-links">
-          <NavLink to="/dashboard" className="dash-link">
-            Dashboard
-          </NavLink>
-          <NavLink to="/saved" className="dash-link">
-            Saved
-          </NavLink>
-          <NavLink to="/applications" className="dash-link">
-            Applications
-          </NavLink>
-          <NavLink to="/profile" className="dash-link">
-            Profile
-          </NavLink>
+          <NavLink to="/dashboard" className="dash-link">Dashboard</NavLink>
+          <NavLink to="/saved" className="dash-link">Saved</NavLink>
+          <NavLink to="/applications" className="dash-link">Applications</NavLink>
+          <NavLink to="/profile" className="dash-link">Profile</NavLink>
         </div>
       </nav>
 
       {/* ================= PROFILE PAGE ================= */}
       <div className="profile-container">
         <h2>Profile Settings</h2>
-        <p className="subtitle">
-          Manage your personal information and preferences
-        </p>
+        <p className="subtitle">Manage your personal information and preferences</p>
 
         {/* ================= PERSONAL INFO ================= */}
         <div className="profile-card">
@@ -40,22 +126,22 @@ export default function Profile() {
           <div className="form-grid">
             <div>
               <label>First Name</label>
-              <input type="text" placeholder="John" />
+              <input value={firstName} onChange={e => setFirstName(e.target.value)} />
             </div>
 
             <div>
               <label>Last Name</label>
-              <input type="text" placeholder="Doe" />
+              <input value={lastName} onChange={e => setLastName(e.target.value)} />
             </div>
 
             <div>
               <label>Email</label>
-              <input type="email" placeholder="john@example.com" />
+              <input value={email} disabled />
             </div>
 
             <div>
               <label>Phone</label>
-              <input type="text" placeholder="+91 98765 43210" />
+              <input value={phone} onChange={e => setPhone(e.target.value)} />
             </div>
           </div>
         </div>
@@ -67,22 +153,22 @@ export default function Profile() {
           <div className="form-grid">
             <div>
               <label>Street Address</label>
-              <input type="text" placeholder="123 Main Street" />
+              <input value={street} onChange={e => setStreet(e.target.value)} />
             </div>
 
             <div>
               <label>City</label>
-              <input type="text" placeholder="Ahmedabad" />
+              <input value={city} onChange={e => setCity(e.target.value)} />
             </div>
 
             <div>
               <label>State</label>
-              <input type="text" placeholder="Gujarat" />
+              <input value={state} onChange={e => setState(e.target.value)} />
             </div>
 
             <div>
               <label>Pincode</label>
-              <input type="text" placeholder="380001" />
+              <input value={pincode} onChange={e => setPincode(e.target.value)} />
             </div>
           </div>
         </div>
@@ -94,30 +180,85 @@ export default function Profile() {
           <div className="form-grid">
             <div>
               <label>Institution</label>
-              <input type="text" placeholder="ABC University" />
+              <input value={institution} onChange={e => setInstitution(e.target.value)} />
             </div>
 
             <div>
               <label>Course</label>
-              <input type="text" placeholder="B.Tech Computer Science" />
+              <input value={course} onChange={e => setCourse(e.target.value)} />
             </div>
 
             <div>
               <label>GPA</label>
-              <input type="text" placeholder="8.4" />
+              <input value={gpa} onChange={e => setGpa(e.target.value)} />
             </div>
 
             <div>
               <label>Graduation Year</label>
-              <input type="text" placeholder="2026" />
+              <input value={graduationYear} onChange={e => setGraduationYear(e.target.value)} />
             </div>
           </div>
         </div>
 
+
+        {/* ================= BACKGROUND INFO ================= */}
+<div className="profile-card">
+  <h3>Background Information</h3>
+
+  <div className="form-grid">
+    <div>
+      <label>10th Percentage (optional)</label>
+      <input
+        value={tenthPercentage}
+        onChange={e => setTenthPercentage(e.target.value)}
+        placeholder="e.g. 85"
+      />
+    </div>
+
+    <div>
+      <label>12th Percentage (optional)</label>
+      <input
+        value={twelfthPercentage}
+        onChange={e => setTwelfthPercentage(e.target.value)}
+        placeholder="e.g. 78"
+      />
+    </div>
+
+    <div>
+      <label>Parent Annual Income (₹)</label>
+      <input
+        value={parentIncome}
+        onChange={e => setParentIncome(e.target.value)}
+        placeholder="e.g. 250000"
+      />
+    </div>
+
+    <div>
+      <label>Caste</label>
+      <input
+        value={caste}
+        onChange={e => setCaste(e.target.value)}
+        placeholder="General / OBC / SC / ST"
+      />
+    </div>
+
+    <div>
+      <label>Locality</label>
+      <select value={locality} onChange={e => setLocality(e.target.value)}>
+        <option value="">Select</option>
+        <option value="Urban">Urban</option>
+        <option value="Rural">Rural</option>
+      </select>
+    </div>
+  </div>
+</div>
+
         {/* ================= ACTIONS ================= */}
         <div className="profile-actions">
           <button className="btn-secondary">Cancel</button>
-          <button className="btn-primary">Save Changes</button>
+          <button type="button" className="btn-primary" onClick={handleSave}>
+            Save Changes
+          </button>
         </div>
       </div>
     </>
