@@ -1,10 +1,11 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/profile.css";
+import scholarships from "../data/scholarships";
 
 export default function Profile() {
-
-
+  const navigate = useNavigate();
+  // ================= USER =================
   const user = JSON.parse(localStorage.getItem("user"));
 
   // ================= STATE =================
@@ -31,72 +32,79 @@ export default function Profile() {
 
   // ================= LOAD PROFILE =================
   useEffect(() => {
-  if (!user) return;
+    if (!user) return;
 
-  fetch(`http://localhost:8080/api/profile/${user.id}`)
-    .then(res => res.json())
-    .then(data => {
-      if (!data) return;
+    fetch(`http://localhost:8080/api/profile/${user.id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data) return;
 
-      setFirstName(prev => prev || data.firstName || "");
-      setLastName(prev => prev || data.lastName || "");
-      setPhone(prev => prev || data.phone || "");
+        setFirstName(data.firstName || "");
+        setLastName(data.lastName || "");
+        setPhone(data.phone || "");
 
-      setStreet(prev => prev || data.street || "");
-      setCity(prev => prev || data.city || "");
-      setState(prev => prev || data.state || "");
-      setPincode(prev => prev || data.pincode || "");
+        setStreet(data.street || "");
+        setCity(data.city || "");
+        setState(data.state || "");
+        setPincode(data.pincode || "");
 
-      setInstitution(prev => prev || data.institution || "");
-      setCourse(prev => prev || data.course || "");
-      setGpa(prev => prev || data.gpa || "");
-      setGraduationYear(prev => prev || data.graduationYear || "");
+        setInstitution(data.institution || "");
+        setCourse(data.course || "");
+        setGpa(data.gpa || "");
+        setGraduationYear(data.graduationYear || "");
 
-      setTenthPercentage(prev => prev || data.tenthPercentage || "");
-      setTwelfthPercentage(prev => prev || data.twelfthPercentage || "");
-      setParentIncome(prev => prev || data.parentIncome || "");
-      setCaste(prev => prev || data.caste || "");
-      setLocality(prev => prev || data.locality || "");
-    });
-}, [user]);
-
+        setTenthPercentage(data.tenthPercentage || "");
+        setTwelfthPercentage(data.twelfthPercentage || "");
+        setParentIncome(data.parentIncome || "");
+        setCaste(data.caste || "");
+        setLocality(data.locality || "");
+      });
+  }, [user]);
 
   // ================= SAVE PROFILE =================
   const handleSave = async () => {
-  console.log("Saving profile for user:", user.id);
+    const res = await fetch("http://localhost:8080/api/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: user.id,
+        firstName,
+        lastName,
+        phone,
+        street,
+        city,
+        state,
+        pincode,
+        institution,
+        course,
+        gpa,
+        graduationYear,
+        tenthPercentage,
+        twelfthPercentage,
+        parentIncome,
+        caste,
+        locality
+      })
+    });
 
-  const res = await fetch("http://localhost:8080/api/profile", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      userId: user.id,
-      firstName,
-      lastName,
-      phone,
-      street,
-      city,
-      state,
-      pincode,
-      institution,
-      course,
-      gpa,
-      graduationYear,
-      tenthPercentage,
-      twelfthPercentage,
-      parentIncome,
-      caste,
-      locality
-    })
-  });
+    if (res.ok) {
+    // ✅ mark profile saved
+    localStorage.setItem("profileSaved", "true");
 
-  console.log("STATUS:", res.status);
+    // ✅ add eligible scholarships (temporary logic)
+    localStorage.setItem(
+      "eligibleScholarships",
+      JSON.stringify([1, 2])
+    );
 
-  if (res.ok) {
     alert("Profile saved successfully");
+
+    // ✅ REDIRECT TO DASHBOARD
+    navigate("/dashboard");
   } else {
     alert("Save failed");
   }
-};
+  };
 
   return (
     <>
@@ -117,7 +125,9 @@ export default function Profile() {
       {/* ================= PROFILE PAGE ================= */}
       <div className="profile-container">
         <h2>Profile Settings</h2>
-        <p className="subtitle">Manage your personal information and preferences</p>
+        <p className="subtitle">
+          Manage your personal information and preferences
+        </p>
 
         {/* ================= PERSONAL INFO ================= */}
         <div className="profile-card">
@@ -195,63 +205,65 @@ export default function Profile() {
 
             <div>
               <label>Graduation Year</label>
-              <input value={graduationYear} onChange={e => setGraduationYear(e.target.value)} />
+              <input
+                value={graduationYear}
+                onChange={e => setGraduationYear(e.target.value)}
+              />
             </div>
           </div>
         </div>
 
-
         {/* ================= BACKGROUND INFO ================= */}
-<div className="profile-card">
-  <h3>Background Information</h3>
+        <div className="profile-card">
+          <h3>Background Information</h3>
 
-  <div className="form-grid">
-    <div>
-      <label>10th Percentage (optional)</label>
-      <input
-        value={tenthPercentage}
-        onChange={e => setTenthPercentage(e.target.value)}
-        placeholder="e.g. 85"
-      />
-    </div>
+          <div className="form-grid">
+            <div>
+              <label>10th Percentage (optional)</label>
+              <input
+                value={tenthPercentage}
+                onChange={e => setTenthPercentage(e.target.value)}
+                placeholder="e.g. 85"
+              />
+            </div>
 
-    <div>
-      <label>12th Percentage (optional)</label>
-      <input
-        value={twelfthPercentage}
-        onChange={e => setTwelfthPercentage(e.target.value)}
-        placeholder="e.g. 78"
-      />
-    </div>
+            <div>
+              <label>12th Percentage (optional)</label>
+              <input
+                value={twelfthPercentage}
+                onChange={e => setTwelfthPercentage(e.target.value)}
+                placeholder="e.g. 78"
+              />
+            </div>
 
-    <div>
-      <label>Parent Annual Income (₹)</label>
-      <input
-        value={parentIncome}
-        onChange={e => setParentIncome(e.target.value)}
-        placeholder="e.g. 250000"
-      />
-    </div>
+            <div>
+              <label>Parent Annual Income (₹)</label>
+              <input
+                value={parentIncome}
+                onChange={e => setParentIncome(e.target.value)}
+                placeholder="e.g. 250000"
+              />
+            </div>
 
-    <div>
-      <label>Caste</label>
-      <input
-        value={caste}
-        onChange={e => setCaste(e.target.value)}
-        placeholder="General / OBC / SC / ST"
-      />
-    </div>
+            <div>
+              <label>Caste</label>
+              <input
+                value={caste}
+                onChange={e => setCaste(e.target.value)}
+                placeholder="General / OBC / SC / ST"
+              />
+            </div>
 
-    <div>
-      <label>Locality</label>
-      <select value={locality} onChange={e => setLocality(e.target.value)}>
-        <option value="">Select</option>
-        <option value="Urban">Urban</option>
-        <option value="Rural">Rural</option>
-      </select>
-    </div>
-  </div>
-</div>
+            <div>
+              <label>Locality</label>
+              <select value={locality} onChange={e => setLocality(e.target.value)}>
+                <option value="">Select</option>
+                <option value="Urban">Urban</option>
+                <option value="Rural">Rural</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
         {/* ================= ACTIONS ================= */}
         <div className="profile-actions">

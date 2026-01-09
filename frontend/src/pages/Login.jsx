@@ -29,9 +29,11 @@ useEffect(() => {
       throw new Error("Invalid email or password");
     }
 const user = await res.json();
-
+localStorage.removeItem("profileSaved");
+localStorage.removeItem("eligibleScholarships");
 // ✅ overwrite old user
 localStorage.setItem("user", JSON.stringify(user));
+
 
     alert("Login successful");
     navigate("/dashboard");
