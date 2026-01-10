@@ -43,17 +43,47 @@ useEffect(() => {
   }
 }, []);
 
+// ===== PROFILE COMPLETION LOGIC (MATCHES PROFILE PAGE) =====
+let profileCompletion = 0;
 
-  // ================= PROFILE COMPLETION =================
-  const profileCompletion =
-    profile &&
-    profile.gpa &&
-    profile.course &&
-    profile.parentIncome &&
-    profile.caste &&
+if (profile) {
+  const requiredFields = [
+    profile.firstName,
+    profile.lastName,
+    profile.phone,
+
+    profile.street,
+    profile.city,
+    profile.state,
+    profile.pincode,
+
+    profile.institution,
+    profile.course,
+    profile.graduationYear,
+
+    profile.parentIncome,
+    profile.caste,
     profile.locality
-      ? 100
-      : 0;
+  ];
+
+  const filled = requiredFields.filter(
+    v => v !== null && v !== ""
+  ).length;
+
+  profileCompletion = Math.round(
+    (filled / requiredFields.length) * 100
+  );
+}
+  // ================= PROFILE COMPLETION =================
+  // const profileCompletion =
+  //   profile &&
+  //   profile.gpa &&
+  //   profile.course &&
+  //   profile.parentIncome &&
+  //   profile.caste &&
+  //   profile.locality
+  //     ? 100
+  //     : 0;
 
   return (
     <>
