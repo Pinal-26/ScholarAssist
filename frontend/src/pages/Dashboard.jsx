@@ -2,12 +2,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useEffect, useState } from "react";
 import scholarships from "../data/scholarships";
+import { useMemo } from "react";
 
 export default function Dashboard() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   // // ================= USER =================
-  // const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user"));
 
   // ================= PROFILE =================
   const [profile, setProfile] = useState(null);
@@ -24,43 +25,42 @@ export default function Dashboard() {
       .catch(err => console.error("Profile fetch error:", err));
   }, [user]);
 
-  const navigate = useNavigate();
-  const [user, setUser] = useState(() => {
+  const [user1, setUser] = useState(() => {
   const stored = localStorage.getItem("user");
   
   return stored ? JSON.parse(stored) : null;
 });
 // ===== PROFILE COMPLETION LOGIC (MATCHES PROFILE PAGE) =====
-// let profileCompletion = 0;
+let profileCompletion = 0;
 
-// if (profile) {
-//   const requiredFields = [
-//     profile.firstName,
-//     profile.lastName,
-//     profile.phone,
+if (profile) {
+  const requiredFields = [
+    profile.firstName,
+    profile.lastName,
+    profile.phone,
 
-//     profile.street,
-//     profile.city,
-//     profile.state,
-//     profile.pincode,
+    profile.street,
+    profile.city,
+    profile.state,
+    profile.pincode,
 
-//     profile.institution,
-//     profile.course,
-//     profile.graduationYear,
+    profile.institution,
+    profile.course,
+    profile.graduationYear,
 
-//     profile.parentIncome,
-//     profile.caste,
-//     profile.locality
-//   ];
+    profile.parentIncome,
+    profile.caste,
+    profile.locality
+  ];
 
-//   const filled = requiredFields.filter(
-//     v => v !== null && v !== ""
-//   ).length;
+  const filled = requiredFields.filter(
+    v => v !== null && v !== ""
+  ).length;
 
-//   profileCompletion = Math.round(
-//     (filled / requiredFields.length) * 100
-//   );
-// }
+  profileCompletion = Math.round(
+    (filled / requiredFields.length) * 100
+  );
+}
 
 
   // ---------- Load eligible scholarships AFTER redirect ----------
@@ -83,16 +83,16 @@ useEffect(() => {
 }, []);
 
 
-  // ================= PROFILE COMPLETION =================
-  const profileCompletion =
-    profile &&
-    profile.gpa &&
-    profile.course &&
-    profile.parentIncome &&
-    profile.caste &&
-    profile.locality
-      ? 100
-      : 0;
+  // // ================= PROFILE COMPLETION =================
+  // const profileCompletion =
+  //   profile &&
+  //   profile.gpa &&
+  //   profile.course &&
+  //   profile.parentIncome &&
+  //   profile.caste &&
+  //   profile.locality
+  //     ? 100
+  //     : 0;
 
   return (
     <>
