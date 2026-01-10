@@ -1,20 +1,32 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
-import scholarships from "../data/scholarships";
 import { useEffect, useState } from "react";
 
 export default function Saved() {
+  const navigate = useNavigate();
+
   const [savedIds, setSavedIds] = useState(() => {
     return JSON.parse(localStorage.getItem("savedScholarships")) || [];
   });
 
   const [savedScholarships, setSavedScholarships] = useState([]);
 
+  // ===== FETCH SAVED SCHOLARSHIPS FROM BACKEND =====
   useEffect(() => {
-    const filtered = scholarships.filter(s =>
-      savedIds.includes(s.id)
-    );
-    setSavedScholarships(filtered);
+    if (savedIds.length === 0) {
+      setSavedScholarships([]);
+      return;
+    }
+
+    fetch("http://localhost:8080/api/scholarships")
+      .then(res => res.json())
+      .then(data => {
+        const filtered = data.filter(s =>
+          savedIds.includes(s.id)
+        );
+        setSavedScholarships(filtered);
+      })
+      .catch(err => console.error("Saved fetch error:", err));
   }, [savedIds]);
 
   const toggleSave = (id) => {
@@ -63,7 +75,12 @@ export default function Saved() {
                 <h4>{s.title}</h4>
                 <p className="amount">₹{s.amount}</p>
                 <p className="deadline">Deadline: {s.deadline}</p>
-                <button>View Details</button>
+
+                <button
+                  onClick={() => navigate(`/scholarship/${s.id}`)}
+                >
+                  View Details
+                </button>
               </div>
             ))}
           </div>

@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/profile.css";
-import scholarships from "../data/scholarships";
+
 
 export default function Profile() {
   const navigate = useNavigate();

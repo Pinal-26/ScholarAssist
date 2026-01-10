@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import Saved from "./pages/Saved";
+import ScholarshipDetails from "./pages/ScholarshipDetails";
 
 export default function App() {
   return (
@@ -20,7 +21,10 @@ export default function App() {
 <Route path="/admin/login" element={<AdminLogin />} />
 <Route path="/admindashboard" element={<AdminDashboard />} />
 <Route path="/saved" element={<Saved />} />
-
+<Route
+          path="/scholarship/:id"
+          element={<ScholarshipDetails />}
+        />
 
     </Routes>
   );

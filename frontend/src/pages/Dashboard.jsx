@@ -1,8 +1,8 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useEffect, useState } from "react";
-import scholarships from "../data/scholarships";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
+
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -12,6 +12,15 @@ export default function Dashboard() {
 
   // ================= PROFILE =================
   const [profile, setProfile] = useState(null);
+  const [scholarships, setScholarships] = useState([]);
+
+  useEffect(() => {
+  fetch("http://localhost:8080/api/scholarships")
+    .then(res => res.json())
+    .then(data => setScholarships(data))
+    .catch(err => console.error(err));
+}, []);
+
 
   // ================= SAVED SCHOLARSHIPS =================
   const [savedIds, setSavedIds] = useState(() => {
@@ -169,7 +178,10 @@ export default function Dashboard() {
                 <h4>{s.title}</h4>
                 <p className="amount">₹{s.amount}</p>
                 <p className="deadline">Deadline: {s.deadline}</p>
-                <button>View Details</button>
+                <button onClick={() => navigate(`/scholarship/${s.id}`)}>
+  View Details
+</button>
+
               </div>
             ))}
           </div>
@@ -194,7 +206,10 @@ export default function Dashboard() {
               <h4>{s.title}</h4>
               <p className="amount">₹{s.amount}</p>
               <p className="deadline">Deadline: {s.deadline}</p>
-              <button>View Details</button>
+              <button onClick={() => navigate(`/scholarship/${s.id}`)}>
+  View Details
+</button>
+
             </div>
           ))}
         </div>
