@@ -2,11 +2,12 @@ import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useEffect, useState } from "react";
 import scholarships from "../data/scholarships";
+import { useMemo } from "react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
 
-  // ================= USER =================
+  // // ================= USER =================
   const user = JSON.parse(localStorage.getItem("user"));
 
   // ================= PROFILE =================
@@ -23,6 +24,44 @@ export default function Dashboard() {
       .then(data => setProfile(data))
       .catch(err => console.error("Profile fetch error:", err));
   }, [user]);
+
+  const [user1, setUser] = useState(() => {
+  const stored = localStorage.getItem("user");
+  
+  return stored ? JSON.parse(stored) : null;
+});
+// ===== PROFILE COMPLETION LOGIC (MATCHES PROFILE PAGE) =====
+let profileCompletion = 0;
+
+if (profile) {
+  const requiredFields = [
+    profile.firstName,
+    profile.lastName,
+    profile.phone,
+
+    profile.street,
+    profile.city,
+    profile.state,
+    profile.pincode,
+
+    profile.institution,
+    profile.course,
+    profile.graduationYear,
+
+    profile.parentIncome,
+    profile.caste,
+    profile.locality
+  ];
+
+  const filled = requiredFields.filter(
+    v => v !== null && v !== ""
+  ).length;
+
+  profileCompletion = Math.round(
+    (filled / requiredFields.length) * 100
+  );
+}
+
 
   // ---------- Load eligible scholarships AFTER redirect ----------
   // ================= ELIGIBLE SCHOLARSHIPS =================
@@ -74,17 +113,7 @@ if (profile) {
     (filled / requiredFields.length) * 100
   );
 }
-  // ================= PROFILE COMPLETION =================
-  // const profileCompletion =
-  //   profile &&
-  //   profile.gpa &&
-  //   profile.course &&
-  //   profile.parentIncome &&
-  //   profile.caste &&
-  //   profile.locality
-  //     ? 100
-  //     : 0;
-
+  
   return (
     <>
       {/* ================= DASHBOARD NAVBAR ================= */}
