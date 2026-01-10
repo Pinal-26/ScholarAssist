@@ -29,7 +29,7 @@ const [formData, setFormData] = useState({
     }
 
     alert("Account created successfully");
-    navigate("/dashboard");
+    navigate("/login");
   } catch (err) {
     alert(err.message);
   }

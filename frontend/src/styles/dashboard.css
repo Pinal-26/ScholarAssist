@@ -208,3 +208,11 @@
 .complete-profile-btn:hover {
   opacity: 0.9;
 }
+
+.info-box {
+  background: #fff7e6;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+

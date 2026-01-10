@@ -1,21 +1,28 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import scholarships from "../data/scholarships";
 
 export default function Dashboard() {
+  // const navigate = useNavigate();
+
+  // // ================= USER =================
+  // const user = JSON.parse(localStorage.getItem("user"));
+
+  // ================= PROFILE =================
   const [profile, setProfile] = useState(null);
+
+  // ================= ELIGIBLE SCHOLARSHIPS =================
+
+  // ---------- Load profile ----------
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
     if (!user) return;
 
     fetch(`http://localhost:8080/api/profile/${user.id}`)
       .then(res => res.json())
       .then(data => setProfile(data))
       .catch(err => console.error("Profile fetch error:", err));
-  }, []);
-  console.log("PROFILE FROM API:", profile);
+  }, [user]);
 
   const navigate = useNavigate();
   const [user, setUser] = useState(() => {
@@ -24,38 +31,68 @@ export default function Dashboard() {
   return stored ? JSON.parse(stored) : null;
 });
 // ===== PROFILE COMPLETION LOGIC (MATCHES PROFILE PAGE) =====
-let profileCompletion = 0;
+// let profileCompletion = 0;
 
-if (profile) {
-  const requiredFields = [
-    profile.firstName,
-    profile.lastName,
-    profile.phone,
+// if (profile) {
+//   const requiredFields = [
+//     profile.firstName,
+//     profile.lastName,
+//     profile.phone,
 
-    profile.street,
-    profile.city,
-    profile.state,
-    profile.pincode,
+//     profile.street,
+//     profile.city,
+//     profile.state,
+//     profile.pincode,
 
-    profile.institution,
-    profile.course,
-    profile.graduationYear,
+//     profile.institution,
+//     profile.course,
+//     profile.graduationYear,
 
-    profile.parentIncome,
-    profile.caste,
-    profile.locality
-  ];
+//     profile.parentIncome,
+//     profile.caste,
+//     profile.locality
+//   ];
 
-  const filled = requiredFields.filter(
-    v => v !== null && v !== ""
-  ).length;
+//   const filled = requiredFields.filter(
+//     v => v !== null && v !== ""
+//   ).length;
 
-  profileCompletion = Math.round(
-    (filled / requiredFields.length) * 100
+//   profileCompletion = Math.round(
+//     (filled / requiredFields.length) * 100
+//   );
+// }
+
+
+  // ---------- Load eligible scholarships AFTER redirect ----------
+  // ================= ELIGIBLE SCHOLARSHIPS =================
+const [eligibleScholarships, setEligibleScholarships] = useState([]);
+
+useEffect(() => {
+  const isSaved = localStorage.getItem("profileSaved");
+  const ids = JSON.parse(
+    localStorage.getItem("eligibleScholarships") || "[]"
   );
-}
+
+  if (isSaved === "true" && ids.length > 0) {
+    setEligibleScholarships(
+      scholarships.filter(s => ids.includes(s.id))
+    );
+  } else {
+    setEligibleScholarships([]); // EMPTY by default
+  }
+}, []);
 
 
+  // ================= PROFILE COMPLETION =================
+  const profileCompletion =
+    profile &&
+    profile.gpa &&
+    profile.course &&
+    profile.parentIncome &&
+    profile.caste &&
+    profile.locality
+      ? 100
+      : 0;
 
   return (
     <>
@@ -66,31 +103,19 @@ if (profile) {
         </div>
 
         <div className="dash-nav-links">
-          <NavLink to="/dashboard" className="dash-link">
-            Dashboard
-          </NavLink>
-
-          <NavLink to="/saved" className="dash-link">
-            Saved
-          </NavLink>
-
-          <NavLink to="/applications" className="dash-link">
-            Applications
-          </NavLink>
-
-          <NavLink to="/profile" className="dash-link">
-            Profile
-          </NavLink>
+          <NavLink to="/dashboard" className="dash-link">Dashboard</NavLink>
+          <NavLink to="/saved" className="dash-link">Saved</NavLink>
+          <NavLink to="/applications" className="dash-link">Applications</NavLink>
+          <NavLink to="/profile" className="dash-link">Profile</NavLink>
         </div>
       </nav>
 
       {/* ================= DASHBOARD CONTENT ================= */}
       <div className="dashboard-container">
+
         {/* ================= HEADER ================= */}
         <div className="dashboard-header">
-          <h1>
-          Welcome back, {user ? user.name : "User"}!
-        </h1>
+          <h1>Welcome back, {user ? user.name : "User"}!</h1>
           <p>Discover scholarships tailored to your profile</p>
         </div>
 
@@ -98,7 +123,7 @@ if (profile) {
         <div className="stats-grid">
           <div className="stat-card">
             <p>Available</p>
-            <h3>6</h3>
+            <h3>{scholarships.length}</h3>
           </div>
 
           <div className="stat-card">
@@ -112,100 +137,56 @@ if (profile) {
           </div>
 
           <div className="stat-card">
-  <p>Profile</p>
-  <h3>{profileCompletion}%</h3>
+            <p>Profile</p>
+            <h3>{profileCompletion}%</h3>
 
-  {profileCompletion < 100 && (
-    <button
-      className="complete-profile-btn"
-      onClick={() => navigate("/profile")}
-    >
-      Complete Profile
-    </button>
-  )}
-</div>
-
-
+            {profileCompletion < 100 && (
+              <button
+                className="complete-profile-btn"
+                onClick={() => navigate("/profile")}
+              >
+                Complete Profile
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* ================= SEARCH ================= */}
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search scholarships by name, provider, or tag..."
-          />
-          <select>
-            <option>All Categories</option>
-            <option>Technology</option>
-            <option>Business</option>
-            <option>Arts</option>
-          </select>
-        </div>
+        {/* ================= ELIGIBLE SCHOLARSHIPS ================= */}
+        <h3 className="section-title">Eligible Scholarships</h3>
 
-        {/* ================= SCHOLARSHIPS ================= */}
-        <h3 className="section-title">Recommended for You</h3>
+        {eligibleScholarships.length === 0 ? (
+          <p style={{ color: "#777", marginBottom: "30px" }}>
+            Complete your profile and click <b>Save Changes</b> to see eligible scholarships.
+          </p>
+        ) : (
+          <div className="scholarship-grid">
+            {eligibleScholarships.map(s => (
+              <div key={s.id} className="scholarship-card">
+                <span className="tag">{s.category}</span>
+                <h4>{s.title}</h4>
+                <p className="amount">₹{s.amount}</p>
+                <p className="deadline">Deadline: {s.deadline}</p>
+                <button>View Details</button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ================= TOTAL AVAILABLE SCHOLARSHIPS ================= */}
+        <h3 className="section-title">Total Available Scholarships</h3>
 
         <div className="scholarship-grid">
-          {/* Card 1 */}
-          <div className="scholarship-card">
-            <span className="tag">Technology</span>
-            <h4>Tech Excellence Scholarship</h4>
-            <p className="provider">Tech Foundation</p>
-            <p className="amount">$5,000</p>
-            <p className="deadline">Deadline: 30/06/2024</p>
-            <button>View Details</button>
-          </div>
-
-          {/* Card 2 */}
-          <div className="scholarship-card">
-            <span className="tag">Leadership</span>
-            <h4>Future Leaders Grant</h4>
-            <p className="provider">Leadership Institute</p>
-            <p className="amount">$10,000</p>
-            <p className="deadline">Deadline: 15/05/2024</p>
-            <button>View Details</button>
-          </div>
-
-          {/* Card 3 */}
-          <div className="scholarship-card">
-            <span className="tag">STEM</span>
-            <h4>Women in STEM Award</h4>
-            <p className="provider">STEM Advancement Fund</p>
-            <p className="amount">$7,500</p>
-            <p className="deadline">Deadline: 20/07/2024</p>
-            <button>View Details</button>
-          </div>
-
-          {/* Card 4 */}
-          <div className="scholarship-card">
-            <span className="tag">Community</span>
-            <h4>Community Impact Scholarship</h4>
-            <p className="provider">Community Foundation</p>
-            <p className="amount">$3,000</p>
-            <p className="deadline">Deadline: 10/08/2024</p>
-            <button>View Details</button>
-          </div>
-
-          {/* Card 5 */}
-          <div className="scholarship-card">
-            <span className="tag">Business</span>
-            <h4>Business Innovators Grant</h4>
-            <p className="provider">Entrepreneur Network</p>
-            <p className="amount">$6,000</p>
-            <p className="deadline">Deadline: 06/07/2024</p>
-            <button>View Details</button>
-          </div>
-
-          {/* Card 6 */}
-          <div className="scholarship-card">
-            <span className="tag">Arts</span>
-            <h4>Arts & Creativity Award</h4>
-            <p className="provider">Arts Council</p>
-            <p className="amount">$4,500</p>
-            <p className="deadline">Deadline: 25/07/2024</p>
-            <button>View Details</button>
-          </div>
+          {scholarships.map(s => (
+            <div key={s.id} className="scholarship-card">
+              <span className="tag">{s.category}</span>
+              <h4>{s.title}</h4>
+              <p className="amount">₹{s.amount}</p>
+              <p className="deadline">Deadline: {s.deadline}</p>
+              <button>View Details</button>
+            </div>
+          ))}
         </div>
+
       </div>
     </>
   );
