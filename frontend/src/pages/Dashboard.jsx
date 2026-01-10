@@ -23,12 +23,39 @@ export default function Dashboard() {
   
   return stored ? JSON.parse(stored) : null;
 });
+// ===== PROFILE COMPLETION LOGIC (MATCHES PROFILE PAGE) =====
+let profileCompletion = 0;
+
+if (profile) {
+  const requiredFields = [
+    profile.firstName,
+    profile.lastName,
+    profile.phone,
+
+    profile.street,
+    profile.city,
+    profile.state,
+    profile.pincode,
+
+    profile.institution,
+    profile.course,
+    profile.graduationYear,
+
+    profile.parentIncome,
+    profile.caste,
+    profile.locality
+  ];
+
+  const filled = requiredFields.filter(
+    v => v !== null && v !== ""
+  ).length;
+
+  profileCompletion = Math.round(
+    (filled / requiredFields.length) * 100
+  );
+}
 
 
-
-
-// Dummy profile completion (you can change later)
-const profileCompletion = 0;
 
   return (
     <>
@@ -97,6 +124,7 @@ const profileCompletion = 0;
     </button>
   )}
 </div>
+
 
         </div>
 
