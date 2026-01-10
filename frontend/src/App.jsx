@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
-
+import Saved from "./pages/Saved";
 
 export default function App() {
   return (
@@ -19,6 +19,8 @@ export default function App() {
       <Route path="/login" element={<Login />} />
 <Route path="/admin/login" element={<AdminLogin />} />
 <Route path="/admindashboard" element={<AdminDashboard />} />
+<Route path="/saved" element={<Saved />} />
+
 
     </Routes>
   );

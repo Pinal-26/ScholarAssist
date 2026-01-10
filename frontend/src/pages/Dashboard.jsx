@@ -2,20 +2,36 @@ import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useEffect, useState } from "react";
 import scholarships from "../data/scholarships";
-import { useMemo } from "react";
+import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 
 export default function Dashboard() {
   const navigate = useNavigate();
 
-  // // ================= USER =================
+  // ================= USER =================
   const user = JSON.parse(localStorage.getItem("user"));
 
   // ================= PROFILE =================
   const [profile, setProfile] = useState(null);
 
-  // ================= ELIGIBLE SCHOLARSHIPS =================
+  // ================= SAVED SCHOLARSHIPS =================
+  const [savedIds, setSavedIds] = useState(() => {
+    return JSON.parse(localStorage.getItem("savedScholarships")) || [];
+  });
 
-  // ---------- Load profile ----------
+  const toggleSave = (id) => {
+    let updated;
+
+    if (savedIds.includes(id)) {
+      updated = savedIds.filter(sid => sid !== id);
+    } else {
+      updated = [...savedIds, id];
+    }
+
+    setSavedIds(updated);
+    localStorage.setItem("savedScholarships", JSON.stringify(updated));
+  };
+
+  // ================= PROFILE FETCH =================
   useEffect(() => {
     if (!user) return;
 
@@ -25,95 +41,53 @@ export default function Dashboard() {
       .catch(err => console.error("Profile fetch error:", err));
   }, [user]);
 
-  const [user1, setUser] = useState(() => {
-  const stored = localStorage.getItem("user");
-  
-  return stored ? JSON.parse(stored) : null;
-});
-// ===== PROFILE COMPLETION LOGIC (MATCHES PROFILE PAGE) =====
-let profileCompletion = 0;
+  // ===== PROFILE COMPLETION LOGIC =====
+  let profileCompletion = 0;
 
-if (profile) {
-  const requiredFields = [
-    profile.firstName,
-    profile.lastName,
-    profile.phone,
+  if (profile) {
+    const requiredFields = [
+      profile.firstName,
+      profile.lastName,
+      profile.phone,
+      profile.street,
+      profile.city,
+      profile.state,
+      profile.pincode,
+      profile.institution,
+      profile.course,
+      profile.graduationYear,
+      profile.parentIncome,
+      profile.caste,
+      profile.locality
+    ];
 
-    profile.street,
-    profile.city,
-    profile.state,
-    profile.pincode,
+    const filled = requiredFields.filter(
+      v => v !== null && v !== ""
+    ).length;
 
-    profile.institution,
-    profile.course,
-    profile.graduationYear,
-
-    profile.parentIncome,
-    profile.caste,
-    profile.locality
-  ];
-
-  const filled = requiredFields.filter(
-    v => v !== null && v !== ""
-  ).length;
-
-  profileCompletion = Math.round(
-    (filled / requiredFields.length) * 100
-  );
-}
-
-
-  // ---------- Load eligible scholarships AFTER redirect ----------
-  // ================= ELIGIBLE SCHOLARSHIPS =================
-const [eligibleScholarships, setEligibleScholarships] = useState([]);
-
-useEffect(() => {
-  const isSaved = localStorage.getItem("profileSaved");
-  const ids = JSON.parse(
-    localStorage.getItem("eligibleScholarships") || "[]"
-  );
-
-  if (isSaved === "true" && ids.length > 0) {
-    setEligibleScholarships(
-      scholarships.filter(s => ids.includes(s.id))
+    profileCompletion = Math.round(
+      (filled / requiredFields.length) * 100
     );
-  } else {
-    setEligibleScholarships([]); // EMPTY by default
   }
-}, []);
 
-// ===== PROFILE COMPLETION LOGIC (MATCHES PROFILE PAGE) =====
-let profileCompletion = 0;
+  // ================= ELIGIBLE SCHOLARSHIPS =================
+  const [eligibleScholarships, setEligibleScholarships] = useState([]);
 
-if (profile) {
-  const requiredFields = [
-    profile.firstName,
-    profile.lastName,
-    profile.phone,
+  useEffect(() => {
+    const isSaved = localStorage.getItem("profileSaved");
+    const ids = JSON.parse(
+      localStorage.getItem("eligibleScholarships") || "[]"
+    );
 
-    profile.street,
-    profile.city,
-    profile.state,
-    profile.pincode,
+    if (isSaved === "true" && ids.length > 0) {
+      setEligibleScholarships(
+        scholarships.filter(s => ids.includes(s.id))
+      );
+    } else {
+      setEligibleScholarships([]);
+    }
+  }, []);
 
-    profile.institution,
-    profile.course,
-    profile.graduationYear,
-
-    profile.parentIncome,
-    profile.caste,
-    profile.locality
-  ];
-
-  const filled = requiredFields.filter(
-    v => v !== null && v !== ""
-  ).length;
-
-  profileCompletion = Math.round(
-    (filled / requiredFields.length) * 100
-  );
-}
-  
   return (
     <>
       {/* ================= DASHBOARD NAVBAR ================= */}
@@ -148,7 +122,7 @@ if (profile) {
 
           <div className="stat-card">
             <p>Saved</p>
-            <h3>0</h3>
+            <h3>{savedIds.length}</h3>
           </div>
 
           <div className="stat-card">
@@ -182,6 +156,15 @@ if (profile) {
           <div className="scholarship-grid">
             {eligibleScholarships.map(s => (
               <div key={s.id} className="scholarship-card">
+                <span
+                  className="bookmark"
+                  onClick={() => toggleSave(s.id)}
+                >
+                  {savedIds.includes(s.id)
+                    ? <FaBookmark color="#f5b301" />
+                    : <FaRegBookmark />}
+                </span>
+
                 <span className="tag">{s.category}</span>
                 <h4>{s.title}</h4>
                 <p className="amount">₹{s.amount}</p>
@@ -198,6 +181,15 @@ if (profile) {
         <div className="scholarship-grid">
           {scholarships.map(s => (
             <div key={s.id} className="scholarship-card">
+              <span
+                className="bookmark"
+                onClick={() => toggleSave(s.id)}
+              >
+                {savedIds.includes(s.id)
+                  ? <FaBookmark color="#f5b301" />
+                  : <FaRegBookmark />}
+              </span>
+
               <span className="tag">{s.category}</span>
               <h4>{s.title}</h4>
               <p className="amount">₹{s.amount}</p>
