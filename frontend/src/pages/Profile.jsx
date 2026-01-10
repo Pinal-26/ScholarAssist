@@ -7,6 +7,7 @@ export default function Profile() {
   const navigate = useNavigate();
   // ================= USER =================
   const user = JSON.parse(localStorage.getItem("user"));
+  const [loaded, setLoaded] = useState(false);
 
   // ================= STATE =================
   const [firstName, setFirstName] = useState("");
@@ -31,35 +32,38 @@ export default function Profile() {
   const [locality, setLocality] = useState("");
 
   // ================= LOAD PROFILE =================
-  useEffect(() => {
-    if (!user) return;
+ useEffect(() => {
+  if (!user || loaded) return;
 
-    fetch(`http://localhost:8080/api/profile/${user.id}`)
-      .then(res => res.json())
-      .then(data => {
-        if (!data) return;
+  fetch(`http://localhost:8080/api/profile/${user.id}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data) return;
 
-        setFirstName(data.firstName || "");
-        setLastName(data.lastName || "");
-        setPhone(data.phone || "");
+      setFirstName(data.firstName || "");
+      setLastName(data.lastName || "");
+      setPhone(data.phone || "");
 
-        setStreet(data.street || "");
-        setCity(data.city || "");
-        setState(data.state || "");
-        setPincode(data.pincode || "");
+      setStreet(data.street || "");
+      setCity(data.city || "");
+      setState(data.state || "");
+      setPincode(data.pincode || "");
 
-        setInstitution(data.institution || "");
-        setCourse(data.course || "");
-        setGpa(data.gpa || "");
-        setGraduationYear(data.graduationYear || "");
+      setInstitution(data.institution || "");
+      setCourse(data.course || "");
+      setGpa(data.gpa || "");
+      setGraduationYear(data.graduationYear || "");
 
-        setTenthPercentage(data.tenthPercentage || "");
-        setTwelfthPercentage(data.twelfthPercentage || "");
-        setParentIncome(data.parentIncome || "");
-        setCaste(data.caste || "");
-        setLocality(data.locality || "");
-      });
-  }, [user]);
+      setTenthPercentage(data.tenthPercentage || "");
+      setTwelfthPercentage(data.twelfthPercentage || "");
+      setParentIncome(data.parentIncome || "");
+      setCaste(data.caste || "");
+      setLocality(data.locality || "");
+
+      setLoaded(true); // ✅ IMPORTANT
+    });
+}, [user, loaded]);
+
 
   // ================= SAVE PROFILE =================
   const handleSave = async () => {
