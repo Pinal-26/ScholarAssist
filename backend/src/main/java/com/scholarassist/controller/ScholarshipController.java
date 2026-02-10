@@ -1,10 +1,17 @@
 package com.scholarassist.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.scholarassist.entity.Scholarship;
 import com.scholarassist.service.ScholarshipService;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/scholarships")
@@ -34,4 +41,11 @@ public class ScholarshipController {
     public Scholarship create(@RequestBody Scholarship scholarship) {
         return service.saveScholarship(scholarship);
     }
+
+    // ✅ Get eligible scholarships for user
+@GetMapping("/eligible/{userId}")
+public List<Scholarship> getEligible(@PathVariable Long userId) {
+    return service.getEligibleScholarships(userId);
+}
+
 }

@@ -82,20 +82,15 @@ export default function Dashboard() {
   // ================= ELIGIBLE SCHOLARSHIPS =================
   const [eligibleScholarships, setEligibleScholarships] = useState([]);
 
-  useEffect(() => {
-    const isSaved = localStorage.getItem("profileSaved");
-    const ids = JSON.parse(
-      localStorage.getItem("eligibleScholarships") || "[]"
-    );
+useEffect(() => {
+  if (!user) return;
 
-    if (isSaved === "true" && ids.length > 0) {
-      setEligibleScholarships(
-        scholarships.filter(s => ids.includes(s.id))
-      );
-    } else {
-      setEligibleScholarships([]);
-    }
-  }, []);
+  fetch(`http://localhost:8080/api/scholarships/eligible/${user.id}`)
+    .then(res => res.json())
+    .then(data => setEligibleScholarships(data))
+    .catch(err => console.error(err));
+}, [user]);
+
 
   return (
     <>

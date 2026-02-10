@@ -96,10 +96,8 @@ export default function Profile() {
     localStorage.setItem("profileSaved", "true");
 
     // ✅ add eligible scholarships (temporary logic)
-    localStorage.setItem(
-      "eligibleScholarships",
-      JSON.stringify([1, 2])
-    );
+    localStorage.setItem("profileSaved", "true");
+
 
     alert("Profile saved successfully");
 
