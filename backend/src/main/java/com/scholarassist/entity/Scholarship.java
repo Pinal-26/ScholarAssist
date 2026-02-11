@@ -29,6 +29,12 @@ public class Scholarship {
 
     private String applyLink;
 
+    // ================= NEW ELIGIBILITY FIELDS =================
+
+    private Double maxIncome;   // Maximum allowed parent income
+
+    private Double minGpa;      // Minimum required GPA
+
     // ===== GETTERS & SETTERS =====
 
     public Long getId() {
@@ -101,5 +107,23 @@ public class Scholarship {
 
     public void setApplyLink(String applyLink) {
         this.applyLink = applyLink;
+    }
+
+    // ===== NEW GETTERS & SETTERS =====
+
+    public Double getMaxIncome() {
+        return maxIncome;
+    }
+
+    public void setMaxIncome(Double maxIncome) {
+        this.maxIncome = maxIncome;
+    }
+
+    public Double getMinGpa() {
+        return minGpa;
+    }
+
+    public void setMinGpa(Double minGpa) {
+        this.minGpa = minGpa;
     }
 }

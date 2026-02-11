@@ -22,6 +22,7 @@ public class ScholarshipService {
         this.profileRepo = profileRepo;
     }
 
+    // ================= ALL SCHOLARSHIPS =================
     public List<Scholarship> getAllScholarships() {
         return scholarshipRepo.findAll();
     }
@@ -34,31 +35,60 @@ public class ScholarshipService {
         return scholarshipRepo.save(s);
     }
 
-    // ✅ CORE LOGIC: Eligible Scholarships
+    // ================= ELIGIBILITY LOGIC =================
     public List<Scholarship> getEligibleScholarships(Long userId) {
-        Profile profile = profileRepo.findByUserId(userId).orElse(null);
-        if (profile == null) return List.of();
 
-        return scholarshipRepo.findAll().stream()
-                .filter(s -> isEligible(profile, s))
+        Profile profile = profileRepo.findByUserId(userId).orElse(null);
+
+        if (profile == null) {
+            return List.of();
+        }
+
+        return scholarshipRepo.findAll()
+                .stream()
+                .filter(scholarship -> isEligible(profile, scholarship))
                 .collect(Collectors.toList());
     }
 
-    private boolean isEligible(Profile p, Scholarship s) {
-        // income check
-        if (p.getParentIncome() != null && p.getParentIncome() > 300000)
-            return false;
+    // ================= CORE CHECK METHOD =================
+    private boolean isEligible(Profile profile, Scholarship scholarship) {
 
-        // GPA check
-        if (p.getGpa() != null && p.getGpa() < 6.0)
-            return false;
+        // ---------- Income Check ----------
+        if (profile.getParentIncome() != null &&
+            scholarship.getMaxIncome() != null) {
 
-        // caste/category check
-        if (s.getCategory() != null &&
-            !s.getCategory().equalsIgnoreCase("General") &&
-            p.getCaste() != null &&
-            !s.getCategory().equalsIgnoreCase(p.getCaste()))
+            if (profile.getParentIncome() > scholarship.getMaxIncome()) {
+                return false;
+            }
+        }
+
+        // ---------- GPA Check ----------
+        if (profile.getGpa() != null &&
+            scholarship.getMinGpa() != null) {
+
+            if (profile.getGpa() < scholarship.getMinGpa()) {
+                return false;
+            }
+        }
+
+       // CATEGORY CHECK
+if (scholarship.getCategory() != null) {
+    if (scholarship.getCategory().equalsIgnoreCase("SC") ||
+        scholarship.getCategory().equalsIgnoreCase("ST") ||
+        scholarship.getCategory().equalsIgnoreCase("OBC") ||
+        scholarship.getCategory().equalsIgnoreCase("General")) {
+
+        if (profile.getCaste() == null ||
+            !scholarship.getCategory().equalsIgnoreCase(profile.getCaste())) {
             return false;
+        }
+    }
+}
+
+
+        // If all checks pass
+        System.out.println("Profile caste: " + profile.getCaste());
+System.out.println("Scholarship category: " + scholarship.getCategory());
 
         return true;
     }

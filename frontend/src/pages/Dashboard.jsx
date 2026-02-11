@@ -176,6 +176,10 @@ useEffect(() => {
     setSavedIds(updated);
     localStorage.setItem("savedScholarships", JSON.stringify(updated));
   };
+console.log("Profile:", profile);
+console.log("Scholarships:", scholarships);
+console.log("Eligible:", eligibleScholarships);
+console.log("Missing Fields:", missingEligibilityFields);
 
   return (
     <>
