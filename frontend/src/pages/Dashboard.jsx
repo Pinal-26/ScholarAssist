@@ -1,11 +1,14 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 
 export default function Dashboard() {
+
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+const [user] = useState(() =>
+  JSON.parse(localStorage.getItem("user"))
+);
 
   const [profile, setProfile] = useState(null);
   const [profileCompletion, setProfileCompletion] = useState(0);
@@ -24,7 +27,8 @@ export default function Dashboard() {
     course: "Course",
     city: "City"
   };
- // ================= PROFILE COMPLETION =================
+
+  // ================= PROFILE COMPLETION =================
   const calculateProfileCompletion = (data) => {
     if (!data) return;
 
@@ -81,49 +85,58 @@ export default function Dashboard() {
     setMissingEligibilityFields(missing);
   };
 
-  // ================= SAFE FETCH FUNCTION =================
-  const safeFetchJSON = async (url) => {
-    try {
-      const res = await fetch(url);
+  // ================= SAFE FETCH =================
+  const safeFetchJSON = useCallback(async (url) => {
+  try {
+    const res = await fetch(url);
 
-      if (!res.ok) {
-        console.log("Request failed:", res.status);
-        return null;
-      }
+    if (!res.ok) return null;
 
-      const text = await res.text();
-      if (!text) return null;
+    const text = await res.text();
+    if (!text) return null;
 
-      return JSON.parse(text);
-    } catch (err) {
-      console.error("Fetch error:", err);
-      return null;
-    }
-  };
+    return JSON.parse(text);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    return null;
+  }
+}, []);
 
-  // ================= FETCH SCHOLARSHIPS =================
-  // ================= LOAD ALL SCHOLARSHIPS (DB + SCRAPER) =================
+
+  // ================= LOAD ALL SCHOLARSHIPS =================
+// ================= LOAD ALL SCHOLARSHIPS =================
 useEffect(() => {
 
   const loadAll = async () => {
+    try {
 
-    const dbRes = await fetch("http://localhost:8080/api/scholarships");
-    const dbData = dbRes.ok ? await dbRes.json() : [];
+      const dbRes = await fetch("http://localhost:8080/api/scholarships");
+      const dbData = dbRes.ok ? await dbRes.json() : [];
 
-    const scrapeRes = await fetch("http://localhost:8080/api/scrape");
-    const scrapedData = scrapeRes.ok ? await scrapeRes.json() : [];
+      const scrapeRes = await fetch("http://localhost:8080/api/scrape");
+      const scrapedData = scrapeRes.ok ? await scrapeRes.json() : [];
 
-    const combined = [
-      ...(dbData || []),
-      ...(scrapedData || [])
-    ];
+      const combined = [
+        ...(dbData || []),
+        ...(scrapedData || []).map((item, index) => ({
+          ...item,
+          id: item.id ? `scraped-${item.id}` : `scraped-${index}`
+        }))
+      ];
 
-    setScholarships(combined);
+      setScholarships(combined);
+
+    } catch (error) {
+      console.error("Error loading scholarships:", error);
+      setScholarships([]);
+    }
   };
 
   loadAll();
 
 }, []);
+
+
 
   // ================= FETCH PROFILE =================
   useEffect(() => {
@@ -150,7 +163,6 @@ useEffect(() => {
     });
   }, [user]);
 
- 
   // ================= SAVE / UNSAVE =================
   const toggleSave = (id) => {
     let updated;
@@ -218,6 +230,8 @@ useEffect(() => {
           </div>
         </div>
 
+        {/* ================= ELIGIBLE ================= */}
+
         <h3 className="section-title">Eligible Scholarships</h3>
 
         {missingEligibilityFields.length > 0 ? (
@@ -225,7 +239,9 @@ useEffect(() => {
             <p>⚠ Please complete these fields to check eligibility:</p>
             <ul>
               {missingEligibilityFields.map((field, index) => (
-                <li key={index}>{fieldLabels[field]}</li>
+                <li key={`missing-${index}`}>
+                  {fieldLabels[field]}
+                </li>
               ))}
             </ul>
             <button onClick={() => navigate("/profile")}>
@@ -238,8 +254,12 @@ useEffect(() => {
           </p>
         ) : (
           <div className="scholarship-grid">
-            {eligibleScholarships.map(s => (
-              <div key={s.id} className="scholarship-card">
+            {eligibleScholarships.map((s, index) => (
+              <div
+                key={s.id ? `eligible-${s.id}` : `eligible-${index}`}
+                className="scholarship-card"
+              >
+
                 <span
                   className="bookmark"
                   onClick={() => toggleSave(s.id)}
@@ -262,41 +282,43 @@ useEffect(() => {
           </div>
         )}
 
+        {/* ================= ALL ================= */}
+
         <h3 className="section-title">All Scholarships</h3>
 
-{scholarships.length === 0 ? (
-  <p style={{ color: "#777" }}>No scholarships found.</p>
-) : (
-  <div className="scholarship-grid">
-    {scholarships.map(s => (
-      <div key={s.id} className="scholarship-card">
+        {scholarships.length === 0 ? (
+          <p style={{ color: "#777" }}>No scholarships found.</p>
+        ) : (
+          <div className="scholarship-grid">
+            {scholarships.map((s, index) => (
+              <div
+                key={s.id ? `all-${s.id}` : `all-${index}`}
+                className="scholarship-card"
+              >
 
-        <span
-          className="bookmark"
-          onClick={() => toggleSave(s.id)}
-        >
-          {savedIds.includes(s.id)
-            ? <FaBookmark color="#f5b301" />
-            : <FaRegBookmark />}
-        </span>
+                <span
+                  className="bookmark"
+                  onClick={() => toggleSave(s.id)}
+                >
+                  {savedIds.includes(s.id)
+                    ? <FaBookmark color="#f5b301" />
+                    : <FaRegBookmark />}
+                </span>
 
-        <span className="tag">{s.category}</span>
-        <h4>{s.title}</h4>
-        <p className="amount">₹{s.amount}</p>
-        <p className="deadline">Deadline: {s.deadline}</p>
+                <span className="tag">{s.category}</span>
+                <h4>{s.title}</h4>
+                <p className="amount">₹{s.amount}</p>
+                <p className="deadline">Deadline: {s.deadline}</p>
 
-        <button onClick={() => navigate(`/scholarship/${s.id}`)}>
-          View Details
-        </button>
+                <button onClick={() => navigate(`/scholarship/${s.id}`)}>
+                  View Details
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
       </div>
-    ))}
-  </div>
-)}
-
-
-      </div>
-
-      
     </>
   );
 }

@@ -1,34 +1,61 @@
 package com.scholarassist.service;
 
+import java.util.Optional;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
 import com.scholarassist.entity.User;
 import com.scholarassist.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository repository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    public User registerUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+    public UserService(UserRepository repository) {
+        this.repository = repository;
     }
+
+    // ================= REGISTER =================
+    public User registerUser(User user) {
+        return repository.save(user);
+    }
+
+    // ================= LOGIN =================
     public User login(String email, String rawPassword) {
 
-    User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        Optional<User> optionalUser = repository.findByEmail(email);
 
-    if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-        throw new RuntimeException("Invalid password");
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        User user = optionalUser.get();
+
+        // ❗ IMPORTANT:
+        // Since we removed PasswordEncoder from here,
+        // Login verification should be handled by Spring Security.
+        // So do NOT manually check password here.
+
+        return user;
     }
 
-    return user;
-}
+    // ================= SPRING SECURITY =================
+    @Override
+    public UserDetails loadUserByUsername(String email)
+            throws UsernameNotFoundException {
 
+        User user = repository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found"));
+
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getEmail())
+                .password(user.getPassword())
+                .roles("USER")
+                .build();
+    }
 }

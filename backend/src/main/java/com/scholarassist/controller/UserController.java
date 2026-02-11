@@ -1,12 +1,8 @@
 package com.scholarassist.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import com.scholarassist.dto.LoginRequest;
 import com.scholarassist.dto.UserResponse;
@@ -18,32 +14,38 @@ import com.scholarassist.service.UserService;
 @CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
-   @PostMapping("/register")
-public ResponseEntity<?> register(@RequestBody User user) {
+    public UserController(UserService userService,
+                          PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    System.out.println("REGISTER API HIT");  // 👈 ADD THIS
+    // ================= REGISTER =================
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody User user) {
 
-    User saved = userService.registerUser(user);
-    return ResponseEntity.ok(saved);
-}
+        // Encrypt password before saving
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        User saved = userService.registerUser(user);
 
+        return ResponseEntity.ok(saved);
+    }
 
-
+    // ================= LOGIN =================
     @PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
 
-    User user = userService.login(req.getEmail(), req.getPassword());
+        User user = userService.login(req.getEmail(), req.getPassword());
 
-    UserResponse res = new UserResponse();
-    res.setId(user.getId());
-    res.setName(user.getName());
-    res.setEmail(user.getEmail());
+        UserResponse res = new UserResponse();
+        res.setId(user.getId());
+        res.setName(user.getName());
+        res.setEmail(user.getEmail());
 
-    return ResponseEntity.ok(res);
-}
-
+        return ResponseEntity.ok(res);
+    }
 }
