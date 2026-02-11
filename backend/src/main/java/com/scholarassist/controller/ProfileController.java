@@ -1,6 +1,7 @@
 package com.scholarassist.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,15 +21,21 @@ public class ProfileController {
     @Autowired
     private ProfileService profileService;
 
-    // ✅ GET PROFILE BY USER ID
-    @GetMapping("/{userId}")
-    public Profile getProfile(@PathVariable Long userId) {
-        return profileService.getByUserId(userId);
-    }
-
-    // ✅ SAVE / UPDATE PROFILE
     @PostMapping
     public Profile saveProfile(@RequestBody Profile profile) {
-        return profileService.saveOrUpdate(profile);
+        return profileService.saveProfile(profile);
     }
+
+ @GetMapping("/{userId}")
+public ResponseEntity<?> getProfile(@PathVariable Long userId) {
+
+    Profile profile = profileService.getProfileByUserId(userId);
+
+    if (profile == null) {
+        return ResponseEntity.ok().body(null);
+    }
+
+    return ResponseEntity.ok(profile);
+}
+
 }

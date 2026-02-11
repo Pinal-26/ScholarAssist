@@ -3,30 +3,155 @@ import "../styles/dashboard.css";
 import { useEffect, useState } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 
-
 export default function Dashboard() {
   const navigate = useNavigate();
-
-  // ================= USER =================
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // ================= PROFILE =================
   const [profile, setProfile] = useState(null);
+  const [profileCompletion, setProfileCompletion] = useState(0);
+  const [missingEligibilityFields, setMissingEligibilityFields] = useState([]);
   const [scholarships, setScholarships] = useState([]);
+  const [eligibleScholarships, setEligibleScholarships] = useState([]);
+  const [savedIds, setSavedIds] = useState(
+    JSON.parse(localStorage.getItem("savedScholarships")) || []
+  );
 
-  useEffect(() => {
-  fetch("http://localhost:8080/api/scholarships")
-    .then(res => res.json())
-    .then(data => setScholarships(data))
-    .catch(err => console.error(err));
+  const fieldLabels = {
+    parentIncome: "Parent Income",
+    caste: "Caste",
+    locality: "Locality",
+    graduationYear: "Graduation Year",
+    course: "Course",
+    city: "City"
+  };
+ // ================= PROFILE COMPLETION =================
+  const calculateProfileCompletion = (data) => {
+    if (!data) return;
+
+    const profileFields = [
+      data.firstName,
+      data.lastName,
+      data.phone,
+      data.street,
+      data.city,
+      data.state,
+      data.pincode,
+      data.institution,
+      data.course,
+      data.graduationYear,
+      data.parentIncome,
+      data.caste,
+      data.locality
+    ];
+
+    const filled = profileFields.filter(
+      v => v !== null && v !== undefined && v.toString().trim() !== ""
+    ).length;
+
+    setProfileCompletion(
+      Math.round((filled / profileFields.length) * 100)
+    );
+  };
+
+  // ================= CHECK ELIGIBILITY =================
+  const checkEligibilityFields = (data) => {
+    if (!data) return;
+
+    const eligibilityRequired = {
+      parentIncome: data.parentIncome,
+      caste: data.caste,
+      locality: data.locality,
+      graduationYear: data.graduationYear,
+      course: data.course,
+      city: data.city
+    };
+
+    const missing = [];
+
+    Object.entries(eligibilityRequired).forEach(([key, value]) => {
+      if (
+        value === null ||
+        value === undefined ||
+        value.toString().trim() === ""
+      ) {
+        missing.push(key);
+      }
+    });
+
+    setMissingEligibilityFields(missing);
+  };
+
+  // ================= SAFE FETCH FUNCTION =================
+  const safeFetchJSON = async (url) => {
+    try {
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        console.log("Request failed:", res.status);
+        return null;
+      }
+
+      const text = await res.text();
+      if (!text) return null;
+
+      return JSON.parse(text);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      return null;
+    }
+  };
+
+  // ================= FETCH SCHOLARSHIPS =================
+  // ================= LOAD ALL SCHOLARSHIPS (DB + SCRAPER) =================
+useEffect(() => {
+
+  const loadAll = async () => {
+
+    const dbRes = await fetch("http://localhost:8080/api/scholarships");
+    const dbData = dbRes.ok ? await dbRes.json() : [];
+
+    const scrapeRes = await fetch("http://localhost:8080/api/scrape");
+    const scrapedData = scrapeRes.ok ? await scrapeRes.json() : [];
+
+    const combined = [
+      ...(dbData || []),
+      ...(scrapedData || [])
+    ];
+
+    setScholarships(combined);
+  };
+
+  loadAll();
+
 }, []);
 
+  // ================= FETCH PROFILE =================
+  useEffect(() => {
+    if (!user) return;
 
-  // ================= SAVED SCHOLARSHIPS =================
-  const [savedIds, setSavedIds] = useState(() => {
-    return JSON.parse(localStorage.getItem("savedScholarships")) || [];
-  });
+    safeFetchJSON(`http://localhost:8080/api/profile/${user.id}`)
+      .then(data => {
+        if (!data) return;
 
+        setProfile(data);
+        calculateProfileCompletion(data);
+        checkEligibilityFields(data);
+      });
+  }, [user]);
+
+  // ================= FETCH ELIGIBLE =================
+  useEffect(() => {
+    if (!user) return;
+
+    safeFetchJSON(
+      `http://localhost:8080/api/scholarships/eligible/${user.id}`
+    ).then(data => {
+      if (data) setEligibleScholarships(data);
+    });
+  }, [user]);
+
+ 
+  // ================= SAVE / UNSAVE =================
   const toggleSave = (id) => {
     let updated;
 
@@ -40,61 +165,8 @@ export default function Dashboard() {
     localStorage.setItem("savedScholarships", JSON.stringify(updated));
   };
 
-  // ================= PROFILE FETCH =================
-  useEffect(() => {
-    if (!user) return;
-
-    fetch(`http://localhost:8080/api/profile/${user.id}`)
-      .then(res => res.json())
-      .then(data => setProfile(data))
-      .catch(err => console.error("Profile fetch error:", err));
-  }, [user]);
-
-  // ===== PROFILE COMPLETION LOGIC =====
-  let profileCompletion = 0;
-
-  if (profile) {
-    const requiredFields = [
-      profile.firstName,
-      profile.lastName,
-      profile.phone,
-      profile.street,
-      profile.city,
-      profile.state,
-      profile.pincode,
-      profile.institution,
-      profile.course,
-      profile.graduationYear,
-      profile.parentIncome,
-      profile.caste,
-      profile.locality
-    ];
-
-    const filled = requiredFields.filter(
-      v => v !== null && v !== ""
-    ).length;
-
-    profileCompletion = Math.round(
-      (filled / requiredFields.length) * 100
-    );
-  }
-
-  // ================= ELIGIBLE SCHOLARSHIPS =================
-  const [eligibleScholarships, setEligibleScholarships] = useState([]);
-
-useEffect(() => {
-  if (!user) return;
-
-  fetch(`http://localhost:8080/api/scholarships/eligible/${user.id}`)
-    .then(res => res.json())
-    .then(data => setEligibleScholarships(data))
-    .catch(err => console.error(err));
-}, [user]);
-
-
   return (
     <>
-      {/* ================= DASHBOARD NAVBAR ================= */}
       <nav className="dash-navbar">
         <div className="dash-logo">
           🎓 <span>ScholarAssist</span>
@@ -108,16 +180,13 @@ useEffect(() => {
         </div>
       </nav>
 
-      {/* ================= DASHBOARD CONTENT ================= */}
       <div className="dashboard-container">
 
-        {/* ================= HEADER ================= */}
         <div className="dashboard-header">
           <h1>Welcome back, {user ? user.name : "User"}!</h1>
           <p>Discover scholarships tailored to your profile</p>
         </div>
 
-        {/* ================= STATS ================= */}
         <div className="stats-grid">
           <div className="stat-card">
             <p>Available</p>
@@ -138,7 +207,7 @@ useEffect(() => {
             <p>Profile</p>
             <h3>{profileCompletion}%</h3>
 
-            {profileCompletion < 100 && (
+            {(profileCompletion < 100 || missingEligibilityFields.length > 0) && (
               <button
                 className="complete-profile-btn"
                 onClick={() => navigate("/profile")}
@@ -149,12 +218,23 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* ================= ELIGIBLE SCHOLARSHIPS ================= */}
         <h3 className="section-title">Eligible Scholarships</h3>
 
-        {eligibleScholarships.length === 0 ? (
-          <p style={{ color: "#777", marginBottom: "30px" }}>
-            Complete your profile and click <b>Save Changes</b> to see eligible scholarships.
+        {missingEligibilityFields.length > 0 ? (
+          <div className="profile-warning">
+            <p>⚠ Please complete these fields to check eligibility:</p>
+            <ul>
+              {missingEligibilityFields.map((field, index) => (
+                <li key={index}>{fieldLabels[field]}</li>
+              ))}
+            </ul>
+            <button onClick={() => navigate("/profile")}>
+              Go to Profile
+            </button>
+          </div>
+        ) : eligibleScholarships.length === 0 ? (
+          <p style={{ color: "#777" }}>
+            No eligible scholarships found.
           </p>
         ) : (
           <div className="scholarship-grid">
@@ -173,43 +253,50 @@ useEffect(() => {
                 <h4>{s.title}</h4>
                 <p className="amount">₹{s.amount}</p>
                 <p className="deadline">Deadline: {s.deadline}</p>
-                <button onClick={() => navigate(`/scholarship/${s.id}`)}>
-  View Details
-</button>
 
+                <button onClick={() => navigate(`/scholarship/${s.id}`)}>
+                  View Details
+                </button>
               </div>
             ))}
           </div>
         )}
 
-        {/* ================= TOTAL AVAILABLE SCHOLARSHIPS ================= */}
-        <h3 className="section-title">Total Available Scholarships</h3>
+        <h3 className="section-title">All Scholarships</h3>
 
-        <div className="scholarship-grid">
-          {scholarships.map(s => (
-            <div key={s.id} className="scholarship-card">
-              <span
-                className="bookmark"
-                onClick={() => toggleSave(s.id)}
-              >
-                {savedIds.includes(s.id)
-                  ? <FaBookmark color="#f5b301" />
-                  : <FaRegBookmark />}
-              </span>
+{scholarships.length === 0 ? (
+  <p style={{ color: "#777" }}>No scholarships found.</p>
+) : (
+  <div className="scholarship-grid">
+    {scholarships.map(s => (
+      <div key={s.id} className="scholarship-card">
 
-              <span className="tag">{s.category}</span>
-              <h4>{s.title}</h4>
-              <p className="amount">₹{s.amount}</p>
-              <p className="deadline">Deadline: {s.deadline}</p>
-              <button onClick={() => navigate(`/scholarship/${s.id}`)}>
-  View Details
-</button>
+        <span
+          className="bookmark"
+          onClick={() => toggleSave(s.id)}
+        >
+          {savedIds.includes(s.id)
+            ? <FaBookmark color="#f5b301" />
+            : <FaRegBookmark />}
+        </span>
 
-            </div>
-          ))}
-        </div>
+        <span className="tag">{s.category}</span>
+        <h4>{s.title}</h4>
+        <p className="amount">₹{s.amount}</p>
+        <p className="deadline">Deadline: {s.deadline}</p>
+
+        <button onClick={() => navigate(`/scholarship/${s.id}`)}>
+          View Details
+        </button>
+      </div>
+    ))}
+  </div>
+)}
+
 
       </div>
+
+      
     </>
   );
 }

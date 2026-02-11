@@ -91,21 +91,15 @@ export default function Profile() {
       })
     });
 
-    if (res.ok) {
-    // ✅ mark profile saved
-    localStorage.setItem("profileSaved", "true");
+   if (res.ok) {
+  alert("Profile saved successfully");
+  navigate("/dashboard");
+} else {
+  const text = await res.text();
+  console.log("Backend error:", text);
+  alert("Save failed");
+}
 
-    // ✅ add eligible scholarships (temporary logic)
-    localStorage.setItem("profileSaved", "true");
-
-
-    alert("Profile saved successfully");
-
-    // ✅ REDIRECT TO DASHBOARD
-    navigate("/dashboard");
-  } else {
-    alert("Save failed");
-  }
   };
 
   return (
