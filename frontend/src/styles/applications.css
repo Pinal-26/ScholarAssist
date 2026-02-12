@@ -1,58 +1,232 @@
-/* Applications Page */
+/* Applications Page - ScholarAssist Theme */
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.applications-page {
+  background: white;
+  min-height: 100vh;
+}
+
+/* ========== SIMPLE NAVBAR ========== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: white;
+  border-bottom: 1px solid #eaeef2;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1e24;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.nav-center {
+  display: flex;
+  gap: 2rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-item {
+  padding: 0.5rem 0;
+  cursor: pointer;
+  color: #5f6b7a;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-item:hover {
+  color: #1a1e24;
+}
+
+.nav-item.active {
+  color: #1a1e24;
+  border-bottom-color: #4f46e5;
+}
+
+/* ========== APPLICATIONS CONTAINER ========== */
 .applications-container {
-  padding: 40px;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .applications-title {
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 600;
-  margin-bottom: 25px;
+  margin-bottom: 1.5rem;
+  color: #1a1e24;
+  position: relative;
+  padding-bottom: 0.75rem;
 }
 
+.applications-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+/* ========== TABLE STYLES ========== */
 .applications-table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eaeef2;
 }
 
 .applications-table thead {
-  background-color: #4f46e5;
-  color: white;
-}
-
-.applications-table th,
-.applications-table td {
-  padding: 15px;
-  text-align: center;
+  background: #f8fafc;
+  border-bottom: 1px solid #eaeef2;
 }
 
 .applications-table th {
-  font-weight: 500;
-  font-size: 14px;
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #5f6b7a;
 }
 
-.applications-table tbody tr {
-  border-bottom: 1px solid #eee;
+.applications-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #eaeef2;
+  color: #1a1e24;
+  font-size: 0.95rem;
+}
+
+.applications-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .applications-table tbody tr:hover {
-  background-color: #f9f9ff;
+  background: #f8fafc;
 }
 
+/* ========== STATUS BADGES ========== */
+.status-badge {
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+  text-align: center;
+  min-width: 100px;
+}
+
+.status-applied {
+  background: #e6f7e6;
+  color: #0b6e4f;
+}
+
+.status-under-review {
+  background: #fff4e5;
+  color: #b45f06;
+}
+
+.status-approved {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+.status-rejected {
+  background: #fee9e7;
+  color: #b3261e;
+}
+
+/* ========== STATUS SELECT DROPDOWN ========== */
 .status-select {
-  padding: 6px 10px;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #e0e0e0;
+  background: white;
   cursor: pointer;
+  font-size: 0.85rem;
+  color: #1a1e24;
+  transition: all 0.2s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%235f6b7a'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.25rem center;
+  background-size: 1.5rem;
+  appearance: none;
 }
 
+.status-select:hover {
+  border-color: #4f46e5;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* ========== NO APPLICATIONS MESSAGE ========== */
 .no-applications {
-  margin-top: 20px;
-  font-size: 16px;
-  color: #777;
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #eaeef2;
+  color: #5f6b7a;
+  font-size: 1.1rem;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .nav-center {
+    position: static;
+    transform: none;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .applications-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .applications-container {
+    padding: 1rem;
+  }
 }

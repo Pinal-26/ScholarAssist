@@ -1,11 +1,66 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import "../styles/home.css";
+
 export default function Home() {
   const navigate = useNavigate();
+
   const [active, setActive] = useState("home");
+
+  // 🌙 Dark Mode state
+  const [darkMode, setDarkMode] = useState(false);
+
   const scrollTo = (id) => {
+    setActive(id);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
+
+  // Load theme from localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+      setDarkMode(true);
+      document.body.classList.add("dark");
+    } else {
+      setDarkMode(false);
+      document.body.classList.remove("dark");
+    }
+  }, []);
+
+  // Toggle theme
+  const toggleTheme = () => {
+    if (darkMode) {
+      setDarkMode(false);
+      document.body.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    } else {
+      setDarkMode(true);
+      document.body.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    }
+  };
+
+  // Active section highlight
+  useEffect(() => {
+    const sections = ["home", "why", "features", "trusted", "footer-bottom"];
+
+    const handleScroll = () => {
+      for (let sec of sections) {
+        const el = document.getElementById(sec);
+        if (!el) continue;
+
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= 140 && rect.bottom >= 140) {
+          setActive(sec);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
@@ -15,7 +70,7 @@ export default function Home() {
           🎓 <span>ScholarAssist</span>
         </div>
 
-          <div>
+        <div className="nav-links">
           <button
             className={`nav-btn ${active === "home" ? "active" : ""}`}
             onClick={() => scrollTo("home")}
@@ -45,7 +100,7 @@ export default function Home() {
           </button>
 
           <button
-            className={`nav-btn ${active === "contact" ? "active" : ""}`}
+            className={`nav-btn ${active === "footer-bottom" ? "active" : ""}`}
             onClick={() => scrollTo("footer-bottom")}
           >
             Contact
@@ -58,36 +113,78 @@ export default function Home() {
           <button className="primary-btn" onClick={() => navigate("/register")}>
             Get Started
           </button>
+
+          {/* 🌙 THEME TOGGLE */}
+          <button className="theme-btn" onClick={toggleTheme}>
+            {darkMode ? "☀️" : "🌙"}
+          </button>
         </div>
       </nav>
 
       {/* ================= HERO ================= */}
       <section id="home" className="hero">
-        <h1>Get started in minutes</h1>
-        <p>Three simple steps to unlock your scholarship opportunities</p>
+        <div className="hero-content">
+          <div className="badge">✨ AI Powered Scholarship Platform</div>
 
-        <div className="steps">
-          <div className="step">
-            <span>1</span>
-            <h3>Create Your Profile</h3>
-            <p>Share your academic background and interests.</p>
+          <h1>
+            Find Scholarships <span>Smarter</span> & Apply Faster 🚀
+          </h1>
+
+          <p>
+            ScholarAssist helps you discover the best scholarships, track your
+            applications, and never miss deadlines — all in one place.
+          </p>
+
+          <div className="hero-buttons">
+            <button
+              className="primary-btn big"
+              onClick={() => navigate("/register")}
+            >
+              Get Started Free
+            </button>
+
+            <button className="secondary-btn" onClick={() => scrollTo("why")}>
+              Learn More ↓
+            </button>
           </div>
 
-          <div className="step">
-            <span>2</span>
-            <h3>Discover Matches</h3>
-            <p>Get personalized scholarship recommendations.</p>
+          <div className="hero-stats">
+            <div className="hero-stat">
+              <h3>50K+</h3>
+              <p>Students Helped</p>
+            </div>
+
+            <div className="hero-stat">
+              <h3>2K+</h3>
+              <p>Scholarships</p>
+            </div>
+
+            <div className="hero-stat">
+              <h3>95%</h3>
+              <p>Success Rate</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="hero-cards">
+          <div className="floating-card">
+            <h3>📌 Personalized Matches</h3>
+            <p>Scholarships based on your profile.</p>
           </div>
 
-          <div className="step">
-            <span>3</span>
-            <h3>Apply & Track</h3>
-            <p>Apply easily and track your progress.</p>
+          <div className="floating-card">
+            <h3>⏰ Deadline Alerts</h3>
+            <p>Never miss an important date.</p>
+          </div>
+
+          <div className="floating-card">
+            <h3>📄 Document Ready</h3>
+            <p>Manage all documents in one dashboard.</p>
           </div>
         </div>
       </section>
 
-      {/* ================= WHY CHOOSE ================= */}
+      {/* ================= WHY ================= */}
       <section className="why" id="why">
         <h2>
           Why choose <span>ScholarAssist</span>?
@@ -100,31 +197,24 @@ export default function Home() {
           <div className="why-card">
             <div className="why-icon gradient-blue">🚀</div>
             <h3>Smart Matching</h3>
-            <p>
-              AI-powered scholarship recommendations tailored to your academic
-              profile.
-            </p>
+            <p>AI-powered recommendations tailored to your profile.</p>
           </div>
 
           <div className="why-card">
             <div className="why-icon gradient-purple">📄</div>
             <h3>Unified Dashboard</h3>
-            <p>
-              Track all applications, documents, and progress in one place.
-            </p>
+            <p>Track all applications, documents, and progress in one place.</p>
           </div>
 
           <div className="why-card">
             <div className="why-icon gradient-orange">🔔</div>
             <h3>Deadline Alerts</h3>
-            <p>
-              Never miss important dates with timely notifications and reminders.
-            </p>
+            <p>Never miss deadlines with timely notifications.</p>
           </div>
         </div>
       </section>
 
-      {/* ================= DIFFERENCE ================= */}
+      {/* ================= FEATURES ================= */}
       <section id="features" className="difference">
         <h2>What makes us different?</h2>
         <p className="diff-subtitle">
@@ -165,45 +255,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ================= STATS ================= */}
-      <section className="stats">
-        <div className="stat">
-          <h2>50K+</h2>
-          <p>Students Helped</p>
-        </div>
-
-        <div className="stat">
-          <h2>2K+</h2>
-          <p>Scholarships</p>
-        </div>
-
-        <div className="stat">
-          <h2>95%</h2>
-          <p>Success Rate</p>
-        </div>
-      </section>
-
-      {/* ================= CTA ================= */}
-            {/* ================= VISITOR COUNTER ================= */}
-      
-
       {/* ================= FOOTER ================= */}
-      <footer  className="footer-main">
+      <footer className="footer-main">
         <div className="footer-grid">
-          
-          {/* Address */}
           <div className="footer-col">
             <h3>Address</h3>
             <div className="footer-line"></div>
             <p>
-              ScholarAssist Foundation<br />
-              Department of Information Technology<br />
-              Faculty of Technology<br />
+              ScholarAssist Foundation <br />
+              Department of Information Technology <br />
+              Faculty of Technology <br />
               Nadiad, Gujarat – 387001, India
             </p>
           </div>
 
-          {/* General Query */}
           <div className="footer-col">
             <h3>For General Query</h3>
             <div className="footer-line"></div>
@@ -211,7 +276,6 @@ export default function Home() {
             <p>📞 +91 11 2345 6789</p>
           </div>
 
-          {/* Technical Query */}
           <div className="footer-col">
             <h3>For Technical Query</h3>
             <div className="footer-line"></div>
@@ -219,51 +283,48 @@ export default function Home() {
             <p>📞 +91 79 1234 5678</p>
           </div>
 
-          {/* Important Links */}
           <div className="footer-col">
             <h3>Important Links</h3>
-            {/* ===== Social Media Icons ===== */}
-<div className="social-icons">
-  <a
-    href="https://www.instagram.com/"
-    target="_blank"
-    rel="noreferrer"
-    aria-label="Instagram"
-  >
-    <i className="fab fa-instagram"></i>
-  </a>
+            <div className="footer-line"></div>
 
-  <a
-    href="https://twitter.com/"
-    target="_blank"
-    rel="noreferrer"
-    aria-label="Twitter"
-  >
-    <i className="fab fa-twitter"></i>
-  </a>
+            <div className="social-icons">
+              <a
+                href="https://www.instagram.com/"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Instagram"
+              >
+                <i className="fab fa-instagram"></i>
+              </a>
 
-  <a
-    href="https://www.linkedin.com/"
-    target="_blank"
-    rel="noreferrer"
-    aria-label="LinkedIn"
-  >
-    <i className="fab fa-linkedin-in"></i>
-  </a>
-</div>
+              <a
+                href="https://twitter.com/"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Twitter"
+              >
+                <i className="fab fa-twitter"></i>
+              </a>
+
+              <a
+                href="https://www.linkedin.com/"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="LinkedIn"
+              >
+                <i className="fab fa-linkedin-in"></i>
+              </a>
+            </div>
           </div>
-
         </div>
       </footer>
 
-      {/* ================= COPYRIGHT ================= */}
       <div id="footer-bottom">
         <p>
           © 2025 Website Managed & Maintained by <b>ScholarAssist Team</b> |
           Building digital solutions for education access
         </p>
       </div>
-
     </>
   );
 }
