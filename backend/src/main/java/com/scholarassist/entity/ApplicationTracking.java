@@ -18,10 +18,6 @@ public class ApplicationTracking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
-
-    private Long scholarshipId;
-
     private LocalDate appliedDate;
 
     private String status; // APPLIED, UNDER_REVIEW, APPROVED, REJECTED
@@ -30,33 +26,73 @@ public class ApplicationTracking {
 
     private String notes;
 
+    // ✅ scholarship_id
     @ManyToOne
-    @JoinColumn(name = "scholarship_id")
+    @JoinColumn(name = "scholarship_id", nullable = false)
     private Scholarship scholarship;
 
+    // ✅ user_id
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Getters & Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // ================= GETTERS & SETTERS =================
 
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public Long getId() {
+        return id;
+    }
 
-    public Long getScholarshipId() { return scholarshipId; }
-    public void setScholarshipId(Long scholarshipId) { this.scholarshipId = scholarshipId; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public LocalDate getAppliedDate() { return appliedDate; }
-    public void setAppliedDate(LocalDate appliedDate) { this.appliedDate = appliedDate; }
+    public LocalDate getAppliedDate() {
+        return appliedDate;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public void setAppliedDate(LocalDate appliedDate) {
+        this.appliedDate = appliedDate;
+    }
 
-    public String getApplicationLink() { return applicationLink; }
-    public void setApplicationLink(String applicationLink) { this.applicationLink = applicationLink; }
+    public String getStatus() {
+        return status;
+    }
 
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getApplicationLink() {
+        return applicationLink;
+    }
+
+    public void setApplicationLink(String applicationLink) {
+        this.applicationLink = applicationLink;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public Scholarship getScholarship() {
+        return scholarship;
+    }
+
+    public void setScholarship(Scholarship scholarship) {
+        this.scholarship = scholarship;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+
 }

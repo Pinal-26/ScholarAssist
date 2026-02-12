@@ -11,7 +11,6 @@ import com.scholarassist.dto.ApplicationDetailsDTO;
 import com.scholarassist.entity.ApplicationTracking;
 import com.scholarassist.entity.Scholarship;
 import com.scholarassist.repository.ApplicationTrackingRepository;
-import com.scholarassist.repository.ScholarshipRepository;
 
 @Service
 public class ApplicationTrackingService {
@@ -19,25 +18,15 @@ public class ApplicationTrackingService {
     @Autowired
     private ApplicationTrackingRepository repository;
 
-    @Autowired
-    private ScholarshipRepository scholarshipRepository;
-
     // ================= APPLY SCHOLARSHIP =================
     public String applyScholarship(ApplicationTracking app) {
 
+        Long userId = app.getUser().getId();
+        Long scholarshipId = app.getScholarship().getId();
+
         // Prevent duplicate
-        if (repository.existsByUserIdAndScholarshipId(
-                app.getUserId(), app.getScholarshipId())) {
+        if (repository.existsByUserIdAndScholarshipId(userId, scholarshipId)) {
             return "You have already applied to this scholarship.";
-        }
-
-        // Validate scholarship exists
-        Scholarship scholarship =
-                scholarshipRepository.findById(app.getScholarshipId())
-                        .orElse(null);
-
-        if (scholarship == null) {
-            return "Scholarship not found.";
         }
 
         app.setAppliedDate(LocalDate.now());
@@ -58,24 +47,19 @@ public class ApplicationTrackingService {
 
         for (ApplicationTracking app : applications) {
 
-            Scholarship scholarship =
-                    scholarshipRepository.findById(
-                            app.getScholarshipId()).orElse(null);
+            Scholarship scholarship = app.getScholarship();
 
-            if (scholarship != null) {
+            ApplicationDetailsDTO dto =
+                    new ApplicationDetailsDTO(
+                            app.getId(),
+                            scholarship.getTitle(),
+                            scholarship.getAmount(),
+                            scholarship.getDeadline(),
+                            app.getAppliedDate(),
+                            app.getStatus()
+                    );
 
-                ApplicationDetailsDTO dto =
-                        new ApplicationDetailsDTO(
-                                app.getId(),
-                                scholarship.getTitle(),
-                                scholarship.getAmount(),
-                                scholarship.getDeadline(),
-                                app.getAppliedDate(),
-                                app.getStatus()
-                        );
-
-                result.add(dto);
-            }
+            result.add(dto);
         }
 
         return result;

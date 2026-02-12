@@ -43,11 +43,12 @@ export default function Dashboard() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          userId: user.id,
-          scholarshipId: scholarship.id,
-          applicationLink: scholarship.applyLink
-        })
+       body: JSON.stringify({
+  user: { id: user.id },
+  scholarship: { id: scholarship.id },
+  applicationLink: scholarship.applyLink
+})
+
       });
 
       const message = await response.text();

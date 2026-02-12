@@ -7,25 +7,19 @@ export default function Applications() {
   const [applications, setApplications] = useState([]);
 
   // ================= FETCH APPLICATIONS =================
-  useEffect(() => {
+ useEffect(() => {
 
-    if (!user || !user.id) {
-      console.log("User not found");
-      return;
-    }
+  if (!user || !user.id) return;
 
-    fetch(`http://localhost:8080/api/applications/user/${user.id}`)
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch applications");
-        return res.json();
-      })
-      .then(data => {
-        console.log("Applications data:", data);
-        setApplications(data || []);
-      })
-      .catch(err => console.error("Error:", err));
+  fetch(`http://localhost:8080/api/applications/user/${user.id}`)
+    .then(res => res.json())
+    .then(data => {
+      setApplications(data);
+    })
+    .catch(err => console.error(err));
 
-  }, [user]);
+}, []);  // ✅ EMPTY dependency array
+
 
   // ================= UPDATE STATUS =================
   const updateStatus = async (id, newStatus) => {
