@@ -1,0 +1,58 @@
+/* Applications Page */
+
+.applications-container {
+  padding: 40px;
+}
+
+.applications-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+.applications-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.applications-table thead {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.applications-table th,
+.applications-table td {
+  padding: 15px;
+  text-align: center;
+}
+
+.applications-table th {
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.applications-table tbody tr {
+  border-bottom: 1px solid #eee;
+}
+
+.applications-table tbody tr:hover {
+  background-color: #f9f9ff;
+}
+
+.status-select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.no-applications {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #777;
+}

@@ -23,13 +23,16 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> {})
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/**").permitAll()
-                .requestMatchers("/api/profile/**").permitAll()
-                .requestMatchers("/api/scholarships/**").permitAll()
-                .requestMatchers("/api/scrape/**").permitAll()
-                .anyRequest().authenticated()
-            )
+           .authorizeHttpRequests(auth -> auth
+    .requestMatchers(
+        "/api/users/**",
+        "/api/scholarships/**",
+        "/api/profile/**",
+        "/api/applications/**"   // ✅ ADD THIS
+    ).permitAll()
+    .anyRequest().authenticated()
+)
+
             .formLogin(form -> form.disable())
             .httpBasic();   // enable DB authentication
 

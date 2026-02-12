@@ -6,9 +6,10 @@ import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 export default function Dashboard() {
 
   const navigate = useNavigate();
-const [user] = useState(() =>
-  JSON.parse(localStorage.getItem("user"))
-);
+
+  const [user] = useState(() =>
+    JSON.parse(localStorage.getItem("user"))
+  );
 
   const [profile, setProfile] = useState(null);
   const [profileCompletion, setProfileCompletion] = useState(0);
@@ -26,6 +27,38 @@ const [user] = useState(() =>
     graduationYear: "Graduation Year",
     course: "Course",
     city: "City"
+  };
+
+  // ================= APPLY SCHOLARSHIP =================
+  const applyScholarship = async (scholarship) => {
+
+    if (!user) {
+      alert("Please login first.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/api/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          scholarshipId: scholarship.id,
+          applicationLink: scholarship.applyLink
+        })
+      });
+
+      const message = await response.text();
+      alert(message);
+
+      window.open(scholarship.applyLink, "_blank");
+
+    } catch (error) {
+      console.error("Apply error:", error);
+      alert("Failed to apply.");
+    }
   };
 
   // ================= PROFILE COMPLETION =================
@@ -73,11 +106,7 @@ const [user] = useState(() =>
     const missing = [];
 
     Object.entries(eligibilityRequired).forEach(([key, value]) => {
-      if (
-        value === null ||
-        value === undefined ||
-        value.toString().trim() === ""
-      ) {
+      if (!value || value.toString().trim() === "") {
         missing.push(key);
       }
     });
@@ -87,56 +116,34 @@ const [user] = useState(() =>
 
   // ================= SAFE FETCH =================
   const safeFetchJSON = useCallback(async (url) => {
-  try {
-    const res = await fetch(url);
-
-    if (!res.ok) return null;
-
-    const text = await res.text();
-    if (!text) return null;
-
-    return JSON.parse(text);
-  } catch (err) {
-    console.error("Fetch error:", err);
-    return null;
-  }
-}, []);
-
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const text = await res.text();
+      if (!text) return null;
+      return JSON.parse(text);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      return null;
+    }
+  }, []);
 
   // ================= LOAD ALL SCHOLARSHIPS =================
-// ================= LOAD ALL SCHOLARSHIPS =================
-useEffect(() => {
+  useEffect(() => {
+    const loadScholarships = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/scholarships");
+        if (!response.ok) throw new Error("Failed to fetch scholarships");
+        const data = await response.json();
+        setScholarships(data || []);
+      } catch (error) {
+        console.error("Error loading scholarships:", error);
+        setScholarships([]);
+      }
+    };
 
-  const loadAll = async () => {
-    try {
-
-      const dbRes = await fetch("http://localhost:8080/api/scholarships");
-      const dbData = dbRes.ok ? await dbRes.json() : [];
-
-      const scrapeRes = await fetch("http://localhost:8080/api/scrape");
-      const scrapedData = scrapeRes.ok ? await scrapeRes.json() : [];
-
-      const combined = [
-        ...(dbData || []),
-        ...(scrapedData || []).map((item, index) => ({
-          ...item,
-          id: item.id ? `scraped-${item.id}` : `scraped-${index}`
-        }))
-      ];
-
-      setScholarships(combined);
-
-    } catch (error) {
-      console.error("Error loading scholarships:", error);
-      setScholarships([]);
-    }
-  };
-
-  loadAll();
-
-}, []);
-
-
+    loadScholarships();
+  }, []);
 
   // ================= FETCH PROFILE =================
   useEffect(() => {
@@ -145,7 +152,6 @@ useEffect(() => {
     safeFetchJSON(`http://localhost:8080/api/profile/${user.id}`)
       .then(data => {
         if (!data) return;
-
         setProfile(data);
         calculateProfileCompletion(data);
         checkEligibilityFields(data);
@@ -166,20 +172,14 @@ useEffect(() => {
   // ================= SAVE / UNSAVE =================
   const toggleSave = (id) => {
     let updated;
-
     if (savedIds.includes(id)) {
       updated = savedIds.filter(sid => sid !== id);
     } else {
       updated = [...savedIds, id];
     }
-
     setSavedIds(updated);
     localStorage.setItem("savedScholarships", JSON.stringify(updated));
   };
-console.log("Profile:", profile);
-console.log("Scholarships:", scholarships);
-console.log("Eligible:", eligibleScholarships);
-console.log("Missing Fields:", missingEligibilityFields);
 
   return (
     <>
@@ -234,8 +234,6 @@ console.log("Missing Fields:", missingEligibilityFields);
           </div>
         </div>
 
-        {/* ================= ELIGIBLE ================= */}
-
         <h3 className="section-title">Eligible Scholarships</h3>
 
         {missingEligibilityFields.length > 0 ? (
@@ -263,7 +261,6 @@ console.log("Missing Fields:", missingEligibilityFields);
                 key={s.id ? `eligible-${s.id}` : `eligible-${index}`}
                 className="scholarship-card"
               >
-
                 <span
                   className="bookmark"
                   onClick={() => toggleSave(s.id)}
@@ -278,15 +275,22 @@ console.log("Missing Fields:", missingEligibilityFields);
                 <p className="amount">₹{s.amount}</p>
                 <p className="deadline">Deadline: {s.deadline}</p>
 
-                <button onClick={() => navigate(`/scholarship/${s.id}`)}>
-                  View Details
-                </button>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button onClick={() => navigate(`/scholarship/${s.id}`)}>
+                    View Details
+                  </button>
+                  <button
+                    style={{ backgroundColor: "#28a745", color: "white" }}
+                    onClick={() => applyScholarship(s)}
+                  >
+                    Apply
+                  </button>
+                </div>
+
               </div>
             ))}
           </div>
         )}
-
-        {/* ================= ALL ================= */}
 
         <h3 className="section-title">All Scholarships</h3>
 
@@ -299,7 +303,6 @@ console.log("Missing Fields:", missingEligibilityFields);
                 key={s.id ? `all-${s.id}` : `all-${index}`}
                 className="scholarship-card"
               >
-
                 <span
                   className="bookmark"
                   onClick={() => toggleSave(s.id)}
@@ -314,9 +317,18 @@ console.log("Missing Fields:", missingEligibilityFields);
                 <p className="amount">₹{s.amount}</p>
                 <p className="deadline">Deadline: {s.deadline}</p>
 
-                <button onClick={() => navigate(`/scholarship/${s.id}`)}>
-                  View Details
-                </button>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button onClick={() => navigate(`/scholarship/${s.id}`)}>
+                    View Details
+                  </button>
+                  <button
+                    style={{ backgroundColor: "#28a745", color: "white" }}
+                    onClick={() => applyScholarship(s)}
+                  >
+                    Apply
+                  </button>
+                </div>
+
               </div>
             ))}
           </div>
