@@ -115,25 +115,37 @@ export default function AdminDashboard() {
         {/* LEFT COLUMN */}
         <div className="dashboard-column">
 
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h4>Admin Controls</h4>
-              <span className="status-badge active">
-                Active
-              </span>
-            </div>
+         <div className="dashboard-card">
+  <div className="card-header">
+    <h4>Admin Controls</h4>
+    <span className="status-badge active">
+      Active
+    </span>
+  </div>
 
-            <p className="card-description">
-              Manage scholarships, users and applications manually.
-            </p>
+  <p className="card-description">
+    Manage scholarships, users and applications manually.
+  </p>
 
-            <button
-              className="btn-primary"
-              onClick={() => navigate("/admin/add-scholarship")}
-            >
-              ➕ Add Scholarship
-            </button>
-          </div>
+  {/* Add Scholarship */}
+  <button
+    className="btn-primary"
+    onClick={() => navigate("/admin/scholarships")}
+  >
+    ➕ Manage Scholarships
+  </button>
+
+  {/* View Students */}
+  <button
+    className="btn-primary"
+    style={{ marginTop: "10px" }}
+    onClick={() => navigate("/admin/students")}
+  >
+    👨‍🎓 View Students
+  </button>
+
+</div>
+
 
         </div>
 

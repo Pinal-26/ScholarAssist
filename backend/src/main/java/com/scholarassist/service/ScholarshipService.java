@@ -30,6 +30,9 @@ public class ScholarshipService {
     public Scholarship getScholarshipById(Long id) {
         return scholarshipRepo.findById(id).orElse(null);
     }
+public void deleteScholarship(Long id) {
+    scholarshipRepo.deleteById(id);
+}
 
     public Scholarship saveScholarship(Scholarship s) {
         return scholarshipRepo.save(s);

@@ -9,7 +9,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Saved from "./pages/Saved";
 import ScholarshipDetails from "./pages/ScholarshipDetails";
 import Applications from "./pages/Applications";
-
+import AdminScholarships from "./pages/AdminScholarships";
+import AdminStudents from "./pages/AdminStudents";
 export default function App() {
   return (
     <Routes>
@@ -21,6 +22,9 @@ export default function App() {
 <Route path="/admin/login" element={<AdminLogin />} />
 <Route path="/admindashboard" element={<AdminDashboard />} />
 <Route path="/saved" element={<Saved />} />
+<Route path="/admin/scholarships" element={<AdminScholarships />} />
+<Route path="/admin/students" element={<AdminStudents />} />
+
 <Route
           path="/scholarship/:id"
           element={<ScholarshipDetails />}
