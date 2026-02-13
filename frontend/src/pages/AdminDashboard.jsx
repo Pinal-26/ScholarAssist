@@ -12,15 +12,14 @@ export default function AdminDashboard() {
   // ===============================
   // 🔐 ADMIN PROTECTION
   // ===============================
- useEffect(() => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  console.log("AdminDashboard user:", user);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    console.log("AdminDashboard user:", user);
 
-  if (!user || user.role?.toUpperCase() !== "ADMIN") {
-    navigate("/login");
-  }
-}, [navigate]);
-
+    if (!user || user.role?.toUpperCase() !== "ADMIN") {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   // ===============================
   // 📊 FETCH DASHBOARD STATS
@@ -46,7 +45,7 @@ export default function AdminDashboard() {
   }, []);
 
   if (loading) {
-    return <h2 style={{ textAlign: "center" }}>Loading Dashboard...</h2>;
+    return <h2 style={{ textAlign: "center", marginTop: "40px" }}>Loading Dashboard...</h2>;
   }
 
   return (
@@ -115,37 +114,32 @@ export default function AdminDashboard() {
         {/* LEFT COLUMN */}
         <div className="dashboard-column">
 
-         <div className="dashboard-card">
-  <div className="card-header">
-    <h4>Admin Controls</h4>
-    <span className="status-badge active">
-      Active
-    </span>
-  </div>
+          <div className="dashboard-card">
+            <div className="card-header">
+              <h4>Admin Controls</h4>
+              <span className="status-badge active">Active</span>
+            </div>
 
-  <p className="card-description">
-    Manage scholarships, users and applications manually.
-  </p>
+            <p className="card-description">
+              Manage scholarships, users and applications manually.
+            </p>
 
-  {/* Add Scholarship */}
-  <button
-    className="btn-primary"
-    onClick={() => navigate("/admin/scholarships")}
-  >
-    ➕ Manage Scholarships
-  </button>
+            <div className="btn-group">
+              <button
+                className="btn-primary"
+                onClick={() => navigate("/admin/scholarships")}
+              >
+                ➕ Manage Scholarships
+              </button>
 
-  {/* View Students */}
-  <button
-    className="btn-primary"
-    style={{ marginTop: "10px" }}
-    onClick={() => navigate("/admin/students")}
-  >
-    👨‍🎓 View Students
-  </button>
-
-</div>
-
+              <button
+                className="btn-primary secondary"
+                onClick={() => navigate("/admin/students")}
+              >
+                👨‍🎓 View Students
+              </button>
+            </div>
+          </div>
 
         </div>
 

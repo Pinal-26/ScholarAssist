@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "../styles/adminScholarships.css";
 
 export default function AdminScholarships() {
 
@@ -20,38 +21,40 @@ export default function AdminScholarships() {
   };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h2>Manage Scholarships</h2>
+    <div className="admin-scholarships-container">
 
-      {scholarships.map(s => (
-        <div key={s.id} style={{
-          border: "1px solid #ddd",
-          padding: "15px",
-          margin: "10px 0",
-          borderRadius: "8px"
-        }}>
-          <h3>{s.title}</h3>
-          <p>{s.description}</p>
-          <p>Amount: ₹{s.amount}</p>
-          <p>Category: {s.category}</p>
-          <p>Min GPA: {s.minGpa}</p>
-          <p>Max Income: {s.maxIncome}</p>
+      <div className="admin-scholarships-header">
+        <h2>Manage Scholarships</h2>
+        <p>View and manage all available scholarships</p>
+      </div>
 
-          <button
-            onClick={() => handleDelete(s.id)}
-            style={{
-              backgroundColor: "red",
-              color: "white",
-              padding: "8px 12px",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
-          >
-            Delete
-          </button>
-        </div>
-      ))}
+      <div className="scholarship-list">
+        {scholarships.map(s => (
+          <div key={s.id} className="scholarship-card">
+
+            <div className="card-top">
+              <h3>{s.title}</h3>
+              <span className="category-badge">{s.category}</span>
+            </div>
+
+            <p className="description">{s.description}</p>
+
+            <div className="details-grid">
+              <p><strong>Amount:</strong> ₹{s.amount}</p>
+              <p><strong>Min GPA:</strong> {s.minGpa}</p>
+              <p><strong>Max Income:</strong> {s.maxIncome}</p>
+            </div>
+
+            <button
+              onClick={() => handleDelete(s.id)}
+              className="delete-btn"
+            >
+              🗑 Delete
+            </button>
+
+          </div>
+        ))}
+      </div>
 
     </div>
   );
