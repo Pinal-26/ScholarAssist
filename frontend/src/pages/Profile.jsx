@@ -1,10 +1,11 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/profile.css";
-
+import Navbar from "./Navbar";
 
 export default function Profile() {
   const navigate = useNavigate();
+
   // ================= USER =================
   const user = JSON.parse(localStorage.getItem("user"));
   const [loaded, setLoaded] = useState(false);
@@ -32,38 +33,38 @@ export default function Profile() {
   const [locality, setLocality] = useState("");
 
   // ================= LOAD PROFILE =================
- useEffect(() => {
-  if (!user || loaded) return;
+  useEffect(() => {
+    if (!user || loaded) return;
 
-  fetch(`http://localhost:8080/api/profile/${user.id}`)
-    .then(res => res.json())
-    .then(data => {
-      if (!data) return;
+    fetch(`http://localhost:8080/api/profile/${user.id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data) return;
 
-      setFirstName(data.firstName || "");
-      setLastName(data.lastName || "");
-      setPhone(data.phone || "");
+        setFirstName(data.firstName || "");
+        setLastName(data.lastName || "");
+        setPhone(data.phone || "");
+        setEmail(data.email || "");
 
-      setStreet(data.street || "");
-      setCity(data.city || "");
-      setState(data.state || "");
-      setPincode(data.pincode || "");
+        setStreet(data.street || "");
+        setCity(data.city || "");
+        setState(data.state || "");
+        setPincode(data.pincode || "");
 
-      setInstitution(data.institution || "");
-      setCourse(data.course || "");
-      setGpa(data.gpa || "");
-      setGraduationYear(data.graduationYear || "");
+        setInstitution(data.institution || "");
+        setCourse(data.course || "");
+        setGpa(data.gpa || "");
+        setGraduationYear(data.graduationYear || "");
 
-      setTenthPercentage(data.tenthPercentage || "");
-      setTwelfthPercentage(data.twelfthPercentage || "");
-      setParentIncome(data.parentIncome || "");
-      setCaste(data.caste || "");
-      setLocality(data.locality || "");
+        setTenthPercentage(data.tenthPercentage || "");
+        setTwelfthPercentage(data.twelfthPercentage || "");
+        setParentIncome(data.parentIncome || "");
+        setCaste(data.caste || "");
+        setLocality(data.locality || "");
 
-      setLoaded(true); // ✅ IMPORTANT
-    });
-}, [user, loaded]);
-
+        setLoaded(true);
+      });
+  }, [user, loaded]);
 
   // ================= SAVE PROFILE =================
   const handleSave = async () => {
@@ -91,32 +92,20 @@ export default function Profile() {
       })
     });
 
-   if (res.ok) {
-  alert("Profile saved successfully");
-  navigate("/dashboard");
-} else {
-  const text = await res.text();
-  console.log("Backend error:", text);
-  alert("Save failed");
-}
-
+    if (res.ok) {
+      alert("Profile saved successfully");
+      navigate("/dashboard");
+    } else {
+      const text = await res.text();
+      console.log("Backend error:", text);
+      alert("Save failed");
+    }
   };
 
   return (
     <>
-      {/* ================= DASHBOARD NAVBAR ================= */}
-      <nav className="dash-navbar">
-        <div className="dash-logo">
-          🎓 <span>ScholarAssist</span>
-        </div>
-
-        <div className="dash-nav-links">
-          <NavLink to="/dashboard" className="dash-link">Dashboard</NavLink>
-          <NavLink to="/saved" className="dash-link">Saved</NavLink>
-          <NavLink to="/applications" className="dash-link">Applications</NavLink>
-          <NavLink to="/profile" className="dash-link">Profile</NavLink>
-        </div>
-      </nav>
+      {/* ================= NAVBAR ================= */}
+      <Navbar showSearch={false} />
 
       {/* ================= PROFILE PAGE ================= */}
       <div className="profile-container">

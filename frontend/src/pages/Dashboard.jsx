@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useEffect, useState, useCallback } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
-
+import Navbar from "./Navbar";
 export default function Dashboard() {
 
   const navigate = useNavigate();
@@ -209,7 +209,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <nav className="dash-navbar">
+      {/* <nav className="dash-navbar">
 
         <div className="dash-logo">
           🎓 <span>ScholarAssist</span>
@@ -234,7 +234,12 @@ export default function Dashboard() {
           <NavLink to="/profile" className="dash-link">Profile</NavLink>
         </div>
 
-      </nav>
+      </nav> */}
+
+<Navbar 
+  searchTerm={searchTerm} 
+  setSearchTerm={setSearchTerm} 
+/>
 
       <div className="dashboard-container">
 

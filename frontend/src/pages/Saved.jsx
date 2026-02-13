@@ -1,6 +1,7 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useEffect, useState } from "react";
+import Navbar from "./Navbar";
 
 export default function Saved() {
   const navigate = useNavigate();
@@ -38,18 +39,7 @@ export default function Saved() {
   return (
     <>
       {/* ================= NAVBAR ================= */}
-      <nav className="dash-navbar">
-        <div className="dash-logo">
-          🎓 <span>ScholarAssist</span>
-        </div>
-
-        <div className="dash-nav-links">
-          <NavLink to="/dashboard" className="dash-link">Dashboard</NavLink>
-          <NavLink to="/saved" className="dash-link">Saved</NavLink>
-          <NavLink to="/applications" className="dash-link">Applications</NavLink>
-          <NavLink to="/profile" className="dash-link">Profile</NavLink>
-        </div>
-      </nav>
+      <Navbar showSearch={false} />
 
       {/* ================= CONTENT ================= */}
       <div className="dashboard-container">
