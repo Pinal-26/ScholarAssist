@@ -2,7 +2,11 @@ package com.scholarassist.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.scholarassist.dto.LoginRequest;
 import com.scholarassist.dto.UserResponse;
@@ -24,16 +28,18 @@ public class UserController {
     }
 
     // ================= REGISTER =================
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+   @PostMapping("/register")
+public ResponseEntity<?> register(@RequestBody User user) {
 
-        // Encrypt password before saving
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        User saved = userService.registerUser(user);
+    user.setRole("USER");
 
-        return ResponseEntity.ok(saved);
-    }
+    User saved = userService.registerUser(user);
+
+    return ResponseEntity.ok(saved);
+}
+
 
     // ================= LOGIN =================
     @PostMapping("/login")
@@ -45,7 +51,7 @@ public class UserController {
         res.setId(user.getId());
         res.setName(user.getName());
         res.setEmail(user.getEmail());
-
+res.setRole(user.getRole());   
         return ResponseEntity.ok(res);
     }
 }

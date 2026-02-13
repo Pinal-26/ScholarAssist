@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "../styles/authSplit.css";
 import { useEffect } from "react";
+
 export default function Login() {
     const [formData, setFormData] = useState({
     email: "",
@@ -35,8 +36,14 @@ localStorage.removeItem("eligibleScholarships");
 localStorage.setItem("user", JSON.stringify(user));
 
 
-    alert("Login successful");
-    navigate("/dashboard");
+alert("Login successful");
+
+if (user.role === "ADMIN") {
+  navigate("/admindashboard");
+} else {
+  navigate("/dashboard");
+}
+
   } catch (err) {
     alert(err.message);
   }

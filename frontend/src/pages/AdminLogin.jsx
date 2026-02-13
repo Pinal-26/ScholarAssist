@@ -6,14 +6,22 @@ export default function AdminLogin() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // 👇 Store admin in localStorage
+    const adminUser = {
+      id: 1,
+      name: "Administrator",
+      role: "ADMIN"
+    };
+
+    localStorage.setItem("user", JSON.stringify(adminUser));
+
     navigate("/admindashboard");
   };
 
   return (
     <div className="auth-page">
       <div className="split-auth">
-
-        {/* LEFT */}
         <div className="auth-left">
           <div className="auth-left-inner">
 
@@ -43,7 +51,6 @@ export default function AdminLogin() {
           </div>
         </div>
 
-        {/* RIGHT */}
         <div className="auth-right">
           <h2>Admin Control Panel</h2>
 
@@ -64,7 +71,6 @@ export default function AdminLogin() {
           </div>
 
         </div>
-
       </div>
     </div>
   );

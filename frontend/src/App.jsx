@@ -18,7 +18,6 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/login" element={<Login />} />
 <Route path="/admin/login" element={<AdminLogin />} />
 <Route path="/admindashboard" element={<AdminDashboard />} />
 <Route path="/saved" element={<Saved />} />

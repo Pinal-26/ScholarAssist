@@ -26,7 +26,12 @@ public class User {
 
     private String password;
 
-    // getters & setters
+    // ✅ NEW FIELD
+    private String role;   // USER or ADMIN
+
+    // =====================
+    // GETTERS & SETTERS
+    // =====================
 
     public Long getId() {
         return id;
@@ -74,5 +79,14 @@ public class User {
     
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    // ✅ ROLE GETTER SETTER
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
