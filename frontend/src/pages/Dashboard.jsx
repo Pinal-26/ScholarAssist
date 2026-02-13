@@ -20,6 +20,9 @@ export default function Dashboard() {
     JSON.parse(localStorage.getItem("savedScholarships")) || []
   );
 
+  // ✅ SEARCH STATE
+  const [searchTerm, setSearchTerm] = useState("");
+
   const fieldLabels = {
     parentIncome: "Parent Income",
     caste: "Caste",
@@ -43,12 +46,11 @@ export default function Dashboard() {
         headers: {
           "Content-Type": "application/json"
         },
-       body: JSON.stringify({
-  user: { id: user.id },
-  scholarship: { id: scholarship.id },
-  applicationLink: scholarship.applyLink
-})
-
+        body: JSON.stringify({
+          user: { id: user.id },
+          scholarship: { id: scholarship.id },
+          applicationLink: scholarship.applyLink
+        })
       });
 
       const message = await response.text();
@@ -182,11 +184,47 @@ export default function Dashboard() {
     localStorage.setItem("savedScholarships", JSON.stringify(updated));
   };
 
+  // ================= FIRST LETTER SEARCH LOGIC =================
+
+  const matchesSearch = (text) => {
+    if (!searchTerm.trim()) return true;
+
+    const words = text.toLowerCase().split(" ");
+    const search = searchTerm.toLowerCase();
+
+    return words.some(word => word.startsWith(search));
+  };
+
+  const filteredEligible = eligibleScholarships.filter(
+    (s) =>
+      matchesSearch(s.title) ||
+      matchesSearch(s.category)
+  );
+
+  const filteredAll = scholarships.filter(
+    (s) =>
+      matchesSearch(s.title) ||
+      matchesSearch(s.category)
+  );
+
   return (
     <>
       <nav className="dash-navbar">
+
         <div className="dash-logo">
           🎓 <span>ScholarAssist</span>
+        </div>
+
+        <div style={{ flex: 1 }}></div>
+
+        <div className="navbar-search">
+          <input
+            type="text"
+            placeholder="Search scholarships..."
+            className="navbar-search-input"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
 
         <div className="dash-nav-links">
@@ -195,6 +233,7 @@ export default function Dashboard() {
           <NavLink to="/applications" className="dash-link">Applications</NavLink>
           <NavLink to="/profile" className="dash-link">Profile</NavLink>
         </div>
+
       </nav>
 
       <div className="dashboard-container">
@@ -237,27 +276,11 @@ export default function Dashboard() {
 
         <h3 className="section-title">Eligible Scholarships</h3>
 
-        {missingEligibilityFields.length > 0 ? (
-          <div className="profile-warning">
-            <p>⚠ Please complete these fields to check eligibility:</p>
-            <ul>
-              {missingEligibilityFields.map((field, index) => (
-                <li key={`missing-${index}`}>
-                  {fieldLabels[field]}
-                </li>
-              ))}
-            </ul>
-            <button onClick={() => navigate("/profile")}>
-              Go to Profile
-            </button>
-          </div>
-        ) : eligibleScholarships.length === 0 ? (
-          <p style={{ color: "#777" }}>
-            No eligible scholarships found.
-          </p>
+        {filteredEligible.length === 0 ? (
+          <p style={{ color: "#777" }}>No matching scholarships found.</p>
         ) : (
           <div className="scholarship-grid">
-            {eligibleScholarships.map((s, index) => (
+            {filteredEligible.map((s, index) => (
               <div
                 key={s.id ? `eligible-${s.id}` : `eligible-${index}`}
                 className="scholarship-card"
@@ -295,11 +318,11 @@ export default function Dashboard() {
 
         <h3 className="section-title">All Scholarships</h3>
 
-        {scholarships.length === 0 ? (
-          <p style={{ color: "#777" }}>No scholarships found.</p>
+        {filteredAll.length === 0 ? (
+          <p style={{ color: "#777" }}>No matching scholarships found.</p>
         ) : (
           <div className="scholarship-grid">
-            {scholarships.map((s, index) => (
+            {filteredAll.map((s, index) => (
               <div
                 key={s.id ? `all-${s.id}` : `all-${index}`}
                 className="scholarship-card"

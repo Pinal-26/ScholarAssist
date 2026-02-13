@@ -197,9 +197,12 @@ body.dark {
 }
 
 /* ================= DASHBOARD NAVBAR ================= */
+/* ================= DASHBOARD NAVBAR (FIXED ALIGNMENT) ================= */
+
+/* ================= DASHBOARD NAVBAR (PERFECT CENTER GRID) ================= */
+
 .dash-navbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 14px 40px;
   background: var(--card);
@@ -213,6 +216,15 @@ body.dark {
   z-index: 1000;
   animation: fadeReveal 0.8s ease;
 }
+
+
+.dash-nav-links {
+  display: flex;
+  gap: 10px;
+  margin-left: 20px;
+}
+
+
 
 body:not(.dark) .dash-navbar {
   background: rgba(235, 242, 247, 0.85);
@@ -268,10 +280,6 @@ body.dark .dash-logo span {
   text-shadow: 0 0 20px rgba(158, 255, 240, 0.7);
 }
 
-.dash-nav-links {
-  display: flex;
-  gap: 10px;
-}
 
 .dash-link {
   text-decoration: none;
@@ -390,6 +398,7 @@ body.dark .theme-toggle {
 }
 
 /* ================= HEADER ================= */
+/* ================= HEADER ================= */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -397,23 +406,27 @@ body.dark .theme-toggle {
   margin-bottom: 30px;
 }
 
+/* FIXED WELCOME TEXT VISIBILITY */
 .dashboard-header h2 {
   font-size: 48px;
   margin-bottom: 10px;
-  color: var(--text);
   font-weight: 950;
   letter-spacing: -1px;
+  color: var(--text);
 }
 
+/* Light Mode */
 body:not(.dark) .dashboard-header h2 {
   color: #1a2e3b;
 }
 
-body.dark .dashboard-header h2 {
+/* Dark Mode */
+body.dark .dashboard-header h1 {
   color: #ffffff;
   text-shadow: 0 4px 12px rgba(0,0,0,0.6);
 }
 
+/* Subtitle */
 .dashboard-header p {
   color: var(--muted);
   margin-bottom: 0;
@@ -429,6 +442,7 @@ body.dark .dashboard-header p {
   color: #f0ffff;
   text-shadow: 0 2px 5px rgba(0,0,0,0.6);
 }
+
 
 .hero-badge {
   display: inline-block;
@@ -1198,5 +1212,82 @@ body:not(.dark) .accent-gold { color: #a07e5c; }
   .hero-badge {
     padding: 8px 16px;
     font-size: 13px;
+  }
+}
+
+/* ================= NAVBAR SEARCH BAR ================= */
+
+.navbar-search {
+  position: relative;
+}
+
+.navbar-search-input {
+  width: 320px;
+  padding: 10px 18px 10px 42px;
+  border-radius: 50px;
+  border: 1px solid var(--border-light);
+  background: var(--card);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  backdrop-filter: blur(12px);
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+
+/* Search Icon */
+.navbar-search::before {
+  content: "🔍";
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* Light Mode */
+body:not(.dark) .navbar-search-input {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(31, 108, 108, 0.2);
+  color: #1a2e3b;
+}
+
+/* Dark Mode */
+body.dark .navbar-search-input {
+  background: rgba(22, 58, 68, 0.85);
+  border: 1px solid rgba(158, 255, 240, 0.5);
+  color: #ffffff;
+}
+
+/* Hover Effect */
+.navbar-search-input:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: 0 8px 20px rgba(31, 108, 108, 0.2);
+}
+
+/* Focus Effect */
+.navbar-search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 15px rgba(31, 108, 108, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .navbar-search-input {
+    width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-search {
+    width: 100%;
+  }
+
+  .navbar-search-input {
+    width: 100%;
   }
 }
