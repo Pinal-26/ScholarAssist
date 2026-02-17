@@ -1,0 +1,15 @@
+[33mcbc0796[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: reset: moving to origin/main
+[33mafee5bd[m[33m ([m[1;32mbackup-main[m[33m)[m HEAD@{1}: commit: bugs
+[33m8736425[m HEAD@{2}: rebase (finish): returning to refs/heads/main
+[33m8736425[m HEAD@{3}: rebase (start): checkout 8736425
+[33m8736425[m HEAD@{4}: commit: bugs
+[33mcc45eeb[m HEAD@{5}: commit: bugs
+[33m72ec541[m HEAD@{6}: commit: bugs
+[33mcbc0796[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{7}: pull origin main: Fast-forward
+[33md483a08[m HEAD@{8}: reset: moving to HEAD
+[33md483a08[m HEAD@{9}: pull origin main: Fast-forward
+[33m5e29797[m HEAD@{10}: commit: navbar
+[33mea0815c[m HEAD@{11}: pull origin main: Fast-forward
+[33m2c21533[m HEAD@{12}: pull origin main: Fast-forward
+[33m7d15334[m HEAD@{13}: commit: added more scholarships
+[33m0c517df[m HEAD@{14}: clone: from https://github.com/Pinal-26/ScholarAssist

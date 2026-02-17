@@ -11,7 +11,7 @@ export default function Dashboard() {
     JSON.parse(localStorage.getItem("user"))
   );
 
-  const [profile, setProfile] = useState(null);
+  const [, setProfile] = useState(null);
   const [profileCompletion, setProfileCompletion] = useState(0);
   const [missingEligibilityFields, setMissingEligibilityFields] = useState([]);
   const [scholarships, setScholarships] = useState([]);
@@ -209,32 +209,6 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* <nav className="dash-navbar">
-
-        <div className="dash-logo">
-          🎓 <span>ScholarAssist</span>
-        </div>
-
-        <div style={{ flex: 1 }}></div>
-
-        <div className="navbar-search">
-          <input
-            type="text"
-            placeholder="Search scholarships..."
-            className="navbar-search-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="dash-nav-links">
-          <NavLink to="/dashboard" className="dash-link">Dashboard</NavLink>
-          <NavLink to="/saved" className="dash-link">Saved</NavLink>
-          <NavLink to="/applications" className="dash-link">Applications</NavLink>
-          <NavLink to="/profile" className="dash-link">Profile</NavLink>
-        </div>
-
-      </nav> */}
 
 <Navbar 
   searchTerm={searchTerm} 
@@ -278,6 +252,33 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+<div className="eligibility-alert">
+  <div className="alert-header">
+    ⚠ <strong>Important Eligibility Criteria Missing</strong>
+  </div>
+
+  <p>
+    To accurately determine your scholarship eligibility, please complete
+    the following required fields:
+  </p>
+
+  <ul>
+    {missingEligibilityFields.map((field, index) => (
+      <li key={index}> {field}</li>
+    ))}
+  </ul>
+
+  <p className="alert-note">
+    Incomplete profile information may affect scholarship recommendations.
+  </p>
+
+  <button
+    className="profile-btn"
+    onClick={() => navigate("/profile")}
+  >
+    Complete Profile
+  </button>
+</div>
 
         <h3 className="section-title">Eligible Scholarships</h3>
 

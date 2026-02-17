@@ -1291,3 +1291,38 @@ body.dark .navbar-search-input {
     width: 100%;
   }
 }
+
+
+.eligibility-alert {
+  background-color: #fdf6e3;
+  border-left: 5px solid #f4a300;
+  padding: 18px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+}
+
+.alert-header {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.eligibility-alert ul {
+  margin-left: 20px;
+  margin-top: 8px;
+}
+
+.alert-note {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.profile-btn {
+  margin-top: 12px;
+  background-color: #f4a300;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
