@@ -1,40 +1,59 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useEffect, useState, useCallback } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import Navbar from "./Navbar";
-export default function Dashboard() {
 
+export default function Dashboard() {
   const navigate = useNavigate();
 
-  const [user] = useState(() =>
-    JSON.parse(localStorage.getItem("user"))
-  );
+  const [user] = useState(() => JSON.parse(localStorage.getItem("user")));
 
   const [, setProfile] = useState(null);
   const [profileCompletion, setProfileCompletion] = useState(0);
   const [missingEligibilityFields, setMissingEligibilityFields] = useState([]);
   const [scholarships, setScholarships] = useState([]);
   const [eligibleScholarships, setEligibleScholarships] = useState([]);
-  const [savedIds, setSavedIds] = useState(
-    JSON.parse(localStorage.getItem("savedScholarships")) || []
-  );
+
+  // ✅ applications state
+  const [applications, setApplications] = useState([]);
+  const location = useLocation();
 
   // ✅ SEARCH STATE
   const [searchTerm, setSearchTerm] = useState("");
 
-  const fieldLabels = {
-    parentIncome: "Parent Income",
-    caste: "Caste",
-    locality: "Locality",
-    graduationYear: "Graduation Year",
-    course: "Course",
-    city: "City"
-  };
+  // ✅ saved key user-wise
+  const savedKey = user
+    ? `savedScholarships_${user.id}`
+    : "savedScholarships_guest";
+
+  const [savedIds, setSavedIds] = useState(() => {
+    return JSON.parse(localStorage.getItem(savedKey)) || [];
+  });
+  useEffect(() => {
+  if (!user) return;
+
+  const saved = JSON.parse(localStorage.getItem(savedKey)) || [];
+  setSavedIds(saved);
+}, [location.pathname]);
+
+useEffect(() => {
+  if (!user) return;
+
+  const saved = JSON.parse(localStorage.getItem(savedKey)) || [];
+  setSavedIds(saved);
+}, [location.pathname, savedKey, user]);
+useEffect(() => {
+  if (!user) return;
+
+  const key = `savedScholarships_${user.id}`;
+  const saved = JSON.parse(localStorage.getItem(key)) || [];
+  setSavedIds(saved);
+}, [user]);
+
 
   // ================= APPLY SCHOLARSHIP =================
   const applyScholarship = async (scholarship) => {
-
     if (!user) {
       alert("Please login first.");
       return;
@@ -44,20 +63,19 @@ export default function Dashboard() {
       const response = await fetch("http://localhost:8080/api/applications", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           user: { id: user.id },
           scholarship: { id: scholarship.id },
-          applicationLink: scholarship.applyLink
-        })
+          applicationLink: scholarship.applyLink,
+        }),
       });
 
       const message = await response.text();
       alert(message);
 
       window.open(scholarship.applyLink, "_blank");
-
     } catch (error) {
       console.error("Apply error:", error);
       alert("Failed to apply.");
@@ -81,16 +99,14 @@ export default function Dashboard() {
       data.graduationYear,
       data.parentIncome,
       data.caste,
-      data.locality
+      data.locality,
     ];
 
     const filled = profileFields.filter(
-      v => v !== null && v !== undefined && v.toString().trim() !== ""
+      (v) => v !== null && v !== undefined && v.toString().trim() !== ""
     ).length;
 
-    setProfileCompletion(
-      Math.round((filled / profileFields.length) * 100)
-    );
+    setProfileCompletion(Math.round((filled / profileFields.length) * 100));
   };
 
   // ================= CHECK ELIGIBILITY =================
@@ -103,7 +119,7 @@ export default function Dashboard() {
       locality: data.locality,
       graduationYear: data.graduationYear,
       course: data.course,
-      city: data.city
+      city: data.city,
     };
 
     const missing = [];
@@ -122,8 +138,10 @@ export default function Dashboard() {
     try {
       const res = await fetch(url);
       if (!res.ok) return null;
+
       const text = await res.text();
       if (!text) return null;
+
       return JSON.parse(text);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -137,6 +155,7 @@ export default function Dashboard() {
       try {
         const response = await fetch("http://localhost:8080/api/scholarships");
         if (!response.ok) throw new Error("Failed to fetch scholarships");
+
         const data = await response.json();
         setScholarships(data || []);
       } catch (error) {
@@ -152,14 +171,15 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return;
 
-    safeFetchJSON(`http://localhost:8080/api/profile/${user.id}`)
-      .then(data => {
+    safeFetchJSON(`http://localhost:8080/api/profile/${user.id}`).then(
+      (data) => {
         if (!data) return;
         setProfile(data);
         calculateProfileCompletion(data);
         checkEligibilityFields(data);
-      });
-  }, [user]);
+      }
+    );
+  }, [user, safeFetchJSON]);
 
   // ================= FETCH ELIGIBLE =================
   useEffect(() => {
@@ -167,56 +187,78 @@ export default function Dashboard() {
 
     safeFetchJSON(
       `http://localhost:8080/api/scholarships/eligible/${user.id}`
-    ).then(data => {
+    ).then((data) => {
       if (data) setEligibleScholarships(data);
     });
-  }, [user]);
+  }, [user, safeFetchJSON]);
+
+  // ================= LOAD SAVED (USER WISE) =================
+  useEffect(() => {
+    if (!user) return;
+
+    const saved = JSON.parse(localStorage.getItem(savedKey)) || [];
+    setSavedIds(saved);
+  }, [savedKey, user]);
+
+  // ✅ MAIN FIX: when you return from Saved page, refresh savedIds
+  useEffect(() => {
+    const handleFocus = () => {
+      if (!user) return;
+      const saved = JSON.parse(localStorage.getItem(savedKey)) || [];
+      setSavedIds(saved);
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [savedKey, user]);
+
+  // ================= FETCH APPLICATIONS (USER WISE) =================
+  useEffect(() => {
+    if (!user) return;
+
+    safeFetchJSON(`http://localhost:8080/api/applications/user/${user.id}`).then(
+      (data) => setApplications(data || [])
+    );
+  }, [user, safeFetchJSON]);
 
   // ================= SAVE / UNSAVE =================
   const toggleSave = (id) => {
     let updated;
+
     if (savedIds.includes(id)) {
-      updated = savedIds.filter(sid => sid !== id);
+      updated = savedIds.filter((sid) => sid !== id);
     } else {
       updated = [...savedIds, id];
     }
+
     setSavedIds(updated);
-    localStorage.setItem("savedScholarships", JSON.stringify(updated));
+    localStorage.setItem(savedKey, JSON.stringify(updated));
   };
 
-  // ================= FIRST LETTER SEARCH LOGIC =================
-
+  // ================= SEARCH LOGIC =================
   const matchesSearch = (text) => {
     if (!searchTerm.trim()) return true;
 
     const words = text.toLowerCase().split(" ");
     const search = searchTerm.toLowerCase();
 
-    return words.some(word => word.startsWith(search));
+    return words.some((word) => word.startsWith(search));
   };
 
   const filteredEligible = eligibleScholarships.filter(
-    (s) =>
-      matchesSearch(s.title) ||
-      matchesSearch(s.category)
+    (s) => matchesSearch(s.title) || matchesSearch(s.category)
   );
 
   const filteredAll = scholarships.filter(
-    (s) =>
-      matchesSearch(s.title) ||
-      matchesSearch(s.category)
+    (s) => matchesSearch(s.title) || matchesSearch(s.category)
   );
 
   return (
     <>
-
-<Navbar 
-  searchTerm={searchTerm} 
-  setSearchTerm={setSearchTerm} 
-/>
+      <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
       <div className="dashboard-container">
-
         <div className="dashboard-header">
           <h1>Welcome back, {user ? user.name : "User"}!</h1>
           <p>Discover scholarships tailored to your profile</p>
@@ -235,14 +277,15 @@ export default function Dashboard() {
 
           <div className="stat-card">
             <p>Applications</p>
-            <h3>3</h3>
+            <h3>{applications.length}</h3>
           </div>
 
           <div className="stat-card">
             <p>Profile</p>
             <h3>{profileCompletion}%</h3>
 
-            {(profileCompletion < 100 || missingEligibilityFields.length > 0) && (
+            {(profileCompletion < 100 ||
+              missingEligibilityFields.length > 0) && (
               <button
                 className="complete-profile-btn"
                 onClick={() => navigate("/profile")}
@@ -252,33 +295,34 @@ export default function Dashboard() {
             )}
           </div>
         </div>
-<div className="eligibility-alert">
-  <div className="alert-header">
-    ⚠ <strong>Important Eligibility Criteria Missing</strong>
-  </div>
 
-  <p>
-    To accurately determine your scholarship eligibility, please complete
-    the following required fields:
-  </p>
+        {missingEligibilityFields.length > 0 && (
+          <div className="eligibility-alert">
+            <div className="alert-header">
+              ⚠ <strong>Important Eligibility Criteria Missing</strong>
+            </div>
 
-  <ul>
-    {missingEligibilityFields.map((field, index) => (
-      <li key={index}> {field}</li>
-    ))}
-  </ul>
+            <p>
+              To accurately determine your scholarship eligibility, please
+              complete the following required fields:
+            </p>
 
-  <p className="alert-note">
-    Incomplete profile information may affect scholarship recommendations.
-  </p>
+            <ul>
+              {missingEligibilityFields.map((field, index) => (
+                <li key={index}>{field}</li>
+              ))}
+            </ul>
 
-  <button
-    className="profile-btn"
-    onClick={() => navigate("/profile")}
-  >
-    Complete Profile
-  </button>
-</div>
+            <p className="alert-note">
+              Incomplete profile information may affect scholarship
+              recommendations.
+            </p>
+
+            <button className="profile-btn" onClick={() => navigate("/profile")}>
+              Complete Profile
+            </button>
+          </div>
+        )}
 
         <h3 className="section-title">Eligible Scholarships</h3>
 
@@ -291,13 +335,12 @@ export default function Dashboard() {
                 key={s.id ? `eligible-${s.id}` : `eligible-${index}`}
                 className="scholarship-card"
               >
-                <span
-                  className="bookmark"
-                  onClick={() => toggleSave(s.id)}
-                >
-                  {savedIds.includes(s.id)
-                    ? <FaBookmark color="#f5b301" />
-                    : <FaRegBookmark />}
+                <span className="bookmark" onClick={() => toggleSave(s.id)}>
+                  {savedIds.includes(s.id) ? (
+                    <FaBookmark color="#f5b301" />
+                  ) : (
+                    <FaRegBookmark />
+                  )}
                 </span>
 
                 <span className="tag">{s.category}</span>
@@ -309,6 +352,7 @@ export default function Dashboard() {
                   <button onClick={() => navigate(`/scholarship/${s.id}`)}>
                     View Details
                   </button>
+
                   <button
                     style={{ backgroundColor: "#28a745", color: "white" }}
                     onClick={() => applyScholarship(s)}
@@ -316,7 +360,6 @@ export default function Dashboard() {
                     Apply
                   </button>
                 </div>
-
               </div>
             ))}
           </div>
@@ -333,13 +376,12 @@ export default function Dashboard() {
                 key={s.id ? `all-${s.id}` : `all-${index}`}
                 className="scholarship-card"
               >
-                <span
-                  className="bookmark"
-                  onClick={() => toggleSave(s.id)}
-                >
-                  {savedIds.includes(s.id)
-                    ? <FaBookmark color="#f5b301" />
-                    : <FaRegBookmark />}
+                <span className="bookmark" onClick={() => toggleSave(s.id)}>
+                  {savedIds.includes(s.id) ? (
+                    <FaBookmark color="#f5b301" />
+                  ) : (
+                    <FaRegBookmark />
+                  )}
                 </span>
 
                 <span className="tag">{s.category}</span>
@@ -351,6 +393,7 @@ export default function Dashboard() {
                   <button onClick={() => navigate(`/scholarship/${s.id}`)}>
                     View Details
                   </button>
+
                   <button
                     style={{ backgroundColor: "#28a745", color: "white" }}
                     onClick={() => applyScholarship(s)}
@@ -358,12 +401,10 @@ export default function Dashboard() {
                     Apply
                   </button>
                 </div>
-
               </div>
             ))}
           </div>
         )}
-
       </div>
     </>
   );

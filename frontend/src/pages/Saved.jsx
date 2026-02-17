@@ -6,44 +6,68 @@ import Navbar from "./Navbar";
 export default function Saved() {
   const navigate = useNavigate();
 
-  const [savedIds, setSavedIds] = useState(() => {
-    return JSON.parse(localStorage.getItem("savedScholarships")) || [];
-  });
+  const user = JSON.parse(localStorage.getItem("user"));
 
+  const savedKey = user
+    ? `savedScholarships_${user.id}`
+    : "savedScholarships_guest";
+
+  const [savedIds, setSavedIds] = useState([]);
   const [savedScholarships, setSavedScholarships] = useState([]);
 
-  // ===== FETCH SAVED SCHOLARSHIPS FROM BACKEND =====
+  // ================= LOAD SAVED IDS =================
+  useEffect(() => {
+    if (!user) return;
+
+    const saved = JSON.parse(localStorage.getItem(savedKey)) || [];
+    setSavedIds(saved);
+  }, [savedKey, user]);
+
+  // ================= FETCH SAVED SCHOLARSHIPS =================
   useEffect(() => {
     if (savedIds.length === 0) {
       setSavedScholarships([]);
       return;
     }
 
-    fetch("http://localhost:8080/api/scholarships")
-      .then(res => res.json())
-      .then(data => {
-        const filtered = data.filter(s =>
-          savedIds.includes(s.id)
-        );
+    const fetchSaved = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/scholarships");
+        if (!res.ok) throw new Error("Failed to fetch");
+
+        const data = await res.json();
+        const filtered = data.filter((s) => savedIds.includes(s.id));
+
         setSavedScholarships(filtered);
-      })
-      .catch(err => console.error("Saved fetch error:", err));
+      } catch (error) {
+        console.error("Saved fetch error:", error);
+      }
+    };
+
+    fetchSaved();
   }, [savedIds]);
 
+  // ================= REMOVE FROM SAVED =================
   const toggleSave = (id) => {
-    const updated = savedIds.filter(sid => sid !== id);
+    const updated = savedIds.filter((sid) => sid !== id);
+
     setSavedIds(updated);
-    localStorage.setItem("savedScholarships", JSON.stringify(updated));
+    localStorage.setItem(savedKey, JSON.stringify(updated));
   };
 
   return (
     <>
-      {/* ================= NAVBAR ================= */}
       <Navbar showSearch={false} />
 
-      {/* ================= CONTENT ================= */}
       <div className="dashboard-container">
-        <h2 className="section-title">Saved Scholarships</h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h2 className="section-title">Saved Scholarships</h2>
+
+          {/* Back Button */}
+          <button onClick={() => navigate(-1)}>
+            ← Back
+          </button>
+        </div>
 
         {savedScholarships.length === 0 ? (
           <p style={{ color: "#777" }}>
@@ -51,7 +75,7 @@ export default function Saved() {
           </p>
         ) : (
           <div className="scholarship-grid">
-            {savedScholarships.map(s => (
+            {savedScholarships.map((s) => (
               <div key={s.id} className="scholarship-card">
                 <span
                   className="bookmark"
@@ -66,11 +90,11 @@ export default function Saved() {
                 <p className="amount">₹{s.amount}</p>
                 <p className="deadline">Deadline: {s.deadline}</p>
 
-                <button
-                  onClick={() => navigate(`/scholarship/${s.id}`)}
-                >
-                  View Details
-                </button>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button onClick={() => navigate(`/scholarship/${s.id}`)}>
+                    View Details
+                  </button>
+                </div>
               </div>
             ))}
           </div>
