@@ -36,8 +36,7 @@ public class SecurityConfig {
 )
 
             .formLogin(form -> form.disable())
-            .httpBasic();   // enable DB authentication
-
+;
         return http.build();
     }
 
