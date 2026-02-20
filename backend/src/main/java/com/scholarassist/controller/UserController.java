@@ -3,15 +3,16 @@ package com.scholarassist.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.scholarassist.dto.LoginRequest;
+import com.scholarassist.dto.RegisterRequest;
 import com.scholarassist.dto.UserResponse;
 import com.scholarassist.entity.User;
 import com.scholarassist.service.UserService;
@@ -22,31 +23,24 @@ import com.scholarassist.service.UserService;
 public class UserController {
 
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService,
-                          PasswordEncoder passwordEncoder) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     // ================= REGISTER =================
-   @PostMapping("/register")
-public ResponseEntity<?> register(@RequestBody User user) {
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
 
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
+        String response = userService.registerUser(request);
 
-    user.setRole("USER");
-
-    User saved = userService.registerUser(user);
-
-    return ResponseEntity.ok(saved);
-}
-
+        return ResponseEntity.ok(response);
+    }
 
     // ================= LOGIN =================
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    try {
 
         User user = userService.login(req.getEmail(), req.getPassword());
 
@@ -54,13 +48,31 @@ public ResponseEntity<?> register(@RequestBody User user) {
         res.setId(user.getId());
         res.setName(user.getName());
         res.setEmail(user.getEmail());
-res.setRole(user.getRole());   
+        res.setRole(user.getRole());
+        res.setEmailVerified(user.isEmailVerified());
+
         return ResponseEntity.ok(res);
+
+    } catch (RuntimeException e) {
+        return ResponseEntity.badRequest().body(
+            java.util.Collections.singletonMap("message", e.getMessage())
+        );
     }
-    // ✅ Get all users (Admin)
-@GetMapping("/all")
-public List<User> getAllUsers() {
-    return userService.getAllUsers();
 }
 
+    // ================= VERIFY OTP =================
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(@RequestParam String email,
+                                       @RequestParam String otp) {
+
+        String response = userService.verifyOtp(email, otp);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // ================= GET ALL USERS =================
+    @GetMapping("/all")
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
 }

@@ -18,18 +18,21 @@ const [formData, setFormData] = useState({
   try {
     const res = await fetch("http://localhost:8080/api/users/register", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
 
+    const data = await res.text();
+
     if (!res.ok) {
-      throw new Error("Registration failed");
+      throw new Error(data);
     }
 
-    alert("Account created successfully");
-    navigate("/login");
+    alert(data);
+
+    // ✅ THIS IS IMPORTANT
+    navigate(`/verify-otp?email=${formData.email}`);
+
   } catch (err) {
     alert(err.message);
   }

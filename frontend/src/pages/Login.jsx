@@ -1,56 +1,71 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/authSplit.css";
-import { useEffect } from "react";
 
 export default function Login() {
-    const [formData, setFormData] = useState({
+
+  const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
-useEffect(() => {
-  localStorage.removeItem("user");
-}, []);
 
   const navigate = useNavigate();
 
+  // Clear old user on login page load
+  useEffect(() => {
+    localStorage.removeItem("user");
+  }, []);
+
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const res = await fetch("http://localhost:8080/api/users/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(formData)
-    });
+    try {
+      const res = await fetch("http://localhost:8080/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
 
-    if (!res.ok) {
-      throw new Error("Invalid email or password");
-    }
-const user = await res.json();
-localStorage.removeItem("profileSaved");
-localStorage.removeItem("eligibleScholarships");
-// ✅ overwrite old user
-localStorage.setItem("user", JSON.stringify(user));
+     let data = null;
 
-
-alert("Login successful");
-
-if (user.role === "ADMIN") {
-  navigate("/admindashboard");
-} else {
-  navigate("/dashboard");
+if (res.headers.get("content-length") !== "0") {
+  data = await res.json();
 }
 
-  } catch (err) {
-    alert(err.message);
-  }
-};
+if (!res.ok) {
+  throw new Error(data?.message || "Login failed");
+}
 
+      // ❌ Stop login if email not verified
+      if (!data.emailVerified) {
+        alert("Please verify your email first.");
+        return;
+      }
 
-  // ✅ GOOGLE LOGIN HANDLER
+      // Clear old local storage
+      localStorage.removeItem("profileSaved");
+      localStorage.removeItem("eligibleScholarships");
+
+      // Save new user
+      localStorage.setItem("user", JSON.stringify(data));
+
+      alert("Login successful");
+
+      // Redirect based on role
+      if (data.role === "ADMIN") {
+        navigate("/admindashboard");
+      } else {
+        navigate("/dashboard");
+      }
+
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // Google Login
   const handleGoogleLogin = () => {
     window.location.href =
       "http://localhost:8080/oauth2/authorization/google";
@@ -60,7 +75,7 @@ if (user.role === "ADMIN") {
     <div className="auth-page">
       <div className="split-auth">
 
-        {/* LEFT */}
+        {/* LEFT SIDE */}
         <div className="auth-left">
           <div className="auth-left-inner">
 
@@ -70,49 +85,53 @@ if (user.role === "ADMIN") {
             </p>
 
             <form onSubmit={handleSubmit}>
-  <label>Email Address</label>
-  <input
-    type="email"
-    placeholder="Enter your email"
-    required
-    onChange={(e) =>
-      setFormData({ ...formData, email: e.target.value })
-    }
-  />
 
-  <div className="password-row">
-    <label>Password</label>
-    <span className="forgot">Forgot Password?</span>
-  </div>
+              <label>Email Address</label>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                required
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
 
-  <input
-    type="password"
-    placeholder="Enter your password"
-    required
-    onChange={(e) =>
-      setFormData({ ...formData, password: e.target.value })
-    }
-  />
+              <div className="password-row">
+                <label>Password</label>
+                <span className="forgot">Forgot Password?</span>
+              </div>
 
-  <button type="submit" className="sign-btn">
-    Sign In
-  </button>
-</form>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                required
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+              />
 
-            {/* 🔹 OR Divider */}
+              <button type="submit" className="sign-btn">
+                Sign In
+              </button>
+
+            </form>
+
+            {/* OR Divider */}
             <div className="divider">
               <span>OR</span>
             </div>
 
-            {/* ✅ GOOGLE LOGIN BUTTON */}
+            {/* Google Login */}
             <button className="google-btn" onClick={handleGoogleLogin}>
-  <img
-    className="google-logo"
-    src="https://developers.google.com/identity/images/g-logo.png"
-    alt="Google"
-  />
-  <span>Continue with Google</span>
-</button>
+              <img
+                className="google-logo"
+                src="https://developers.google.com/identity/images/g-logo.png"
+                alt="Google"
+              />
+              <span>Continue with Google</span>
+            </button>
 
             <p className="bottom-text">
               Don’t have an account?{" "}
@@ -131,7 +150,7 @@ if (user.role === "ADMIN") {
           </div>
         </div>
 
-        {/* RIGHT (UNCHANGED) */}
+        {/* RIGHT SIDE */}
         <div className="auth-right">
           <h2>Continue Your Journey</h2>
 
