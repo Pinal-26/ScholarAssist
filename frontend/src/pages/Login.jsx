@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../firebase";
 import "../styles/authSplit.css";
 
 export default function Login() {
@@ -11,49 +13,37 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  // Clear old user on login page load
   useEffect(() => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
   }, []);
 
+  // ================= NORMAL LOGIN =================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const res = await fetch("http://localhost:8080/api/users/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
 
-     let data = null;
+      const data = await res.json();
 
-if (res.headers.get("content-length") !== "0") {
-  data = await res.json();
-}
+      if (!res.ok) {
+        throw new Error(data?.message || "Login failed");
+      }
 
-if (!res.ok) {
-  throw new Error(data?.message || "Login failed");
-}
-
-      // ❌ Stop login if email not verified
       if (!data.emailVerified) {
         alert("Please verify your email first.");
         return;
       }
 
-      // Clear old local storage
-      localStorage.removeItem("profileSaved");
-      localStorage.removeItem("eligibleScholarships");
-
-      // Save new user
       localStorage.setItem("user", JSON.stringify(data));
 
       alert("Login successful");
 
-      // Redirect based on role
       if (data.role === "ADMIN") {
         navigate("/admindashboard");
       } else {
@@ -65,17 +55,56 @@ if (!res.ok) {
     }
   };
 
-  // Google Login
-  const handleGoogleLogin = () => {
-    window.location.href =
-      "http://localhost:8080/oauth2/authorization/google";
+  // ================= FIREBASE GOOGLE LOGIN =================
+  const handleGoogleLogin = async () => {
+    try {
+
+      // 1️⃣ Firebase Google popup
+      const result = await signInWithPopup(auth, provider);
+
+      const firebaseUser = result.user;
+
+      // 2️⃣ Get ID token
+      const token = await firebaseUser.getIdToken();
+
+      // 3️⃣ Send token to backend
+      const res = await fetch(
+        "http://localhost:8080/api/users/firebase-login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token })
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Google authentication failed");
+      }
+
+      const userData = await res.json();
+
+      // 4️⃣ Save user + token
+      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("token", token);
+
+      alert("Google Login Successful 🎉");
+
+      if (userData.role === "ADMIN") {
+        navigate("/admindashboard");
+      } else {
+        navigate("/dashboard");
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
   };
 
   return (
     <div className="auth-page">
       <div className="split-auth">
 
-        {/* LEFT SIDE */}
         <div className="auth-left">
           <div className="auth-left-inner">
 
@@ -118,12 +147,11 @@ if (!res.ok) {
 
             </form>
 
-            {/* OR Divider */}
             <div className="divider">
               <span>OR</span>
             </div>
 
-            {/* Google Login */}
+            {/* 🔥 FIREBASE GOOGLE LOGIN */}
             <button className="google-btn" onClick={handleGoogleLogin}>
               <img
                 className="google-logo"
@@ -140,51 +168,41 @@ if (!res.ok) {
               </span>
             </p>
 
-            <p className="admin-link">
-              Are you an admin?{" "}
-              <span onClick={() => navigate("/admin/login")}>
-                Admin Login
-              </span>
-            </p>
-
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
+        {/* RIGHT SIDE unchanged */}
         <div className="auth-right">
           <h2>Continue Your Journey</h2>
 
-          <div className="info-card">
-            🎯
+          <div className="info-card">🎯
             <div>
               <h4>View Eligible Scholarships</h4>
               <p>Scholarships matched to your profile</p>
             </div>
           </div>
 
-          <div className="info-card">
-            📄
+          <div className="info-card">📄
             <div>
               <h4>Manage Documents</h4>
               <p>Upload once, reuse everywhere</p>
             </div>
           </div>
 
-          <div className="info-card">
-            🕒
+          <div className="info-card">🕒
             <div>
               <h4>Track Deadlines</h4>
               <p>Never miss important dates</p>
             </div>
           </div>
 
-          <div className="info-card">
-            🚀
+          <div className="info-card">🚀
             <div>
               <h4>Resume Applications</h4>
               <p>Continue where you left off</p>
             </div>
           </div>
+
         </div>
 
       </div>
