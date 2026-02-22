@@ -1,7 +1,17 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
+import { FiLogOut } from "react-icons/fi";
 
 export default function Navbar({ searchTerm, setSearchTerm, showSearch = true }) {
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+  localStorage.removeItem("user");
+  navigate("/", { replace: true });
+};
+
+
   return (
     <nav className="dash-navbar">
 
@@ -11,7 +21,6 @@ export default function Navbar({ searchTerm, setSearchTerm, showSearch = true })
 
       <div style={{ flex: 1 }}></div>
 
-      {/* ✅ Only show search if allowed */}
       {showSearch && (
         <div className="navbar-search">
           <input
@@ -29,6 +38,11 @@ export default function Navbar({ searchTerm, setSearchTerm, showSearch = true })
         <NavLink to="/saved" className="dash-link">Saved</NavLink>
         <NavLink to="/applications" className="dash-link">Applications</NavLink>
         <NavLink to="/profile" className="dash-link">Profile</NavLink>
+
+        {/* Logout Button */}
+        <button onClick={handleLogout} className="logout-btn">
+          <FiLogOut size={20} />
+        </button>
       </div>
 
     </nav>

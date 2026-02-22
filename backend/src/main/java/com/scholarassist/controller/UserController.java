@@ -1,17 +1,20 @@
 package com.scholarassist.controller;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
 import com.scholarassist.dto.LoginRequest;
+import com.scholarassist.dto.RegisterRequest;
 import com.scholarassist.dto.UserResponse;
 import com.scholarassist.entity.User;
 import com.scholarassist.service.UserService;
@@ -22,45 +25,123 @@ import com.scholarassist.service.UserService;
 public class UserController {
 
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService,
-                          PasswordEncoder passwordEncoder) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     // ================= REGISTER =================
-   @PostMapping("/register")
-public ResponseEntity<?> register(@RequestBody User user) {
-
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-    user.setRole("USER");
-
-    User saved = userService.registerUser(user);
-
-    return ResponseEntity.ok(saved);
-}
-
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(userService.registerUser(request));
+    }
 
     // ================= LOGIN =================
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+        try {
+            User user = userService.login(req.getEmail(), req.getPassword());
 
-        User user = userService.login(req.getEmail(), req.getPassword());
+            UserResponse res = new UserResponse();
+            res.setId(user.getId());
+            res.setName(user.getName());
+            res.setEmail(user.getEmail());
+            res.setRole(user.getRole());
+            res.setEmailVerified(user.isEmailVerified());
 
-        UserResponse res = new UserResponse();
-        res.setId(user.getId());
-        res.setName(user.getName());
-        res.setEmail(user.getEmail());
-res.setRole(user.getRole());   
-        return ResponseEntity.ok(res);
+            return ResponseEntity.ok(res);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(Collections.singletonMap("message", e.getMessage()));
+        }
     }
-    // ✅ Get all users (Admin)
-@GetMapping("/all")
-public List<User> getAllUsers() {
-    return userService.getAllUsers();
+
+    // ================= FIREBASE LOGIN =================
+    @PostMapping("/firebase-login")
+    public ResponseEntity<?> firebaseLogin(@RequestBody Map<String, String> request) {
+
+        try {
+            String token = request.get("token");
+
+            FirebaseToken decodedToken =
+                    FirebaseAuth.getInstance().verifyIdToken(token);
+
+            String email = decodedToken.getEmail();
+            String name = decodedToken.getName();
+
+            User user = userService.findByEmail(email);
+
+            if (user == null) {
+                user = new User();
+                user.setEmail(email);
+                user.setName(name);
+                user.setRole("USER");
+                user.setEmailVerified(true);
+                userService.save(user);
+            }
+
+            UserResponse res = new UserResponse();
+            res.setId(user.getId());
+            res.setName(user.getName());
+            res.setEmail(user.getEmail());
+            res.setRole(user.getRole());
+            res.setEmailVerified(true);
+
+            return ResponseEntity.ok(res);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Collections.singletonMap("message", "Invalid Firebase token"));
+        }
+    }
+
+    // ================= VERIFY OTP =================
+// ================= VERIFY OTP =================
+@PostMapping("/verify-otp")
+public ResponseEntity<?> verifyOtp(
+        @RequestParam String email,
+        @RequestParam String otp) {
+
+    try {
+
+        String result = userService.verifyOtp(email, otp);
+
+        if (result.equals("Email verified successfully")) {
+            return ResponseEntity.ok(result);
+        }
+
+        if (result.equals("Email already verified")) {
+            return ResponseEntity.ok(result);
+        }
+
+        if (result.equals("Invalid OTP")) {
+            return ResponseEntity.status(403).body(result);
+        }
+
+        if (result.equals("OTP expired")) {
+            return ResponseEntity.status(403).body(result);
+        }
+
+        return ResponseEntity.badRequest().body(result);
+
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
+@PostMapping("/forgot-password")
+public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+    return ResponseEntity.ok(userService.forgotPassword(email));
 }
 
+@PostMapping("/reset-password")
+public ResponseEntity<String> resetPassword(
+        @RequestParam String email,
+        @RequestParam String otp,
+        @RequestParam String newPassword) {
+
+    return ResponseEntity.ok(
+            userService.resetPassword(email, otp, newPassword)
+    );
+}
 }

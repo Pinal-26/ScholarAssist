@@ -1,5 +1,7 @@
 package com.scholarassist.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,13 +28,33 @@ public class User {
 
     private String password;
 
-    // ✅ NEW FIELD
+    
     private String role;   // USER or ADMIN
 
-    // =====================
-    // GETTERS & SETTERS
-    // =====================
+    private String otp;
 
+private LocalDateTime otpExpiry;
+
+private boolean emailVerified = false;
+
+    public String getOtp() {
+        return otp;
+    }
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
+    public LocalDateTime getOtpExpiry() {
+        return otpExpiry;
+    }
+    public void setOtpExpiry(LocalDateTime otpExpiry) {
+        this.otpExpiry = otpExpiry;
+    }
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
     public Long getId() {
         return id;
     }
