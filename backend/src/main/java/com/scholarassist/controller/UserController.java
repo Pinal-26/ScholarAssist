@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -94,4 +95,38 @@ public class UserController {
                     .body(Collections.singletonMap("message", "Invalid Firebase token"));
         }
     }
+
+    // ================= VERIFY OTP =================
+// ================= VERIFY OTP =================
+@PostMapping("/verify-otp")
+public ResponseEntity<?> verifyOtp(
+        @RequestParam String email,
+        @RequestParam String otp) {
+
+    try {
+
+        String result = userService.verifyOtp(email, otp);
+
+        if (result.equals("Email verified successfully")) {
+            return ResponseEntity.ok(result);
+        }
+
+        if (result.equals("Email already verified")) {
+            return ResponseEntity.ok(result);
+        }
+
+        if (result.equals("Invalid OTP")) {
+            return ResponseEntity.status(403).body(result);
+        }
+
+        if (result.equals("OTP expired")) {
+            return ResponseEntity.status(403).body(result);
+        }
+
+        return ResponseEntity.badRequest().body(result);
+
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
 }

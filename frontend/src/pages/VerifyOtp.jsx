@@ -13,24 +13,35 @@ export default function VerifyOtp() {
   const handleVerify = async (e) => {
     e.preventDefault();
 
+    if (!email) {
+      alert("Email not found. Please register again.");
+      return;
+    }
+
+    if (!otp.trim()) {
+      alert("Please enter OTP");
+      return;
+    }
+
     try {
       const res = await fetch(
-        `http://localhost:8080/api/users/verify-otp?email=${email}&otp=${otp}`,
-        { method: "POST" }
+        `http://localhost:8080/api/users/verify-otp?email=${email}&otp=${otp.trim()}`,
+        {
+          method: "POST",
+        }
       );
 
       const message = await res.text();
 
-      if (!res.ok || message !== "Email verified successfully") {
-        alert(message);
-        return;
+      if (res.ok) {
+        alert(message || "Email verified successfully");
+        navigate("/login");
+      } else {
+        alert(message || "Invalid or expired OTP");
       }
 
-      alert("Email verified successfully!");
-      navigate("/login");
-
-    } catch (err) {
-      alert(err.message);
+    } catch {
+      alert("Server error. Please try again.");
     }
   };
 
@@ -48,6 +59,7 @@ export default function VerifyOtp() {
             placeholder="Enter 6-digit OTP"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
+            maxLength="6"
             required
           />
 
