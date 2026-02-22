@@ -57,49 +57,58 @@ export default function Login() {
 
   // ================= FIREBASE GOOGLE LOGIN =================
   const handleGoogleLogin = async () => {
-    try {
+  try {
 
-      // 1️⃣ Firebase Google popup
-      const result = await signInWithPopup(auth, provider);
+    // 1️⃣ Firebase popup
+    const result = await signInWithPopup(auth, provider);
+    const firebaseUser = result.user;
 
-      const firebaseUser = result.user;
+    // 2️⃣ Get Firebase ID token
+    const token = await firebaseUser.getIdToken();
 
-      // 2️⃣ Get ID token
-      const token = await firebaseUser.getIdToken();
-
-      // 3️⃣ Send token to backend
-      const res = await fetch(
-        "http://localhost:8080/api/users/firebase-login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token })
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Google authentication failed");
+    // 3️⃣ Send token to backend
+    const res = await fetch(
+      "http://localhost:8080/api/users/firebase-login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ token })
       }
+    );
 
-      const userData = await res.json();
+   let data = null;
 
-      // 4️⃣ Save user + token
-      localStorage.setItem("user", JSON.stringify(userData));
-      localStorage.setItem("token", token);
+if (res.headers.get("content-length") !== "0") {
+  data = await res.json();
+}
 
-      alert("Google Login Successful 🎉");
+if (!res.ok) {
+  throw new Error(data?.message || "Google authentication failed");
+}
 
-      if (userData.role === "ADMIN") {
-        navigate("/admindashboard");
-      } else {
-        navigate("/dashboard");
-      }
-
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
+    if (!res.ok) {
+      throw new Error(data?.message || "Google authentication failed");
     }
-  };
+
+    // 4️⃣ Save user
+    localStorage.setItem("user", JSON.stringify(data));
+    localStorage.setItem("token", token);
+
+    alert("Google Login Successful 🎉");
+
+    if (data.role === "ADMIN") {
+      navigate("/admindashboard");
+    } else {
+      navigate("/dashboard");
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+};
 
   return (
     <div className="auth-page">

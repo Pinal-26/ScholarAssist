@@ -37,19 +37,15 @@ public class UserService implements UserDetailsService {
         Optional<User> existingUser =
                 repository.findByEmail(request.getEmail());
 
-        // If user already exists
         if (existingUser.isPresent()) {
 
             User user = existingUser.get();
 
-            // If already verified
             if (user.isEmailVerified()) {
                 return "Email already registered";
             }
 
-            // If not verified → resend OTP
             String otp = generateOtp();
-
             user.setOtp(otp);
             user.setOtpExpiry(LocalDateTime.now().plusMinutes(5));
 
@@ -59,7 +55,6 @@ public class UserService implements UserDetailsService {
             return "New OTP sent to email";
         }
 
-        // Create new user
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
@@ -123,7 +118,15 @@ public class UserService implements UserDetailsService {
         return "Email verified successfully";
     }
 
-    // ================= GET ALL USERS =================
+    // ================= FIND BY EMAIL (needed for firebase) =================
+    public User findByEmail(String email) {
+        return repository.findByEmail(email).orElse(null);
+    }
+
+    public User save(User user) {
+        return repository.save(user);
+    }
+
     public List<User> getAllUsers() {
         return repository.findAll();
     }
@@ -144,7 +147,6 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    // ================= OTP GENERATOR =================
     private String generateOtp() {
         return String.valueOf(100000 + new Random().nextInt(900000));
     }
