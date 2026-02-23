@@ -29,19 +29,22 @@ public class SecurityConfig {
             // Authorization rules
             .authorizeHttpRequests(auth -> auth
         .requestMatchers(
-                "/api/users/register",
-                "/api/users/login",
-                "/api/users/admin-login",
-                "/api/users/firebase-login",
-                "/api/users/verify-otp",
-                "/api/users/forgot-password",
-                "/api/users/reset-password",
-                "/api/scholarships/**",
-                "/api/users/all",
-                "/api/admin/analytics/**",
-                "/api/admin/performance/**",
-                "/api/profile/**"  
-        ).permitAll()
+    "/api/users/register",
+    "/api/users/login",
+    "/api/users/admin-login",
+    "/api/users/firebase-login",
+    "/api/users/verify-otp",
+    "/api/users/forgot-password",
+    "/api/users/reset-password",
+    "/api/scholarships/**",
+    "/api/applications/**",  
+     "/api/admin/applications", // ✅ ADD THIS LINE
+    "/api/users/all",
+    "/api/admin/analytics/**",
+    "/api/admin/performance/**",
+    "/api/profile/**",
+     "/api/admin/stats"
+).permitAll()
         .anyRequest().authenticated()
 )
 

@@ -21,20 +21,21 @@ export default function AdminDashboard() {
     return;
   }
 
-  // Fetch stats from backend
   fetch("http://localhost:8080/api/admin/stats")
-    .then(res => res.json())
-    .then(data => {
-      setStats({
-        totalUsers: data.totalUsers,
-        totalScholarships: data.totalScholarships,
-        totalApplied: data.totalApplied,
-        totalApproved: data.totalApproved
-      });
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch stats");
+      }
+      return res.json();
     })
-    .catch(err => console.error("Error fetching stats:", err));
+    .then(data => {
+      setStats(data); // no need to manually map
+    })
+    .catch(err => {
+      console.error("Error fetching stats:", err);
+    });
 
-}, []);
+}, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("admin");
@@ -100,9 +101,9 @@ export default function AdminDashboard() {
       View All Students
     </div>
 
-    <div className="admin-card" onClick={() => navigate("/admin/applications")}>
-      View By Scholarship Status
-    </div>
+    <div className="admin-card" onClick={() => navigate("/admin/applications-status")}>
+  View By Scholarship Status
+</div>
 
     <div className="admin-card" onClick={() => navigate("/admin/remove-user")}>
       Remove Suspicious User

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.scholarassist.entity.ApplicationTracking;
 import com.scholarassist.entity.Scholarship;
 import com.scholarassist.entity.User;
 import com.scholarassist.repository.ScholarshipRepository;
@@ -27,25 +28,22 @@ public class AdminController {
     @Autowired
     private ApplicationTrackingRepository applicationTrackingRepository;
 
-    // ================== STATS ==================
-    @GetMapping("/stats")
-    public Map<String, Object> getStats() {
+@GetMapping("/stats")
+public Map<String, Object> getStats() {
 
-        Map<String, Object> stats = new HashMap<>();
+    long totalUsers = userRepository.count();
+    long totalScholarships = scholarshipRepository.count();
+    long totalApplied = applicationTrackingRepository.count();
+    long totalApproved = applicationTrackingRepository.countByStatusIgnoreCase("APPROVED");
 
-        stats.put("totalUsers", userRepository.countByRole("USER"));
-        stats.put("totalScholarships", scholarshipRepository.count());
-        stats.put("totalApplied", applicationTrackingRepository.count());
-        stats.put("totalApproved",
-                applicationTrackingRepository.countByStatus("APPROVED"));
+    Map<String, Object> stats = new HashMap<>();
+    stats.put("totalUsers", totalUsers);
+    stats.put("totalScholarships", totalScholarships);
+    stats.put("totalApplied", totalApplied);
+    stats.put("totalApproved", totalApproved);
 
-        return stats;
-    }
-
-    @GetMapping("/status")
-    public String getStatus() {
-        return "Backend Running";
-    }
+    return stats;
+}
 
     // ================== SCHOLARSHIPS ==================
 
@@ -77,5 +75,14 @@ public class AdminController {
         return "User removed successfully";
     }
 
+    @GetMapping("/applications/status/{status}")
+public List<ApplicationTracking> getApplicationsByStatus(@PathVariable String status) {
+    return applicationTrackingRepository.findByStatusIgnoreCase(status);
+}
+
+@GetMapping("/applications")
+public List<ApplicationTracking> getAllApplications() {
+    return applicationTrackingRepository.findAll();
+}
     
 }

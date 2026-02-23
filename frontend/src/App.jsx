@@ -22,6 +22,7 @@ import EditScholarship from "./pages/EditScholarship";
 import ViewStudents from "./pages/ViewStudents";
 import WebsiteUsabilityGraph from "./pages/WebsiteUsabilityGraph";
 import ResponseTimeGraph from "./pages/ResponseTimeGraph";
+import AdminApplicationsByStatus from "./pages/AdminApplicationsByStatus";
 export default function App() {
   return (
     <Routes>
@@ -39,6 +40,7 @@ export default function App() {
 <Route path="/admin/students" element={<ViewStudents />} />
 <Route path="/admin/usability-graph" element={<WebsiteUsabilityGraph />} />
 <Route path="/admin/response-time" element={<ResponseTimeGraph />} />
+<Route path="/admin/applications-status" element={<AdminApplicationsByStatus />} />
       {/* Protected User Routes */}
       <Route
         path="/dashboard"

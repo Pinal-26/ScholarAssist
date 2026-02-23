@@ -6,9 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.scholarassist.dto.ApplicationDetailsDTO;
+import com.scholarassist.dto.ApplyRequest;
 import com.scholarassist.entity.ApplicationTracking;
-import com.scholarassist.service.ApplicationTrackingService;
 import com.scholarassist.repository.ApplicationTrackingRepository;
+import com.scholarassist.service.ApplicationTrackingService;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -23,11 +24,9 @@ public class ApplicationTrackingController {
 
     // ================= APPLY =================
 
-    
-
     @PostMapping
-    public String apply(@RequestBody ApplicationTracking app) {
-        return service.applyScholarship(app);
+    public ApplicationTracking apply(@RequestBody ApplyRequest request) {
+        return service.applyScholarship(request);
     }
 
     // ================= USER APPLICATIONS =================
@@ -48,9 +47,7 @@ public class ApplicationTrackingController {
     // ================= ADMIN FILTER BY STATUS =================
 
     @GetMapping("/admin")
-    public List<ApplicationTracking> getByStatus(
-            @RequestParam String status) {
-
+    public List<ApplicationTracking> getByStatus(@RequestParam String status) {
         return applicationTrackingRepository.findByStatus(status);
     }
 }

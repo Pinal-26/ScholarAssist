@@ -1,29 +1,10 @@
-package com.scholarassist.entity;
+package com.scholarassist.dto;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "application_tracking")
-public class ApplicationTracking {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class ApplyRequest {
 
     private Long userId;
-
     private Long scholarshipId;
-
     private String applicationLink;
-
-    @Column(nullable = false)
-    private String status = "PENDING";   // ✅ default status
-
-    // ================= GETTERS & SETTERS =================
-
-    public Long getId() {
-        return id;
-    }
 
     public Long getUserId() {
         return userId;
@@ -47,13 +28,5 @@ public class ApplicationTracking {
 
     public void setApplicationLink(String applicationLink) {
         this.applicationLink = applicationLink;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 }

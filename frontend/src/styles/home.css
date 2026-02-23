@@ -1136,12 +1136,10 @@ body.dark .floating-card p {
   font-weight: 600;
 }
 
-/* ================= WHY SECTION - LIGHT MODE WITH COLOR ACCENTS ================= */
 .why {
   padding: 110px 30px;
   text-align: center;
-  background: var(--bg);
-  position: relative;
+  background: var(--bg);   /* same as whole page */
 }
 
 body:not(.dark) .why {
@@ -1374,7 +1372,7 @@ body:not(.dark) .gradient-gold {
 .difference {
   padding: 110px 30px;
   text-align: center;
-  background: var(--bg-alt);
+  background: transparent;
   position: relative;
 }
 
@@ -1547,7 +1545,7 @@ body.dark .diff-card p {
 .trusted {
   padding: 100px 30px;
   text-align: center;
-  background: var(--bg);
+  background: transparent;
 }
 
 body:not(.dark) .trusted {
@@ -1651,7 +1649,7 @@ body.dark .logo-card:hover {
 
 /* ================= FOOTER - LIGHT MODE WITH COLOR ACCENTS ================= */
 .footer-main {
-  background: var(--bg-alt);
+  background: transparent;
   padding: 80px 60px;
   border-top: 1px solid var(--border);
 }
@@ -1979,4 +1977,11 @@ body:not(.dark) .bg-accent-soft-sage {
 
 body:not(.dark) .bg-accent-soft-lavender {
   background: rgba(110, 92, 138, 0.05);
+}
+
+.why,
+.difference,
+.trusted,
+.footer-main {
+  background: var(--bg) !important;
 }

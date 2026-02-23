@@ -57,34 +57,44 @@ useEffect(() => {
 
 
   // ================= APPLY SCHOLARSHIP =================
-  const applyScholarship = async (scholarship) => {
-    if (!user) {
-      alert("Please login first.");
-      return;
+ const applyScholarship = async (scholarship) => {
+  if (!user) {
+    alert("Please login first.");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:8080/api/applications", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    userId: user.id,
+    scholarshipId: scholarship.id,
+    applicationLink: scholarship.applyLink,
+  }),
+});
+
+    if (!response.ok) {
+      throw new Error("Failed to apply");
     }
 
-    try {
-      const response = await fetch("http://localhost:8080/api/applications", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user: { id: user.id },
-          scholarship: { id: scholarship.id },
-          applicationLink: scholarship.applyLink,
-        }),
-      });
+    const newApplication = await response.json(); // 👈 IMPORTANT
 
-      const message = await response.text();
-      alert(message);
+    // ✅ Add to dashboard applications state immediately
+    setApplications((prev) => [...prev, newApplication]);
 
-      window.open(scholarship.applyLink, "_blank");
-    } catch (error) {
-      console.error("Apply error:", error);
-      alert("Failed to apply.");
-    }
-  };
+    alert("Application submitted successfully!");
+
+    // Optional: open scholarship link
+    window.open(scholarship.applyLink, "_blank");
+
+  } catch (error) {
+    console.error("Apply error:", error);
+    alert("Failed to apply.");
+  }
+};
 
   // ================= PROFILE COMPLETION =================
   const calculateProfileCompletion = (data) => {

@@ -5,49 +5,67 @@ import java.time.LocalDate;
 public class ApplicationDetailsDTO {
 
     private Long id;
-    private String title;
+    private String scholarshipTitle;
     private Integer amount;
     private LocalDate deadline;
-    private LocalDate appliedDate;
     private String status;
 
+    // ✅ DEFAULT CONSTRUCTOR (IMPORTANT)
+    public ApplicationDetailsDTO() {
+    }
+
+    // ✅ PARAMETERIZED CONSTRUCTOR (Optional)
     public ApplicationDetailsDTO(Long id,
-                                 String title,
+                                 String scholarshipTitle,
                                  Integer amount,
                                  LocalDate deadline,
-                                 LocalDate appliedDate,
                                  String status) {
         this.id = id;
-        this.title = title;
+        this.scholarshipTitle = scholarshipTitle;
         this.amount = amount;
         this.deadline = deadline;
-        this.appliedDate = appliedDate;
         this.status = status;
     }
 
-    // ===== GETTERS =====
+    // ===== GETTERS & SETTERS =====
 
     public Long getId() {
         return id;
     }
 
-    public String getTitle() {
-        return title;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getScholarshipTitle() {
+        return scholarshipTitle;
+    }
+
+    public void setScholarshipTitle(String scholarshipTitle) {
+        this.scholarshipTitle = scholarshipTitle;
     }
 
     public Integer getAmount() {
         return amount;
     }
 
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
+
     public LocalDate getDeadline() {
         return deadline;
     }
 
-    public LocalDate getAppliedDate() {
-        return appliedDate;
+    public void setDeadline(LocalDate deadline) {
+        this.deadline = deadline;
     }
 
     public String getStatus() {
         return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

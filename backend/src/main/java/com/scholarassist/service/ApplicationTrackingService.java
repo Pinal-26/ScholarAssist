@@ -1,83 +1,92 @@
 package com.scholarassist.service;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.scholarassist.dto.ApplicationDetailsDTO;
+import com.scholarassist.dto.ApplyRequest;
 import com.scholarassist.entity.ApplicationTracking;
 import com.scholarassist.entity.Scholarship;
 import com.scholarassist.repository.ApplicationTrackingRepository;
+import com.scholarassist.repository.ScholarshipRepository;
 
 @Service
 public class ApplicationTrackingService {
 
     @Autowired
-    private ApplicationTrackingRepository repository;
+    private ApplicationTrackingRepository applicationTrackingRepository;
+
+    @Autowired
+    private ScholarshipRepository scholarshipRepository;
 
     // ================= APPLY SCHOLARSHIP =================
-    public String applyScholarship(ApplicationTracking app) {
 
-        Long userId = app.getUser().getId();
-        Long scholarshipId = app.getScholarship().getId();
+    public ApplicationTracking applyScholarship(ApplyRequest request) {
 
-        // Prevent duplicate
-        if (repository.existsByUserIdAndScholarshipId(userId, scholarshipId)) {
-            return "You have already applied to this scholarship.";
-        }
+        ApplicationTracking application = new ApplicationTracking();
 
-        app.setAppliedDate(LocalDate.now());
-        app.setStatus("APPLIED");
+        application.setUserId(request.getUserId());
+        application.setScholarshipId(request.getScholarshipId());
+        application.setApplicationLink(request.getApplicationLink());
 
-        repository.save(app);
+        application.setStatus("PENDING");   // ✅ VERY IMPORTANT
 
-        return "Application saved successfully.";
+        return applicationTrackingRepository.save(application);
     }
 
     // ================= GET USER APPLICATIONS =================
+
     public List<ApplicationDetailsDTO> getUserApplications(Long userId) {
 
         List<ApplicationTracking> applications =
-                repository.findByUserId(userId);
+                applicationTrackingRepository.findAll()
+                        .stream()
+                        .filter(a -> a.getUserId().equals(userId))
+                        .collect(Collectors.toList());
 
-        List<ApplicationDetailsDTO> result = new ArrayList<>();
+        return applications.stream().map(app -> {
 
-        for (ApplicationTracking app : applications) {
+            Scholarship scholarship = scholarshipRepository
+                    .findById(app.getScholarshipId())
+                    .orElse(null);
 
-            Scholarship scholarship = app.getScholarship();
+            ApplicationDetailsDTO dto = new ApplicationDetailsDTO();
 
-            ApplicationDetailsDTO dto =
-                    new ApplicationDetailsDTO(
-                            app.getId(),
-                            scholarship.getTitle(),
-                            scholarship.getAmount(),
-                            scholarship.getDeadline(),
-                            app.getAppliedDate(),
-                            app.getStatus()
-                    );
+            dto.setId(app.getId());
+            dto.setStatus(app.getStatus());
 
-            result.add(dto);
-        }
+            if (scholarship != null) {
+                dto.setScholarshipTitle(scholarship.getTitle());
+                dto.setAmount(scholarship.getAmount());
+                dto.setDeadline(scholarship.getDeadline());
+            }
 
-        return result;
+            return dto;
+
+        }).collect(Collectors.toList());
     }
 
     // ================= UPDATE STATUS =================
+
     public String updateStatus(Long id, String status) {
 
-        ApplicationTracking app =
-                repository.findById(id).orElse(null);
+        Optional<ApplicationTracking> optional =
+                applicationTrackingRepository.findById(id);
 
-        if (app == null) {
-            return "Application not found.";
+        if (optional.isEmpty()) {
+            return "Application not found";
         }
 
-        app.setStatus(status);
-        repository.save(app);
+        ApplicationTracking application = optional.get();
 
-        return "Status updated successfully.";
+        application.setStatus(status.toUpperCase());
+
+        applicationTrackingRepository.save(application);
+
+        return "Status updated successfully";
     }
 }
