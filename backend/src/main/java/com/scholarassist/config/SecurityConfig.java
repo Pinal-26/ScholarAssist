@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,43 +19,58 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-       http
-    .csrf(csrf -> csrf.disable())   // 🔥 THIS LINE IS REQUIRED
-    .cors(cors -> {})
-    .authorizeHttpRequests(auth -> auth
+        http
+            // Disable CSRF for React frontend
+            .csrf(csrf -> csrf.disable())
+
+            // Enable CORS
+            .cors(Customizer.withDefaults())
+
+            // Authorization rules
+            .authorizeHttpRequests(auth -> auth
         .requestMatchers(
-            "/api/users/register",
-            "/api/users/login",
-            "/api/users/verify-otp",
-            "/api/users/firebase-login",
-            "/api/scholarships/**",
-            "/api/profile/**",
-            "/api/applications/**",
-            "/api/admin/**",
-            "/api/users/forgot-password",
-"/api/users/reset-password"
+                "/api/users/register",
+                "/api/users/login",
+                "/api/users/admin-login",
+                "/api/users/firebase-login",
+                "/api/users/verify-otp",
+                "/api/users/forgot-password",
+                "/api/users/reset-password",
+                "/api/scholarships/**",
+                "/api/users/all",
+                "/api/admin/analytics/**",
+                "/api/admin/performance/**",
+                "/api/profile/**"  
         ).permitAll()
         .anyRequest().authenticated()
-    )
-        .formLogin(form -> form.disable());
+)
+
+            // Disable default login page
+            .formLogin(form -> form.disable());
 
         return http.build();
     }
 
-    // 🔥 THIS WAS MISSING (VERY IMPORTANT)
+    // CORS configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
+
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 
+    // Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

@@ -21,8 +21,12 @@ export default function Dashboard() {
 
   // ✅ SEARCH STATE
   const [searchTerm, setSearchTerm] = useState("");
+  // ✅ NEW EXTRA FILTERS (Does NOT affect existing logic)
+const [minAmountFilter, setMinAmountFilter] = useState("");
+const [amountSort, setAmountSort] = useState("");
+  
+ 
 
-  // ✅ saved key user-wise
   const savedKey = user
     ? `savedScholarships_${user.id}`
     : "savedScholarships_guest";
@@ -237,22 +241,45 @@ useEffect(() => {
   };
 
   // ================= SEARCH LOGIC =================
-  const matchesSearch = (text) => {
-    if (!searchTerm.trim()) return true;
+// ================= SEARCH LOGIC =================
+const matchesSearch = (text) => {
+  if (!searchTerm.trim()) return true;
 
-    const words = text.toLowerCase().split(" ");
-    const search = searchTerm.toLowerCase();
+  const words = text.toLowerCase().split(" ");
+  const search = searchTerm.toLowerCase();
 
-    return words.some((word) => word.startsWith(search));
-  };
+  return words.some((word) => word.startsWith(search));
+};
 
-  const filteredEligible = eligibleScholarships.filter(
-    (s) => matchesSearch(s.title) || matchesSearch(s.category)
+// ================= FILTER ELIGIBLE =================
+const filteredEligible = eligibleScholarships.filter(
+  (s) => matchesSearch(s.title) || matchesSearch(s.category)
+);
+
+// Make safe copy
+let finalEligible = [...filteredEligible];
+
+// Minimum Amount Filter
+if (minAmountFilter && !isNaN(minAmountFilter)) {
+  finalEligible = finalEligible.filter(
+    (s) => Number(s.amount) >= Number(minAmountFilter)
   );
+}
 
-  const filteredAll = scholarships.filter(
-    (s) => matchesSearch(s.title) || matchesSearch(s.category)
-  );
+// Sorting Logic
+if (amountSort === "low") {
+  finalEligible.sort((a, b) => Number(a.amount) - Number(b.amount));
+} else if (amountSort === "high") {
+  finalEligible.sort((a, b) => Number(b.amount) - Number(a.amount));
+}
+
+// ================= FILTER ALL =================
+const filteredAll = scholarships.filter(
+  (s) => matchesSearch(s.title) || matchesSearch(s.category)
+);
+
+
+// ================= FILTER ALL =================
 
   return (
     <>
@@ -324,13 +351,42 @@ useEffect(() => {
           </div>
         )}
 
+        <div className="eligible-filter-bar" style={{ display: "flex", gap: "10px", marginBottom: "15px", flexWrap: "wrap" }}>
+  
+  <input
+    type="number"
+    placeholder="Minimum Amount"
+    value={minAmountFilter}
+    onChange={(e) => setMinAmountFilter(e.target.value)}
+  />
+
+  <select
+    value={amountSort}
+    onChange={(e) => setAmountSort(e.target.value)}
+  >
+    <option value="">Sort By Amount</option>
+    <option value="low">Low → High</option>
+    <option value="high">High → Low</option>
+  </select>
+
+  <button
+    onClick={() => {
+      setMinAmountFilter("");
+      setAmountSort("");
+    }}
+  >
+    Reset
+  </button>
+
+</div>
+
         <h3 className="section-title">Eligible Scholarships</h3>
 
-        {filteredEligible.length === 0 ? (
+        {finalEligible.length === 0 ? (
           <p style={{ color: "#777" }}>No matching scholarships found.</p>
         ) : (
           <div className="scholarship-grid">
-            {filteredEligible.map((s, index) => (
+            {finalEligible.map((s, index) => (
               <div
                 key={s.id ? `eligible-${s.id}` : `eligible-${index}`}
                 className="scholarship-card"

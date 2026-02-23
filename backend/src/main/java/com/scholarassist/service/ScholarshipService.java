@@ -1,6 +1,7 @@
 package com.scholarassist.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class ScholarshipService {
         this.profileRepo = profileRepo;
     }
 
-    // ================= ALL SCHOLARSHIPS =================
+    // ================= GET ALL =================
     public List<Scholarship> getAllScholarships() {
         return scholarshipRepo.findAll();
     }
@@ -30,68 +31,90 @@ public class ScholarshipService {
     public Scholarship getScholarshipById(Long id) {
         return scholarshipRepo.findById(id).orElse(null);
     }
-public void deleteScholarship(Long id) {
-    scholarshipRepo.deleteById(id);
-}
 
-    public Scholarship saveScholarship(Scholarship s) {
-        return scholarshipRepo.save(s);
+    public Scholarship saveScholarship(Scholarship scholarship) {
+        return scholarshipRepo.save(scholarship);
     }
 
-    // ================= ELIGIBILITY LOGIC =================
+    public void deleteScholarship(Long id) {
+        scholarshipRepo.deleteById(id);
+    }
+
+    // ================= ELIGIBLE SCHOLARSHIPS =================
     public List<Scholarship> getEligibleScholarships(Long userId) {
 
-        Profile profile = profileRepo.findByUserId(userId).orElse(null);
+        Optional<Profile> optionalProfile = profileRepo.findByUserId(userId);
 
-        if (profile == null) {
+        if (optionalProfile.isEmpty()) {
             return List.of();
         }
 
-        return scholarshipRepo.findAll()
-                .stream()
-                .filter(scholarship -> isEligible(profile, scholarship))
+        Profile profile = optionalProfile.get();
+
+        List<Scholarship> allScholarships = scholarshipRepo.findAll();
+
+        return allScholarships.stream()
+                .filter(s -> isEligible(profile, s))
                 .collect(Collectors.toList());
     }
 
-    // ================= CORE CHECK METHOD =================
+    // ================= CORE ELIGIBILITY CHECK =================
     private boolean isEligible(Profile profile, Scholarship scholarship) {
 
-        // ---------- Income Check ----------
-        if (profile.getParentIncome() != null &&
-            scholarship.getMaxIncome() != null) {
-
-            if (profile.getParentIncome() > scholarship.getMaxIncome()) {
-                return false;
-            }
-        }
-
-        // ---------- GPA Check ----------
-        if (profile.getGpa() != null &&
-            scholarship.getMinGpa() != null) {
-
+        // ---------- GPA CHECK ----------
+        if (profile.getGpa() != null && scholarship.getMinGpa() != null) {
             if (profile.getGpa() < scholarship.getMinGpa()) {
                 return false;
             }
         }
 
-       // CATEGORY CHECK
-if (scholarship.getCategory() != null) {
-    if (scholarship.getCategory().equalsIgnoreCase("SC") ||
-        scholarship.getCategory().equalsIgnoreCase("ST") ||
-        scholarship.getCategory().equalsIgnoreCase("OBC") ||
-        scholarship.getCategory().equalsIgnoreCase("General")) {
+        // ---------- 10TH PERCENTAGE CHECK ----------
+        if (profile.getTenthPercentage() != null &&
+            scholarship.getMinTenthPercentage() != null) {
 
-        if (profile.getCaste() == null ||
-            !scholarship.getCategory().equalsIgnoreCase(profile.getCaste())) {
-            return false;
+            if (profile.getTenthPercentage() < scholarship.getMinTenthPercentage()) {
+                return false;
+            }
         }
+
+        // ---------- 12TH PERCENTAGE CHECK ----------
+        if (profile.getTwelfthPercentage() != null &&
+            scholarship.getMinTwelfthPercentage() != null) {
+
+            if (profile.getTwelfthPercentage() < scholarship.getMinTwelfthPercentage()) {
+                return false;
+            }
+        }
+
+        // ---------- INCOME CHECK ----------
+        if (profile.getParentIncome() != null &&
+            scholarship.getMaxParentIncome() != null) {
+
+            if (profile.getParentIncome() > scholarship.getMaxParentIncome()) {
+                return false;
+            }
+        }
+
+        // ---------- CASTE CHECK ----------
+        // ---------- CASTE CHECK ----------
+if (scholarship.getEligibleCaste() != null &&
+    !scholarship.getEligibleCaste().equalsIgnoreCase("ALL")) {
+
+    if (profile.getCaste() == null ||
+        !scholarship.getEligibleCaste().equalsIgnoreCase(profile.getCaste())) {
+        return false;
     }
 }
 
+// ---------- LOCALITY CHECK ----------
+if (scholarship.getEligibleLocality() != null &&
+    !scholarship.getEligibleLocality().equalsIgnoreCase("ALL")) {
 
-        // If all checks pass
-        System.out.println("Profile caste: " + profile.getCaste());
-System.out.println("Scholarship category: " + scholarship.getCategory());
+    if (profile.getLocality() == null ||
+        !scholarship.getEligibleLocality().equalsIgnoreCase(profile.getLocality())) {
+        return false;
+    }
+}
 
         return true;
     }

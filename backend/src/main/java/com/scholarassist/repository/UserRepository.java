@@ -8,4 +8,5 @@ import com.scholarassist.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
    Optional<User> findByEmail(String email);
+   long countByRole(String role);
 }

@@ -2,14 +2,7 @@ package com.scholarassist.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.scholarassist.entity.Scholarship;
 import com.scholarassist.service.ScholarshipService;
@@ -25,33 +18,55 @@ public class ScholarshipController {
         this.service = service;
     }
 
-    // ✅ Get all scholarships
+    // ================= GET ALL =================
     @GetMapping
     public List<Scholarship> getAll() {
         return service.getAllScholarships();
     }
 
-    // ✅ Get scholarship details by ID
+    // ================= GET BY ID =================
     @GetMapping("/{id}")
     public Scholarship getById(@PathVariable Long id) {
         return service.getScholarshipById(id);
     }
 
-    // ✅ Add scholarship (admin / testing)
+    // ================= CREATE =================
     @PostMapping
     public Scholarship create(@RequestBody Scholarship scholarship) {
         return service.saveScholarship(scholarship);
     }
 
-    // ✅ Get eligible scholarships for user
-@GetMapping("/eligible/{userId}")
-public List<Scholarship> getEligible(@PathVariable Long userId) {
-    return service.getEligibleScholarships(userId);
-}
-// ✅ Delete scholarship (Admin)
-@DeleteMapping("/{id}")
-public void deleteScholarship(@PathVariable Long id) {
-    service.deleteScholarship(id);
-}
+    // ================= UPDATE =================
+    @PutMapping("/{id}")
+    public Scholarship updateScholarship(
+            @PathVariable Long id,
+            @RequestBody Scholarship updated) {
 
+        Scholarship scholarship = service.getScholarshipById(id);
+
+        scholarship.setTitle(updated.getTitle());
+        scholarship.setCategory(updated.getCategory());
+        scholarship.setAmount(updated.getAmount());
+        scholarship.setDeadline(updated.getDeadline());
+        scholarship.setDescription(updated.getDescription());
+        scholarship.setEligibility(updated.getEligibility());
+        scholarship.setApplyLink(updated.getApplyLink());
+        scholarship.setProvider(updated.getProvider());
+        scholarship.setMaxIncome(updated.getMaxIncome());
+        scholarship.setMinGpa(updated.getMinGpa());
+
+        return service.saveScholarship(scholarship);
+    }
+
+    // ================= DELETE =================
+    @DeleteMapping("/{id}")
+    public void deleteScholarship(@PathVariable Long id) {
+        service.deleteScholarship(id);
+    }
+
+    // ================= ELIGIBLE =================
+    @GetMapping("/eligible/{userId}")
+    public List<Scholarship> getEligible(@PathVariable Long userId) {
+        return service.getEligibleScholarships(userId);
+    }
 }

@@ -16,6 +16,12 @@ import ProtectedRoute from "./pages/ProtectedRoute";
 import VerifyOtp from "./pages/VerifyOtp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import AddScholarship from "./pages/AddScholarship";
+import EditScholarshipList from "./pages/EditScholarshipList";
+import EditScholarship from "./pages/EditScholarship";
+import ViewStudents from "./pages/ViewStudents";
+import WebsiteUsabilityGraph from "./pages/WebsiteUsabilityGraph";
+import ResponseTimeGraph from "./pages/ResponseTimeGraph";
 export default function App() {
   return (
     <Routes>
@@ -27,6 +33,12 @@ export default function App() {
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/scholarship/:id" element={<ScholarshipDetails />} />
       <Route path="/verify-otp" element={<VerifyOtp />} />
+      <Route path="/admin/add-scholarship" element={<AddScholarship />} />
+      <Route path="/admin/edit-scholarships" element={<EditScholarshipList />} />
+<Route path="/admin/edit-scholarship/:id" element={<EditScholarship />} />
+<Route path="/admin/students" element={<ViewStudents />} />
+<Route path="/admin/usability-graph" element={<WebsiteUsabilityGraph />} />
+<Route path="/admin/response-time" element={<ResponseTimeGraph />} />
       {/* Protected User Routes */}
       <Route
         path="/dashboard"

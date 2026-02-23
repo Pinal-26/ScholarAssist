@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,7 +61,6 @@ public class UserController {
     // ================= FIREBASE LOGIN =================
     @PostMapping("/firebase-login")
     public ResponseEntity<?> firebaseLogin(@RequestBody Map<String, String> request) {
-
         try {
             String token = request.get("token");
 
@@ -97,51 +97,89 @@ public class UserController {
     }
 
     // ================= VERIFY OTP =================
-// ================= VERIFY OTP =================
-@PostMapping("/verify-otp")
-public ResponseEntity<?> verifyOtp(
-        @RequestParam String email,
-        @RequestParam String otp) {
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(
+            @RequestParam String email,
+            @RequestParam String otp) {
+
+        try {
+            String result = userService.verifyOtp(email, otp);
+
+            if (result.equals("Email verified successfully") ||
+                result.equals("Email already verified")) {
+                return ResponseEntity.ok(result);
+            }
+
+            if (result.equals("Invalid OTP") ||
+                result.equals("OTP expired")) {
+                return ResponseEntity.status(403).body(result);
+            }
+
+            return ResponseEntity.badRequest().body(result);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // ================= FORGOT PASSWORD =================
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+        return ResponseEntity.ok(userService.forgotPassword(email));
+    }
+
+    // ================= RESET PASSWORD =================
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @RequestParam String email,
+            @RequestParam String otp,
+            @RequestParam String newPassword) {
+
+        return ResponseEntity.ok(
+                userService.resetPassword(email, otp, newPassword)
+        );
+    }
+
+    @PostMapping("/admin-login")
+public ResponseEntity<?> adminLogin(@RequestBody LoginRequest req) {
 
     try {
+        User user = userService.login(req.getEmail(), req.getPassword());
 
-        String result = userService.verifyOtp(email, otp);
-
-        if (result.equals("Email verified successfully")) {
-            return ResponseEntity.ok(result);
+        if (!"ADMIN".equalsIgnoreCase(user.getRole())) {
+            return ResponseEntity.status(403)
+                    .body(Collections.singletonMap("message", "Access denied. Not an admin."));
         }
 
-        if (result.equals("Email already verified")) {
-            return ResponseEntity.ok(result);
+        if (!user.isEmailVerified()) {
+            return ResponseEntity.status(403)
+                    .body(Collections.singletonMap("message", "Please verify email first."));
         }
 
-        if (result.equals("Invalid OTP")) {
-            return ResponseEntity.status(403).body(result);
-        }
+        UserResponse res = new UserResponse();
+        res.setId(user.getId());
+        res.setName(user.getName());
+        res.setEmail(user.getEmail());
+        res.setRole(user.getRole());
+        res.setEmailVerified(user.isEmailVerified());
 
-        if (result.equals("OTP expired")) {
-            return ResponseEntity.status(403).body(result);
-        }
+        return ResponseEntity.ok(res);
 
-        return ResponseEntity.badRequest().body(result);
-
-    } catch (Exception e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(400)
+                .body(Collections.singletonMap("message", e.getMessage()));
     }
 }
-@PostMapping("/forgot-password")
-public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-    return ResponseEntity.ok(userService.forgotPassword(email));
-}
 
-@PostMapping("/reset-password")
-public ResponseEntity<String> resetPassword(
-        @RequestParam String email,
-        @RequestParam String otp,
-        @RequestParam String newPassword) {
+    // ================= GET ALL USERS (ADMIN) =================
+@GetMapping("/all")
+public ResponseEntity<?> getAllUsers() {
 
-    return ResponseEntity.ok(
-            userService.resetPassword(email, otp, newPassword)
-    );
+    try {
+        return ResponseEntity.ok(userService.getAllUsers());
+    } catch (Exception e) {
+        return ResponseEntity.badRequest()
+                .body(Collections.singletonMap("message", e.getMessage()));
+    }
 }
 }

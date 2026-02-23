@@ -10,7 +10,8 @@ import org.springframework.data.repository.query.Param;
 import com.scholarassist.entity.ApplicationTracking;
 
 public interface ApplicationTrackingRepository extends JpaRepository<ApplicationTracking, Long> {
-
+long countByStatus(String status);
+List<ApplicationTracking> findByStatus(String status);
     List<ApplicationTracking> findByUserId(Long userId);
 
     boolean existsByUserIdAndScholarshipId(Long userId, Long scholarshipId);
