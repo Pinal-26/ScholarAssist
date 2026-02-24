@@ -9,7 +9,7 @@ public class ApplicationDetailsDTO {
     private Integer amount;
     private LocalDate deadline;
     private String status;
-
+private String appliedDate;
     // ✅ DEFAULT CONSTRUCTOR (IMPORTANT)
     public ApplicationDetailsDTO() {
     }
@@ -19,16 +19,24 @@ public class ApplicationDetailsDTO {
                                  String scholarshipTitle,
                                  Integer amount,
                                  LocalDate deadline,
-                                 String status) {
+                                 String status,
+                                 String appliedDate) {
         this.id = id;
         this.scholarshipTitle = scholarshipTitle;
         this.amount = amount;
         this.deadline = deadline;
         this.status = status;
+        this.appliedDate = appliedDate;
     }
 
     // ===== GETTERS & SETTERS =====
 
+    public String getAppliedDate() {
+        return appliedDate;
+    }
+    public void setAppliedDate(String appliedDate) {
+        this.appliedDate = appliedDate;
+    }
     public Long getId() {
         return id;
     }

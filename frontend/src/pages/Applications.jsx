@@ -23,7 +23,7 @@ useEffect(() => {
       setApplications(data);
     })
     .catch((err) => console.error(err));
-}, [user]);
+}, [user?.id]);
 
   // ================= UPDATE STATUS =================
   const updateStatus = async (id, newStatus) => {
@@ -70,7 +70,7 @@ useEffect(() => {
               <tbody>
                 {applications.map((app) => (
                   <tr key={app.id}>
-                    <td>{app.title || "-"}</td>
+                    <td>{app.scholarshipTitle || "-"}</td>                    
                     <td>{app.amount ? `₹${app.amount}` : "-"}</td>
                     <td>{app.deadline ? app.deadline : "-"}</td>
                     <td>{app.appliedDate ? app.appliedDate : "-"}</td>

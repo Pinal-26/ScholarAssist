@@ -15,12 +15,22 @@ public class ApplicationTracking {
     private Long scholarshipId;
 
     private String applicationLink;
+    
+    @Column(name = "applied_date")
+    private String appliedDate;
 
     @Column(nullable = false)
-    private String status = "PENDING";   // ✅ default status
+    private String status = "PENDING";   
 
     // ================= GETTERS & SETTERS =================
 
+    public String getAppliedDate() {
+    return appliedDate;
+    }
+
+    public void setAppliedDate(String appliedDate) {
+        this.appliedDate = appliedDate;
+    }
     public Long getId() {
         return id;
     }

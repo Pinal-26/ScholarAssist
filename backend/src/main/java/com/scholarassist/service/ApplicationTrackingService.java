@@ -1,5 +1,6 @@
 package com.scholarassist.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ public class ApplicationTrackingService {
         application.setUserId(request.getUserId());
         application.setScholarshipId(request.getScholarshipId());
         application.setApplicationLink(request.getApplicationLink());
-
+    application.setAppliedDate(LocalDate.now().toString());
         application.setStatus("PENDING");   // ✅ VERY IMPORTANT
 
         return applicationTrackingRepository.save(application);
@@ -63,6 +64,7 @@ public class ApplicationTrackingService {
                 dto.setScholarshipTitle(scholarship.getTitle());
                 dto.setAmount(scholarship.getAmount());
                 dto.setDeadline(scholarship.getDeadline());
+                dto.setAppliedDate(app.getAppliedDate());
             }
 
             return dto;
