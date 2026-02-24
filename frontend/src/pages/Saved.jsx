@@ -5,56 +5,69 @@ import Navbar from "./Navbar";
 
 export default function Saved() {
   const navigate = useNavigate();
-
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const savedKey = user
-    ? `savedScholarships_${user.id}`
-    : "savedScholarships_guest";
-
   const [savedIds, setSavedIds] = useState([]);
-  const [savedScholarships, setSavedScholarships] = useState([]);
+  const [allScholarships, setAllScholarships] = useState([]);
 
-  // ================= LOAD SAVED IDS =================
+  // ✅ Load saved IDs ONLY ONCE
   useEffect(() => {
-    if (!user) return;
+  if (!user) return;
 
-    const saved = JSON.parse(localStorage.getItem(savedKey)) || [];
-    setSavedIds(saved);
-  }, [savedKey, user]);
+  fetch(`http://localhost:8080/api/saved/${user.id}`)
+    .then(res => res.json())
+    .then(data => {
+const ids = data.map(item => Number(item.scholarshipId));
+      setSavedIds(ids);
+    });
 
-  // ================= FETCH SAVED SCHOLARSHIPS =================
+}, []);
+
+  // ✅ Fetch scholarships ONLY ONCE
   useEffect(() => {
-    if (savedIds.length === 0) {
-      setSavedScholarships([]);
-      return;
-    }
-
-    const fetchSaved = async () => {
+    const fetchAll = async () => {
       try {
         const res = await fetch("http://localhost:8080/api/scholarships");
-        if (!res.ok) throw new Error("Failed to fetch");
+        if (!res.ok) throw new Error("Failed");
 
         const data = await res.json();
-        const filtered = data.filter((s) => savedIds.includes(s.id));
-
-        setSavedScholarships(filtered);
-      } catch (error) {
-        console.error("Saved fetch error:", error);
+        setAllScholarships(data);
+      } catch (err) {
+        console.error("Backend error:", err);
       }
     };
 
-    fetchSaved();
-  }, [savedIds]);
+    fetchAll();
+  }, []); // 🔥 empty dependency
 
-  // ================= REMOVE FROM SAVED =================
-  const toggleSave = (id) => {
-    const updated = savedIds.filter((sid) => sid !== id);
+  // Filter saved locally (no useEffect needed)
+  const savedScholarships = allScholarships.filter((s) =>
+    savedIds.includes(Number(s.id))
+  );
 
-    setSavedIds(updated);
-    localStorage.setItem(savedKey, JSON.stringify(updated));
-  };
+  const toggleSave = async (scholarshipId) => {
+  if (!user) return;
 
+  try {
+    const res = await fetch(
+      `http://localhost:8080/api/saved/${user.id}/${scholarshipId}`,
+      {
+        method: "DELETE",
+        credentials: "include"
+      }
+    );
+
+    if (!res.ok) throw new Error("Failed to remove");
+
+    // remove locally for instant UI update
+    setSavedIds(prev =>
+      prev.filter(id => id !== Number(scholarshipId))
+    );
+
+  } catch (err) {
+    console.error("Remove error:", err);
+  }
+};
   return (
     <>
       <Navbar showSearch={false} />
@@ -62,11 +75,7 @@ export default function Saved() {
       <div className="dashboard-container">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h2 className="section-title">Saved Scholarships</h2>
-
-          {/* Back Button */}
-          <button onClick={() => navigate(-1)}>
-            ← Back
-          </button>
+          <button onClick={() => navigate(-1)}>← Back</button>
         </div>
 
         {savedScholarships.length === 0 ? (
@@ -85,7 +94,7 @@ export default function Saved() {
                   🔖
                 </span>
 
-                <span className="tag">{s.category}</span>
+                <span className="tag">{s.type}</span>
                 <h4>{s.title}</h4>
                 <p className="amount">₹{s.amount}</p>
                 <p className="deadline">Deadline: {s.deadline}</p>

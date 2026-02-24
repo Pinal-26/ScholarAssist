@@ -321,4 +321,93 @@ body.dark .chart-wrapper {
   background: rgba(158, 255, 240, 0.05);
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
 
+.sync-btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+   display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sync-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 198, 255, 0.4);
+}
+
+.sync-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.success-msg {
+  margin-top: 15px;
+  color: #00ffae;
+  font-weight: 500;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid white;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  margin-right: 8px;
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.toast-success {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  background: linear-gradient(135deg, #00ffae, #00c9ff);
+  color: #002b36;
+  padding: 14px 22px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 255, 174, 0.3);
+  animation: slideIn 0.4s ease;
+  z-index: 999;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.sync-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.last-sync {
+  font-size: 13px;
+  color: #00e6c3;   /* teal highlight */
+  font-weight: 500;
+}

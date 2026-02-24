@@ -10,5 +10,5 @@ public interface ApplicationTrackingRepository
     long countByStatusIgnoreCase(String status);
 List<ApplicationTracking> findByStatus(String status);
 List<ApplicationTracking> findByStatusIgnoreCase(String status);
-
+boolean existsByUserIdAndScholarshipId(Long userId, Long scholarshipId);
 }

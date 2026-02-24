@@ -17,43 +17,46 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-            // Disable CSRF for React frontend
-            .csrf(csrf -> csrf.disable())
+    http
+        .csrf(csrf -> csrf.disable())
+        .cors(Customizer.withDefaults())
+        .authorizeHttpRequests(auth -> auth
 
-            // Enable CORS
-            .cors(Customizer.withDefaults())
+            // PUBLIC ENDPOINTS
+            .requestMatchers(
+                "/api/users/register",
+                "/api/users/login",
+                "/api/users/admin-login",
+                "/api/users/firebase-login",
+                "/api/users/verify-otp",
+                "/api/users/forgot-password",
+                "/api/users/reset-password",
+                "/api/scholarships/**",
+                "/api/applications/**",
+                "/api/admin/applications",
+                "/api/users/all",
+                "/api/admin/analytics/**",
+                "/api/admin/performance/**",
+                "/api/profile/**",
+                "/api/admin/stats",
+                "/api/admin/import", 
+                "/api/saved/**",
+                "/api/notifications/**"
+            ).permitAll()
 
-            // Authorization rules
-            .authorizeHttpRequests(auth -> auth
-        .requestMatchers(
-    "/api/users/register",
-    "/api/users/login",
-    "/api/users/admin-login",
-    "/api/users/firebase-login",
-    "/api/users/verify-otp",
-    "/api/users/forgot-password",
-    "/api/users/reset-password",
-    "/api/scholarships/**",
-    "/api/applications/**",  
-     "/api/admin/applications", // ✅ ADD THIS LINE
-    "/api/users/all",
-    "/api/admin/analytics/**",
-    "/api/admin/performance/**",
-    "/api/profile/**",
-     "/api/admin/stats"
-).permitAll()
-        .anyRequest().authenticated()
-)
+            // ADMIN PROTECTED
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-            // Disable default login page
-            .formLogin(form -> form.disable());
+            // EVERYTHING ELSE
+            .anyRequest().authenticated()
+        )
+        .formLogin(form -> form.disable());
 
-        return http.build();
-    }
-
+    return http.build();
+}
+        
     // CORS configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

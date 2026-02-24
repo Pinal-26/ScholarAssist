@@ -12,11 +12,13 @@ export default function AddScholarship() {
     amount: "",
     deadline: "",
     description: "",
-    eligibility: "",
     applyLink: "",
     provider: "",
+    type: "",
     maxIncome: "",
-    minGpa: ""
+    minPercentage: "",
+    eligibleCaste: "",
+    eligibleLocality: ""
   });
 
   const handleChange = (e) => {
@@ -37,9 +39,9 @@ export default function AddScholarship() {
         },
         body: JSON.stringify({
           ...formData,
-          amount: parseFloat(formData.amount),
+          amount: parseInt(formData.amount),
           maxIncome: parseFloat(formData.maxIncome),
-          minGpa: parseFloat(formData.minGpa)
+          minPercentage: parseFloat(formData.minPercentage)
         })
       });
 
@@ -69,12 +71,14 @@ export default function AddScholarship() {
         <input name="amount" type="number" placeholder="Amount" onChange={handleChange} required />
         <input name="deadline" type="date" onChange={handleChange} required />
         <input name="provider" placeholder="Provider" onChange={handleChange} required />
+        <input name="type" placeholder="Type (Government/Private)" onChange={handleChange} required />
         <input name="applyLink" placeholder="Application Link" onChange={handleChange} required />
-        <input name="maxIncome" type="number" placeholder="Max Income" onChange={handleChange} required />
-        <input name="minGpa" type="number" step="0.1" placeholder="Min GPA" onChange={handleChange} required />
+        <input name="maxIncome" type="number" placeholder="Max Income" onChange={handleChange} />
+        <input name="minPercentage" type="number" placeholder="Min Percentage" onChange={handleChange} />
+        <input name="eligibleCaste" placeholder="Eligible Caste (ALL/OBC/ST/etc)" onChange={handleChange} />
+        <input name="eligibleLocality" placeholder="Eligible Locality (Gujarat/All India)" onChange={handleChange} />
 
         <textarea name="description" placeholder="Description" onChange={handleChange} required />
-        <textarea name="eligibility" placeholder="Eligibility" onChange={handleChange} required />
 
         <button type="submit" className="admin-btn">
           Add Scholarship

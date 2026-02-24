@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.scholarassist.entity.ApplicationTracking;
@@ -12,6 +13,7 @@ import com.scholarassist.entity.Scholarship;
 import com.scholarassist.entity.User;
 import com.scholarassist.repository.ScholarshipRepository;
 import com.scholarassist.repository.UserRepository;
+import com.scholarassist.service.ScholarshipImportService;
 import com.scholarassist.repository.ApplicationTrackingRepository;
 
 @RestController
@@ -27,7 +29,14 @@ public class AdminController {
 
     @Autowired
     private ApplicationTrackingRepository applicationTrackingRepository;
+@Autowired
+    private ScholarshipImportService scholarshipImportService;
 
+    @PostMapping("/import")
+    public ResponseEntity<String> importScholarships() {
+        String result = scholarshipImportService.importScholarships();
+        return ResponseEntity.ok(result);
+    }
 @GetMapping("/stats")
 public Map<String, Object> getStats() {
 

@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import com.scholarassist.dto.ApplicationDetailsDTO;
 import com.scholarassist.dto.ApplyRequest;
 import com.scholarassist.entity.ApplicationTracking;
+import com.scholarassist.entity.Notification;
 import com.scholarassist.repository.ApplicationTrackingRepository;
+import com.scholarassist.repository.NotificationRepository;
 import com.scholarassist.service.ApplicationTrackingService;
 
 @RestController
@@ -22,11 +24,48 @@ public class ApplicationTrackingController {
     @Autowired
     private ApplicationTrackingRepository applicationTrackingRepository;
 
+    @Autowired
+    private NotificationRepository notificationRepository;
+
     // ================= APPLY =================
 
     @PostMapping
-    public ApplicationTracking apply(@RequestBody ApplyRequest request) {
-        return service.applyScholarship(request);
+    public Object apply(@RequestBody ApplyRequest request) {
+
+        Object result = service.applyScholarship(request);
+
+        if (result instanceof String) {
+            // NOT_ELIGIBLE case
+            return result;
+        }
+
+        // ✅ SUCCESS CASE → SEND NOTIFICATION
+        notificationRepository.save(
+            new Notification(
+                request.getUserId(),
+                "✅ Your application has been submitted successfully."
+            )
+        );
+
+        return result;
+    }
+
+    // ================= FORCE APPLY =================
+
+    @PostMapping("/force")
+    public ApplicationTracking forceApply(@RequestBody ApplyRequest request) {
+
+        ApplicationTracking saved = service.forceApplyScholarship(request);
+
+        // ⚠ NOT ELIGIBLE BUT APPLIED
+        notificationRepository.save(
+            new Notification(
+                request.getUserId(),
+                "⚠ You applied for a scholarship even though you were not eligible."
+            )
+        );
+
+        return saved;
     }
 
     // ================= USER APPLICATIONS =================
@@ -41,7 +80,22 @@ public class ApplicationTrackingController {
     @PutMapping("/{id}/status")
     public String updateStatus(@PathVariable Long id,
                                @RequestParam String status) {
-        return service.updateStatus(id, status);
+
+        String result = service.updateStatus(id, status);
+
+        // 🔔 Optional: Notify user on status change
+        ApplicationTracking app = applicationTrackingRepository.findById(id).orElse(null);
+
+        if (app != null) {
+            notificationRepository.save(
+                new Notification(
+                    app.getUserId(),
+                    "📢 Your application status has been updated to: " + status
+                )
+            );
+        }
+
+        return result;
     }
 
     // ================= ADMIN FILTER BY STATUS =================
