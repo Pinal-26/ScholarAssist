@@ -1,27 +1,37 @@
 package com.scholarassist.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.scholarassist.entity.Notification;
 import com.scholarassist.entity.Profile;
 import com.scholarassist.entity.Scholarship;
+import com.scholarassist.entity.User;
+import com.scholarassist.repository.NotificationRepository;
 import com.scholarassist.repository.ProfileRepository;
 import com.scholarassist.repository.ScholarshipRepository;
+import com.scholarassist.repository.UserRepository;
 
 @Service
 public class ScholarshipService {
 
     private final ScholarshipRepository scholarshipRepo;
     private final ProfileRepository profileRepo;
-
-    public ScholarshipService(ScholarshipRepository scholarshipRepo,
-                              ProfileRepository profileRepo) {
-        this.scholarshipRepo = scholarshipRepo;
-        this.profileRepo = profileRepo;
-    }
+private final UserRepository userRepo;
+private final NotificationRepository notificationRepo;
+   public ScholarshipService(ScholarshipRepository scholarshipRepo,
+                           ProfileRepository profileRepo,
+                           UserRepository userRepo,
+                           NotificationRepository notificationRepo) {
+    this.scholarshipRepo = scholarshipRepo;
+    this.profileRepo = profileRepo;
+    this.userRepo = userRepo;
+    this.notificationRepo = notificationRepo;
+}
 
     // ================= GET ALL =================
     public List<Scholarship> getAllScholarships() {
@@ -33,8 +43,23 @@ public class ScholarshipService {
     }
 
     public Scholarship saveScholarship(Scholarship scholarship) {
-        return scholarshipRepo.save(scholarship);
+
+    Scholarship saved = scholarshipRepo.save(scholarship);
+
+    // 🔔 Notify all users about new scholarship
+    List<User> users = userRepo.findAll();
+
+    for (User user : users) {
+        notificationRepo.save(
+            new Notification(
+                user.getId(),
+                "🔥 New scholarship added: " + saved.getTitle()
+            )
+        );
     }
+
+    return saved;
+}
 
     public void deleteScholarship(Long id) {
         scholarshipRepo.deleteById(id);
@@ -42,6 +67,7 @@ public class ScholarshipService {
 
     // ================= ELIGIBLE SCHOLARSHIPS =================
     public List<Scholarship> getEligibleScholarships(Long userId) {
+
 
         Optional<Profile> optionalProfile = profileRepo.findByUserId(userId);
 
@@ -57,61 +83,58 @@ public class ScholarshipService {
                 .filter(s -> isEligible(profile, s))
                 .collect(Collectors.toList());
     }
-
+    
     // ================= CORE ELIGIBILITY CHECK =================
     private boolean isEligible(Profile profile, Scholarship scholarship) {
-
-        // ---------- GPA CHECK ----------
-        if (profile.getGpa() != null && scholarship.getMinGpa() != null) {
-            if (profile.getGpa() < scholarship.getMinGpa()) {
-                return false;
-            }
-        }
-
-        // ---------- 10TH PERCENTAGE CHECK ----------
-        if (profile.getTenthPercentage() != null &&
-            scholarship.getMinTenthPercentage() != null) {
-
-            if (profile.getTenthPercentage() < scholarship.getMinTenthPercentage()) {
-                return false;
-            }
-        }
-
-        // ---------- 12TH PERCENTAGE CHECK ----------
-        if (profile.getTwelfthPercentage() != null &&
-            scholarship.getMinTwelfthPercentage() != null) {
-
-            if (profile.getTwelfthPercentage() < scholarship.getMinTwelfthPercentage()) {
-                return false;
-            }
-        }
-
+    // Skip expired scholarships
+    if (scholarship.getDeadline() != null &&
+        scholarship.getDeadline().isBefore(LocalDate.now())) {
+        return false;
+    }
         // ---------- INCOME CHECK ----------
         if (profile.getParentIncome() != null &&
-            scholarship.getMaxParentIncome() != null) {
+            scholarship.getMaxIncome() != null) {
 
-            if (profile.getParentIncome() > scholarship.getMaxParentIncome()) {
+            if (profile.getParentIncome() > scholarship.getMaxIncome()) {
+                return false;
+            }
+        }
+
+        // ---------- PERCENTAGE CHECK ----------
+        if (profile.getTwelfthPercentage() != null &&
+            scholarship.getMinPercentage() != null) {
+
+            if (profile.getTwelfthPercentage() < scholarship.getMinPercentage()) {
                 return false;
             }
         }
 
         // ---------- CASTE CHECK ----------
-        // ---------- CASTE CHECK ----------
-if (scholarship.getEligibleCaste() != null &&
-    !scholarship.getEligibleCaste().equalsIgnoreCase("ALL")) {
+        if (scholarship.getEligibleCaste() != null) {
 
-    if (profile.getCaste() == null ||
-        !scholarship.getEligibleCaste().equalsIgnoreCase(profile.getCaste())) {
+    String scholarshipCaste = scholarship.getEligibleCaste().trim().toLowerCase();
+    String studentCaste = profile.getCaste() != null
+            ? profile.getCaste().trim().toLowerCase()
+            : "";
+
+    if (!scholarshipCaste.equals("all") &&
+        !scholarshipCaste.equals(studentCaste)) {
         return false;
     }
 }
 
-// ---------- LOCALITY CHECK ----------
-if (scholarship.getEligibleLocality() != null &&
-    !scholarship.getEligibleLocality().equalsIgnoreCase("ALL")) {
+        // ---------- LOCALITY CHECK ----------
+      if (scholarship.getEligibleLocality() != null) {
 
-    if (profile.getLocality() == null ||
-        !scholarship.getEligibleLocality().equalsIgnoreCase(profile.getLocality())) {
+    String scholarshipState = scholarship.getEligibleLocality().trim().toLowerCase();
+    String studentState = profile.getLocality() != null
+            ? profile.getLocality().trim().toLowerCase()
+            : "";
+
+    // Allow ALL / All India
+    if (!scholarshipState.equals("all india") &&
+        !scholarshipState.equals("all") &&
+        !scholarshipState.equals(studentState)) {
         return false;
     }
 }

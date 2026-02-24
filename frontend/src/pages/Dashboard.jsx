@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useEffect, useState, useCallback } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
@@ -15,49 +15,46 @@ export default function Dashboard() {
   const [scholarships, setScholarships] = useState([]);
   const [eligibleScholarships, setEligibleScholarships] = useState([]);
 
-  // ✅ applications state
   const [applications, setApplications] = useState([]);
-  const location = useLocation();
+  // const location = useLocation();
 
-  // ✅ SEARCH STATE
   const [searchTerm, setSearchTerm] = useState("");
-  // ✅ NEW EXTRA FILTERS (Does NOT affect existing logic)
-const [minAmountFilter, setMinAmountFilter] = useState("");
-const [amountSort, setAmountSort] = useState("");
-  
- 
+  const [minAmountFilter, setMinAmountFilter] = useState("");
+  const [amountSort, setAmountSort] = useState("");
+  const [savedIds, setSavedIds] = useState([]);
 
-  const savedKey = user
-    ? `savedScholarships_${user.id}`
-    : "savedScholarships_guest";
-
-  const [savedIds, setSavedIds] = useState(() => {
-    return JSON.parse(localStorage.getItem(savedKey)) || [];
-  });
-  useEffect(() => {
+const loadSaved = async () => {
   if (!user) return;
 
-  const saved = JSON.parse(localStorage.getItem(savedKey)) || [];
-  setSavedIds(saved);
-}, [location.pathname]);
+  try {
+   const res = await fetch(
+  `http://localhost:8080/api/saved/${user.id}`,
+  {
+    credentials: "include"
+  }
+);
+
+    if (!res.ok) throw new Error("Failed to load saved");
+
+    const data = await res.json();
+
+    const ids = data.map(item =>
+      Number(item.scholarshipId)
+    );
+
+    setSavedIds(ids);
+
+  } catch (err) {
+    console.error("Error loading saved:", err);
+  }
+};
 
 useEffect(() => {
-  if (!user) return;
-
-  const saved = JSON.parse(localStorage.getItem(savedKey)) || [];
-  setSavedIds(saved);
-}, [location.pathname, savedKey, user]);
-useEffect(() => {
-  if (!user) return;
-
-  const key = `savedScholarships_${user.id}`;
-  const saved = JSON.parse(localStorage.getItem(key)) || [];
-  setSavedIds(saved);
-}, [user]);
-
+  loadSaved();
+}, []);
 
   // ================= APPLY SCHOLARSHIP =================
- const applyScholarship = async (scholarship) => {
+const applyScholarship = async (scholarship) => {
   if (!user) {
     alert("Please login first.");
     return;
@@ -65,29 +62,64 @@ useEffect(() => {
 
   try {
     const response = await fetch("http://localhost:8080/api/applications", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    userId: user.id,
-    scholarshipId: scholarship.id,
-    applicationLink: scholarship.applyLink,
-  }),
-});
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user.id,
+        scholarshipId: scholarship.id,
+        applicationLink: scholarship.applyLink,
+      }),
+    });
 
-    if (!response.ok) {
-      throw new Error("Failed to apply");
+    const text = await response.text();
+    if (text === "ALREADY_APPLIED") {
+      alert("You have already applied for this scholarship.");
+      return;
+    }
+    // 🔴 NOT ELIGIBLE CASE
+    if (text === "NOT_ELIGIBLE") {
+
+      const confirmApply = window.confirm(
+        "You are not eligible for this scholarship.\nStill want to try your luck?"
+      );
+
+      // 🔥 ALWAYS open official link
+      window.open(scholarship.applyLink, "_blank");
+
+      if (!confirmApply) return;
+
+      // If confirmed → force save in DB
+      const forceResponse = await fetch(
+        "http://localhost:8080/api/applications/force",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            scholarshipId: scholarship.id,
+            applicationLink: scholarship.applyLink,
+          }),
+        }
+      );
+
+      const newApplication = await forceResponse.json();
+      setApplications((prev) => [...prev, newApplication]);
+
+      alert("Application submitted (even though not eligible).");
+      return;
     }
 
-    const newApplication = await response.json(); // 👈 IMPORTANT
+    // ✅ NORMAL ELIGIBLE CASE
+    const newApplication = JSON.parse(text);
 
-    // ✅ Add to dashboard applications state immediately
     setApplications((prev) => [...prev, newApplication]);
 
     alert("Application submitted successfully!");
 
-    // Optional: open scholarship link
     window.open(scholarship.applyLink, "_blank");
 
   } catch (error) {
@@ -206,27 +238,8 @@ useEffect(() => {
     });
   }, [user, safeFetchJSON]);
 
-  // ================= LOAD SAVED (USER WISE) =================
-  useEffect(() => {
-    if (!user) return;
-
-    const saved = JSON.parse(localStorage.getItem(savedKey)) || [];
-    setSavedIds(saved);
-  }, [savedKey, user]);
-
-  // ✅ MAIN FIX: when you return from Saved page, refresh savedIds
-  useEffect(() => {
-    const handleFocus = () => {
-      if (!user) return;
-      const saved = JSON.parse(localStorage.getItem(savedKey)) || [];
-      setSavedIds(saved);
-    };
-
-    window.addEventListener("focus", handleFocus);
-
-    return () => window.removeEventListener("focus", handleFocus);
-  }, [savedKey, user]);
-
+  
+  
   // ================= FETCH APPLICATIONS (USER WISE) =================
   useEffect(() => {
     if (!user) return;
@@ -236,22 +249,58 @@ useEffect(() => {
     );
   }, [user, safeFetchJSON]);
 
-  // ================= SAVE / UNSAVE =================
-  const toggleSave = (id) => {
-    let updated;
+// ================= SAVE / UNSAVE =================
+const toggleSave = async (scholarshipId) => {
+  console.log(
+  "DELETE URL:",
+  `http://localhost:8080/api/saved/${user.id}/${scholarshipId}`
+);
+  if (!user) {
+    alert("Please login first.");
+    return;
+  }
 
-    if (savedIds.includes(id)) {
-      updated = savedIds.filter((sid) => sid !== id);
+  const isSaved = savedIds.includes(scholarshipId);
+
+  try {
+    if (isSaved) {
+      const res = await fetch(
+        `http://localhost:8080/api/saved/${user.id}/${scholarshipId}`,
+        {
+          method: "DELETE",
+          credentials: "include"   // ⭐ THIS IS THE FIX
+
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to unsave");
+
     } else {
-      updated = [...savedIds, id];
+      const res = await fetch(
+  "http://localhost:8080/api/saved",
+  {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userId: user.id,
+      scholarshipId: scholarshipId
+    })
+  }
+);
+      if (!res.ok) throw new Error("Failed to save");
     }
 
-    setSavedIds(updated);
-    localStorage.setItem(savedKey, JSON.stringify(updated));
-  };
+    await loadSaved();
+
+  } catch (error) {
+    console.error("Save/Unsave error:", error);
+  }
+};
 
   // ================= SEARCH LOGIC =================
-// ================= SEARCH LOGIC =================
 const matchesSearch = (text) => {
   if (!searchTerm.trim()) return true;
 
@@ -285,7 +334,7 @@ if (amountSort === "low") {
 
 // ================= FILTER ALL =================
 const filteredAll = scholarships.filter(
-  (s) => matchesSearch(s.title) || matchesSearch(s.category)
+  (s) => matchesSearch(s.title) || matchesSearch(s.type)
 );
 
 
@@ -409,7 +458,7 @@ const filteredAll = scholarships.filter(
                   )}
                 </span>
 
-                <span className="tag">{s.category}</span>
+                <span className="tag">{s.type}</span>
                 <h4>{s.title}</h4>
                 <p className="amount">₹{s.amount}</p>
                 <p className="deadline">Deadline: {s.deadline}</p>
@@ -450,7 +499,7 @@ const filteredAll = scholarships.filter(
                   )}
                 </span>
 
-                <span className="tag">{s.category}</span>
+                <span className="tag">{s.type}</span>
                 <h4>{s.title}</h4>
                 <p className="amount">₹{s.amount}</p>
                 <p className="deadline">Deadline: {s.deadline}</p>

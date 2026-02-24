@@ -60,7 +60,7 @@ export default function AdminScholarships() {
                   key={s.id ? `admin-${s.id}` : `admin-${index}`}
                   className="scholarship-card"
                 >
-                  <span className="tag">{s.category}</span>
+                  <span className="tag">{s.type}</span>
                   <h4>{s.title}</h4>
                   <p className="amount">₹{s.amount}</p>
                   <p className="deadline">

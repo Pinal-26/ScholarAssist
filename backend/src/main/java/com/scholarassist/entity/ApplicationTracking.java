@@ -3,7 +3,7 @@ package com.scholarassist.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "application_tracking")
+@Table(name = "application_tracking", uniqueConstraints = @UniqueConstraint(columnNames = {"userId", "scholarshipId"}))
 public class ApplicationTracking {
 
     @Id
@@ -20,7 +20,7 @@ public class ApplicationTracking {
     private String appliedDate;
 
     @Column(nullable = false)
-    private String status = "PENDING";   
+    private String status = "PENDING";
 
     // ================= GETTERS & SETTERS =================
 

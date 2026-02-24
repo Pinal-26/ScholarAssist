@@ -37,26 +37,29 @@ public class ScholarshipController {
     }
 
     // ================= UPDATE =================
-    @PutMapping("/{id}")
-    public Scholarship updateScholarship(
-            @PathVariable Long id,
-            @RequestBody Scholarship updated) {
+   @PutMapping("/{id}")
+public Scholarship updateScholarship(
+        @PathVariable Long id,
+        @RequestBody Scholarship updated) {
 
-        Scholarship scholarship = service.getScholarshipById(id);
+    Scholarship scholarship = service.getScholarshipById(id);
 
-        scholarship.setTitle(updated.getTitle());
-        scholarship.setCategory(updated.getCategory());
-        scholarship.setAmount(updated.getAmount());
-        scholarship.setDeadline(updated.getDeadline());
-        scholarship.setDescription(updated.getDescription());
-        scholarship.setEligibility(updated.getEligibility());
-        scholarship.setApplyLink(updated.getApplyLink());
-        scholarship.setProvider(updated.getProvider());
-        scholarship.setMaxIncome(updated.getMaxIncome());
-        scholarship.setMinGpa(updated.getMinGpa());
+    scholarship.setTitle(updated.getTitle());
+    scholarship.setCategory(updated.getCategory());
+    scholarship.setAmount(updated.getAmount());
+    scholarship.setDeadline(updated.getDeadline());
+    scholarship.setDescription(updated.getDescription());
+    scholarship.setApplyLink(updated.getApplyLink());
+    scholarship.setProvider(updated.getProvider());
+    scholarship.setType(updated.getType());
 
-        return service.saveScholarship(scholarship);
-    }
+    scholarship.setMaxIncome(updated.getMaxIncome());
+    scholarship.setMinPercentage(updated.getMinPercentage());
+    scholarship.setEligibleCaste(updated.getEligibleCaste());
+    scholarship.setEligibleLocality(updated.getEligibleLocality());
+
+    return service.saveScholarship(scholarship);
+}
 
     // ================= DELETE =================
     @DeleteMapping("/{id}")

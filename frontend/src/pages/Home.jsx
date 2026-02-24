@@ -8,25 +8,24 @@ export default function Home() {
   const [active, setActive] = useState("home");
 
   // 🌙 Dark Mode state
-  const [darkMode, setDarkMode] = useState(false);
-
+  const [darkMode, setDarkMode] = useState(
+    localStorage.getItem("theme") === "dark"
+  );
   const scrollTo = (id) => {
     setActive(id);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
   // Load theme from localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-
-    if (savedTheme === "dark") {
-      setDarkMode(true);
-      document.body.classList.add("dark");
-    } else {
-      setDarkMode(false);
-      document.body.classList.remove("dark");
-    }
-  }, []);
+ useEffect(() => {
+  if (darkMode) {
+    document.documentElement.classList.add("dark");
+    localStorage.setItem("theme", "dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+    localStorage.setItem("theme", "light");
+  }
+}, [darkMode]);
 
   // Toggle theme
   const toggleTheme = () => {
@@ -124,7 +123,7 @@ export default function Home() {
       {/* ================= HERO ================= */}
       <section id="home" className="hero">
         <div className="hero-content">
-          <div className="badge">✨ AI Powered Scholarship Platform</div>
+          {/* <div className="badge">✨ AI Powered Scholarship Platform</div> */}
 
           <h1>
             Find Scholarships <span>Smarter</span> & Apply Faster 🚀

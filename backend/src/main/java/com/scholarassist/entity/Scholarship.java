@@ -11,46 +11,39 @@ public class Scholarship {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-
+    // ===== BASIC INFO =====
+@Column(unique = true)
+private String title;
     private String provider;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(columnDefinition = "TEXT")
-    private String eligibility;
-
-    
     private Integer amount;
 
     private LocalDate deadline;
 
-    private String category;
-   
-    private String applyLink;
+    private String type;          // Government / Private / etc.
 
-    private Double maxIncome;   // Maximum allowed parent income
+    private String category;      // General / OBC / SC / ST
 
-    private Double minGpa;      // Minimum required GPA
-private Double minTenthPercentage;
-private Double minTwelfthPercentage;
-private Double maxParentIncome;
-private String eligibleCaste;     // General / OBC / SC / ST / ALL
-private String eligibleLocality;  // Urban / Rural / ALL
-    public Double getMinTenthPercentage() {
-        return minTenthPercentage;
-    }
-    
-public void setMinTenthPercentage(Double minTenthPercentage) {
-        this.minTenthPercentage = minTenthPercentage;
-    }   
+    private String applyLink;     // Website link
+
+
+    // ===== ELIGIBILITY =====
+    private Double maxIncome;              // Max parent income
+
+    private Double minPercentage;          // Minimum required %
+
+    private String eligibleCaste;          // General / OBC / SC / ST / ALL
+
+    private String eligibleLocality;       // Gujarat / All India
+
+
+    // ================= GETTERS & SETTERS =================
+
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -77,14 +70,6 @@ public void setMinTenthPercentage(Double minTenthPercentage) {
         this.description = description;
     }
 
-    public String getEligibility() {
-        return eligibility;
-    }
-
-    public void setEligibility(String eligibility) {
-        this.eligibility = eligibility;
-    }
-
     public Integer getAmount() {
         return amount;
     }
@@ -99,6 +84,14 @@ public void setMinTenthPercentage(Double minTenthPercentage) {
 
     public void setDeadline(LocalDate deadline) {
         this.deadline = deadline;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getCategory() {
@@ -117,8 +110,6 @@ public void setMinTenthPercentage(Double minTenthPercentage) {
         this.applyLink = applyLink;
     }
 
-    // ===== NEW GETTERS & SETTERS =====
-
     public Double getMaxIncome() {
         return maxIncome;
     }
@@ -127,28 +118,12 @@ public void setMinTenthPercentage(Double minTenthPercentage) {
         this.maxIncome = maxIncome;
     }
 
-    public Double getMinGpa() {
-        return minGpa;
+    public Double getMinPercentage() {
+        return minPercentage;
     }
 
-    public void setMinGpa(Double minGpa) {
-        this.minGpa = minGpa;
-    }
-
-    public Double getMinTwelfthPercentage() {
-        return minTwelfthPercentage;
-    }
-
-    public void setMinTwelfthPercentage(Double minTwelfthPercentage) {
-        this.minTwelfthPercentage = minTwelfthPercentage;
-    }
-
-    public Double getMaxParentIncome() {
-        return maxParentIncome;
-    }
-
-    public void setMaxParentIncome(Double maxParentIncome) {
-        this.maxParentIncome = maxParentIncome;
+    public void setMinPercentage(Double minPercentage) {
+        this.minPercentage = minPercentage;
     }
 
     public String getEligibleCaste() {

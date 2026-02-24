@@ -24,21 +24,70 @@ public class ApplicationTrackingService {
     @Autowired
     private ScholarshipRepository scholarshipRepository;
 
-    // ================= APPLY SCHOLARSHIP =================
+    @Autowired
+    private ScholarshipService scholarshipService;
 
-    public ApplicationTracking applyScholarship(ApplyRequest request) {
+// ================= APPLY SCHOLARSHIP =================
+public Object applyScholarship(ApplyRequest request) {
 
-        ApplicationTracking application = new ApplicationTracking();
+    Optional<Scholarship> optionalScholarship =
+            scholarshipRepository.findById(request.getScholarshipId());
 
-        application.setUserId(request.getUserId());
-        application.setScholarshipId(request.getScholarshipId());
-        application.setApplicationLink(request.getApplicationLink());
-    application.setAppliedDate(LocalDate.now().toString());
-        application.setStatus("PENDING");   // ✅ VERY IMPORTANT
+    if (optionalScholarship.isEmpty()) {
+        return "SCHOLARSHIP_NOT_FOUND";
+    }
+        // 🚫 Prevent duplicate application
+        boolean alreadyApplied = applicationTrackingRepository
+                .existsByUserIdAndScholarshipId(
+                        request.getUserId(),
+                        request.getScholarshipId()
+                );
 
-        return applicationTrackingRepository.save(application);
+if (alreadyApplied) {
+    return "ALREADY_APPLIED";
+}
+    Scholarship scholarship = optionalScholarship.get();
+
+    // 🚫 Check expired
+    if (scholarship.getDeadline() != null &&
+        scholarship.getDeadline().isBefore(LocalDate.now())) {
+        return "EXPIRED";
     }
 
+    // 🚫 Check eligibility
+    boolean eligible = scholarshipService
+            .getEligibleScholarships(request.getUserId())
+            .stream()
+            .anyMatch(s -> s.getId().equals(scholarship.getId()));
+
+    if (!eligible) {
+        return "NOT_ELIGIBLE";
+    }
+
+    // ✅ Save normally
+    ApplicationTracking application = new ApplicationTracking();
+    application.setUserId(request.getUserId());
+    application.setScholarshipId(request.getScholarshipId());
+    application.setApplicationLink(request.getApplicationLink());
+    application.setAppliedDate(LocalDate.now().toString());
+    application.setStatus("PENDING");
+
+    return applicationTrackingRepository.save(application);
+}
+    
+        // ================= FORCE APPLY =================
+public ApplicationTracking forceApplyScholarship(ApplyRequest request) {
+
+    ApplicationTracking application = new ApplicationTracking();
+
+    application.setUserId(request.getUserId());
+    application.setScholarshipId(request.getScholarshipId());
+    application.setApplicationLink(request.getApplicationLink());
+    application.setAppliedDate(LocalDate.now().toString());
+    application.setStatus("PENDING");
+
+    return applicationTrackingRepository.save(application);
+}
     // ================= GET USER APPLICATIONS =================
 
     public List<ApplicationDetailsDTO> getUserApplications(Long userId) {
