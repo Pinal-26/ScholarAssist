@@ -6,13 +6,14 @@ import "../styles/authSplit.css";
 
 export default function Login() {
 
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
 
-  const navigate = useNavigate();
-
+  // Clear old session on load
   useEffect(() => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
@@ -35,15 +36,18 @@ export default function Login() {
         throw new Error(data?.message || "Login failed");
       }
 
-     if (!data.emailVerified) {
-  navigate(`/verify-otp?email=${formData.email}`);
-  return;
-}
+      // If email not verified
+      if (!data.emailVerified) {
+        navigate(`/verify-otp?email=${formData.email}`);
+        return;
+      }
 
+      // Save user
       localStorage.setItem("user", JSON.stringify(data));
 
-      alert("Login successful");
+      alert("Login Successful 🎉");
 
+      // Role based navigation
       if (data.role === "ADMIN") {
         navigate("/admindashboard");
       } else {
@@ -55,65 +59,59 @@ export default function Login() {
     }
   };
 
-  // ================= FIREBASE GOOGLE LOGIN =================
+  // ================= GOOGLE LOGIN =================
   const handleGoogleLogin = async () => {
-  try {
+    try {
 
-    // 1️⃣ Firebase popup
-    const result = await signInWithPopup(auth, provider);
-    const firebaseUser = result.user;
+      // 1️⃣ Firebase popup
+      const result = await signInWithPopup(auth, provider);
+      const firebaseUser = result.user;
 
-    // 2️⃣ Get Firebase ID token
-    const token = await firebaseUser.getIdToken();
+      // 2️⃣ Get ID token
+      const token = await firebaseUser.getIdToken();
 
-    // 3️⃣ Send token to backend
-    const res = await fetch(
-      "http://localhost:8080/api/users/firebase-login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ token })
+      // 3️⃣ Send token to backend
+      const res = await fetch(
+        "http://localhost:8080/api/users/firebase-login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ token })
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Google authentication failed");
       }
-    );
 
-   let data = null;
+      // Save user
+      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("token", token);
 
-if (res.headers.get("content-length") !== "0") {
-  data = await res.json();
-}
+      alert("Google Login Successful 🎉");
 
-if (!res.ok) {
-  throw new Error(data?.message || "Google authentication failed");
-}
+      // Role based navigation
+      if (data.role === "ADMIN") {
+        navigate("/admindashboard");
+      } else {
+        navigate("/dashboard");
+      }
 
-    if (!res.ok) {
-      throw new Error(data?.message || "Google authentication failed");
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
     }
-
-    // 4️⃣ Save user
-    localStorage.setItem("user", JSON.stringify(data));
-    localStorage.setItem("token", token);
-
-    alert("Google Login Successful 🎉");
-
-    if (data.role === "ADMIN") {
-      navigate("/admindashboard");
-    } else {
-      navigate("/dashboard");
-    }
-
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  }
-};
+  };
 
   return (
     <div className="auth-page">
       <div className="split-auth">
 
+        {/* LEFT SIDE */}
         <div className="auth-left">
           <div className="auth-left-inner">
 
@@ -137,12 +135,13 @@ if (!res.ok) {
 
               <div className="password-row">
                 <label>Password</label>
-<span 
-  className="forgot" 
-  onClick={() => navigate("/forgot-password")}
->
-  Forgot Password?
-</span>                </div>
+                <span
+                  className="forgot"
+                  onClick={() => navigate("/forgot-password")}
+                >
+                  Forgot Password?
+                </span>
+              </div>
 
               <input
                 type="password"
@@ -164,7 +163,7 @@ if (!res.ok) {
               <span>OR</span>
             </div>
 
-            {/* 🔥 FIREBASE GOOGLE LOGIN */}
+            {/* GOOGLE LOGIN */}
             <button className="google-btn" onClick={handleGoogleLogin}>
               <img
                 className="google-logo"
@@ -174,6 +173,7 @@ if (!res.ok) {
               <span>Continue with Google</span>
             </button>
 
+            {/* REGISTER */}
             <p className="bottom-text">
               Don’t have an account?{" "}
               <span onClick={() => navigate("/register")}>
@@ -181,10 +181,21 @@ if (!res.ok) {
               </span>
             </p>
 
+            {/* ADMIN LOGIN OPTION */}
+            <p className="bottom-text">
+              Are you an Admin?{" "}
+              <span
+                style={{ color: "#007bff", cursor: "pointer" }}
+                onClick={() => navigate("/admin/login")}
+              >
+                Login here
+              </span>
+            </p>
+
           </div>
         </div>
 
-        {/* RIGHT SIDE unchanged */}
+        {/* RIGHT SIDE */}
         <div className="auth-right">
           <h2>Continue Your Journey</h2>
 

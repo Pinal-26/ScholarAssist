@@ -16,9 +16,12 @@ import com.scholarassist.dto.RegisterRequest;
 import com.scholarassist.entity.User;
 import com.scholarassist.repository.UserRepository;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class UserService implements UserDetailsService {
 
+    @Autowired
     private final UserRepository repository;
     private final EmailService emailService;
 
@@ -203,4 +206,24 @@ public String resetPassword(String email, String otp, String newPassword) {
 
     return "Password reset successful";
 }
+@PostConstruct
+public void createDefaultAdmin() {
+
+    Optional<User> existingAdmin = repository.findByEmail("admin@gmail.com");
+
+    if (existingAdmin.isEmpty()) {
+
+        User admin = new User();
+        admin.setName("Administrator");
+        admin.setEmail("admin@gmail.com");
+        admin.setPassword(passwordEncoder.encode("tulsi")); // password
+        admin.setRole("ADMIN");
+        admin.setEmailVerified(true);
+
+        repository.save(admin);
+
+        System.out.println("Default Admin Created!");
+    }
+}
+    
 }

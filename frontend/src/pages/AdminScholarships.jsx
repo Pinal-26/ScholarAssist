@@ -1,60 +1,99 @@
 import { useEffect, useState } from "react";
-import "../styles/adminScholarships.css";
+import "../styles/adminDashboard.css";
 
 export default function AdminScholarships() {
 
   const [scholarships, setScholarships] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(6);
+  const [searchTerm, setSearchTerm] = useState("");
 
+  // ================= FETCH SCHOLARSHIPS =================
   useEffect(() => {
     fetch("http://localhost:8080/api/scholarships")
       .then(res => res.json())
-      .then(data => setScholarships(data));
+      .then(data => setScholarships(data || []))
+      .catch(err => console.error("Error loading scholarships:", err));
   }, []);
 
-  const handleDelete = (id) => {
-    fetch(`http://localhost:8080/api/scholarships/${id}`, {
-      method: "DELETE"
-    })
-    .then(() => {
-      setScholarships(scholarships.filter(s => s.id !== id));
-    });
-  };
+  // ================= SEARCH FILTER =================
+  const filteredScholarships = scholarships.filter((s) => {
+    if (!searchTerm.trim()) return true;
+
+    const text = (s.title + " " + s.category).toLowerCase();
+    return text.includes(searchTerm.toLowerCase());
+  });
 
   return (
-    <div className="admin-scholarships-container">
+    <div className="admin-dashboard">
 
-      <div className="admin-scholarships-header">
-        <h2>Manage Scholarships</h2>
-        <p>View and manage all available scholarships</p>
+      <div className="admin-header">
+        <h1>All Scholarships</h1>
       </div>
 
-      <div className="scholarship-list">
-        {scholarships.map(s => (
-          <div key={s.id} className="scholarship-card">
+      {/* SEARCH BAR */}
+      <div style={{ margin: "20px 0", textAlign: "center" }}>
+        <input
+          type="text"
+          placeholder="Search scholarships..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            padding: "10px",
+            width: "300px",
+            borderRadius: "6px",
+            border: "1px solid #ccc"
+          }}
+        />
+      </div>
 
-            <div className="card-top">
-              <h3>{s.title}</h3>
-              <span className="category-badge">{s.category}</span>
-            </div>
+      {filteredScholarships.length === 0 ? (
+        <p style={{ color: "#777", textAlign: "center" }}>
+          No scholarships found.
+        </p>
+      ) : (
+        <>
+          <div className="scholarship-grid">
+            {filteredScholarships
+              .slice(0, visibleCount)
+              .map((s, index) => (
+                <div
+                  key={s.id ? `admin-${s.id}` : `admin-${index}`}
+                  className="scholarship-card"
+                >
+                  <span className="tag">{s.category}</span>
+                  <h4>{s.title}</h4>
+                  <p className="amount">₹{s.amount}</p>
+                  <p className="deadline">
+                    Deadline: {s.deadline}
+                  </p>
 
-            <p className="description">{s.description}</p>
-
-            <div className="details-grid">
-              <p><strong>Amount:</strong> ₹{s.amount}</p>
-              <p><strong>Min GPA:</strong> {s.minGpa}</p>
-              <p><strong>Max Income:</strong> {s.maxIncome}</p>
-            </div>
-
-            <button
-              onClick={() => handleDelete(s.id)}
-              className="delete-btn"
-            >
-              🗑 Delete
-            </button>
-
+                  <p style={{ fontSize: "14px", marginTop: "10px" }}>
+                    {s.description?.substring(0, 100)}...
+                  </p>
+                </div>
+              ))}
           </div>
-        ))}
-      </div>
+
+          {/* LOAD MORE BUTTON */}
+          {visibleCount < filteredScholarships.length && (
+            <div style={{ textAlign: "center", marginTop: "20px" }}>
+              <button
+                onClick={() => setVisibleCount(prev => prev + 6)}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#1f6f8b",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer"
+                }}
+              >
+                Load More Scholarships
+              </button>
+            </div>
+          )}
+        </>
+      )}
 
     </div>
   );

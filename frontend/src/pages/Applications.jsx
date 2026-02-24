@@ -9,16 +9,21 @@ export default function Applications() {
   const [applications, setApplications] = useState([]);
 
   // ================= FETCH APPLICATIONS =================
-  useEffect(() => {
-    if (!user || !user.id) return;
+useEffect(() => {
+  if (!user || !user.id) return;
 
-    fetch(`http://localhost:8080/api/applications/user/${user.id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setApplications(data);
-      })
-      .catch((err) => console.error(err));
-  }, [user]);
+  fetch(`http://localhost:8080/api/applications/user/${user.id}`)
+    .then(async (res) => {
+      if (!res.ok) return [];
+
+      const text = await res.text();
+      return text ? JSON.parse(text) : [];
+    })
+    .then((data) => {
+      setApplications(data);
+    })
+    .catch((err) => console.error(err));
+}, [user?.id]);
 
   // ================= UPDATE STATUS =================
   const updateStatus = async (id, newStatus) => {
@@ -65,7 +70,7 @@ export default function Applications() {
               <tbody>
                 {applications.map((app) => (
                   <tr key={app.id}>
-                    <td>{app.title || "-"}</td>
+                    <td>{app.scholarshipTitle || "-"}</td>                    
                     <td>{app.amount ? `₹${app.amount}` : "-"}</td>
                     <td>{app.deadline ? app.deadline : "-"}</td>
                     <td>{app.appliedDate ? app.appliedDate : "-"}</td>

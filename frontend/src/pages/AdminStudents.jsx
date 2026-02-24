@@ -5,11 +5,14 @@ export default function AdminStudents() {
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/users/all")
-      .then(res => res.json())
-      .then(data => setStudents(data));
-  }, []);
-
+  fetch("http://localhost:8080/api/admin/students")
+    .then(res => res.json())
+    .then(data => {
+      // Filter only USER role
+      const students = data.filter(user => user.role === "USER");
+      setStudents(students);
+    });
+}, []);
   return (
     <div style={{ padding: "30px" }}>
       <h2>Registered Students</h2>

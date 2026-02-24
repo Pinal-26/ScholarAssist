@@ -1,14 +1,6 @@
 package com.scholarassist.entity;
 
-import java.time.LocalDate;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "application_tracking")
@@ -18,48 +10,45 @@ public class ApplicationTracking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate appliedDate;
+    private Long userId;
 
-    private String status; // APPLIED, UNDER_REVIEW, APPROVED, REJECTED
+    private Long scholarshipId;
 
     private String applicationLink;
+    
+    @Column(name = "applied_date")
+    private String appliedDate;
 
-    private String notes;
-
-    // ✅ scholarship_id
-    @ManyToOne
-    @JoinColumn(name = "scholarship_id", nullable = false)
-    private Scholarship scholarship;
-
-    // ✅ user_id
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false)
+    private String status = "PENDING";   
 
     // ================= GETTERS & SETTERS =================
 
+    public String getAppliedDate() {
+    return appliedDate;
+    }
+
+    public void setAppliedDate(String appliedDate) {
+        this.appliedDate = appliedDate;
+    }
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public LocalDate getAppliedDate() {
-        return appliedDate;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public void setAppliedDate(LocalDate appliedDate) {
-        this.appliedDate = appliedDate;
+    public Long getScholarshipId() {
+        return scholarshipId;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setScholarshipId(Long scholarshipId) {
+        this.scholarshipId = scholarshipId;
     }
 
     public String getApplicationLink() {
@@ -70,29 +59,11 @@ public class ApplicationTracking {
         this.applicationLink = applicationLink;
     }
 
-    public String getNotes() {
-        return notes;
+    public String getStatus() {
+        return status;
     }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setStatus(String status) {
+        this.status = status;
     }
-
-    public Scholarship getScholarship() {
-        return scholarship;
-    }
-
-    public void setScholarship(Scholarship scholarship) {
-        this.scholarship = scholarship;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-
 }

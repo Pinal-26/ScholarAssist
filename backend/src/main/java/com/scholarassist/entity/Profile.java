@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -19,7 +20,7 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false, unique = true)
+    
     private Long userId;
 
     private String firstName;
@@ -41,7 +42,7 @@ public class Profile {
     private Long parentIncome;
     private String caste;
     private String locality;
-
+    
     // ===== GETTERS & SETTERS =====
 
     public Long getId() { return id; }

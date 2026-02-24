@@ -21,22 +21,30 @@ public class Scholarship {
     @Column(columnDefinition = "TEXT")
     private String eligibility;
 
+    
     private Integer amount;
 
     private LocalDate deadline;
 
     private String category;
-
+   
     private String applyLink;
-
-    // ================= NEW ELIGIBILITY FIELDS =================
 
     private Double maxIncome;   // Maximum allowed parent income
 
     private Double minGpa;      // Minimum required GPA
-
-    // ===== GETTERS & SETTERS =====
-
+private Double minTenthPercentage;
+private Double minTwelfthPercentage;
+private Double maxParentIncome;
+private String eligibleCaste;     // General / OBC / SC / ST / ALL
+private String eligibleLocality;  // Urban / Rural / ALL
+    public Double getMinTenthPercentage() {
+        return minTenthPercentage;
+    }
+    
+public void setMinTenthPercentage(Double minTenthPercentage) {
+        this.minTenthPercentage = minTenthPercentage;
+    }   
     public Long getId() {
         return id;
     }
@@ -125,5 +133,37 @@ public class Scholarship {
 
     public void setMinGpa(Double minGpa) {
         this.minGpa = minGpa;
+    }
+
+    public Double getMinTwelfthPercentage() {
+        return minTwelfthPercentage;
+    }
+
+    public void setMinTwelfthPercentage(Double minTwelfthPercentage) {
+        this.minTwelfthPercentage = minTwelfthPercentage;
+    }
+
+    public Double getMaxParentIncome() {
+        return maxParentIncome;
+    }
+
+    public void setMaxParentIncome(Double maxParentIncome) {
+        this.maxParentIncome = maxParentIncome;
+    }
+
+    public String getEligibleCaste() {
+        return eligibleCaste;
+    }
+
+    public void setEligibleCaste(String eligibleCaste) {
+        this.eligibleCaste = eligibleCaste;
+    }
+
+    public String getEligibleLocality() {
+        return eligibleLocality;
+    }
+
+    public void setEligibleLocality(String eligibleLocality) {
+        this.eligibleLocality = eligibleLocality;
     }
 }

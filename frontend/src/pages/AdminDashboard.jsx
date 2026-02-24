@@ -1,164 +1,128 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/adminDashboard.css";
 
 export default function AdminDashboard() {
 
   const navigate = useNavigate();
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [systemStatus, setSystemStatus] = useState("");
 
-  // ===============================
-  // 🔐 ADMIN PROTECTION
-  // ===============================
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalScholarships: 0,
+    totalApplied: 0,
+    totalApproved: 0
+  });
+
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    console.log("AdminDashboard user:", user);
+  const admin = JSON.parse(localStorage.getItem("admin"));
 
-    if (!user || user.role?.toUpperCase() !== "ADMIN") {
-      navigate("/login");
-    }
-  }, [navigate]);
-
-  // ===============================
-  // 📊 FETCH DASHBOARD STATS
-  // ===============================
-  useEffect(() => {
-
-    fetch("http://localhost:8080/api/admin/stats")
-      .then(res => res.ok ? res.json() : [])
-      .then(data => {
-        setStats(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Error fetching stats:", err);
-        setLoading(false);
-      });
-
-    fetch("http://localhost:8080/api/admin/status")
-      .then(res => res.text())
-      .then(data => setSystemStatus(data))
-      .catch(err => console.error(err));
-
-  }, []);
-
-  if (loading) {
-    return <h2 style={{ textAlign: "center", marginTop: "40px" }}>Loading Dashboard...</h2>;
+  if (!admin || admin.role !== "ADMIN") {
+    navigate("/admin-login");
+    return;
   }
 
+  fetch("http://localhost:8080/api/admin/stats")
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch stats");
+      }
+      return res.json();
+    })
+    .then(data => {
+      setStats(data); // no need to manually map
+    })
+    .catch(err => {
+      console.error("Error fetching stats:", err);
+    });
+
+}, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("admin");
+    navigate("/admin/login");
+  };
+
   return (
-    <div className="admin-container">
+    <div className="admin-dashboard">
 
-      {/* HEADER */}
-      <header className="admin-header">
-        <div className="header-left">
-          <h1>ScholarAssist Admin</h1>
-          <p className="subtitle">Smart Scholarship Management Platform</p>
-        </div>
+  {/* HEADER */}
+  <div className="admin-header">
+    <h1>ScholarAssist Admin</h1>
+    <button className="logout-btn" onClick={handleLogout}>Logout</button>
+  </div>
 
-        <div className="admin-profile">
-          <div className="profile-info">
-            <span className="profile-name">Administrator</span>
-            <span className="profile-role">System Admin</span>
-          </div>
-          <div className="profile-avatar">SA</div>
-        </div>
-      </header>
+  {/* STATISTICS SECTION */}
+  <h2 className="section-title">Statistics Overview</h2>
 
-      {/* SYSTEM OVERVIEW */}
-      <section className="overview-section">
-        <h3 className="section-title">System Overview</h3>
-
-        <div className="stats-grid">
-
-          <div className="stat-card">
-            <div className="stat-icon">👨‍🎓</div>
-            <div className="stat-content">
-              <h3>{stats?.totalStudents || 0}</h3>
-              <p>Registered Students</p>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon">🎓</div>
-            <div className="stat-content">
-              <h3>{stats?.totalScholarships || 0}</h3>
-              <p>Scholarships Listed</p>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon">📄</div>
-            <div className="stat-content">
-              <h3>{stats?.totalApplications || 0}</h3>
-              <p>Total Applications</p>
-            </div>
-          </div>
-
-          <div className="stat-card highlight">
-            <div className="stat-icon">🏆</div>
-            <div className="stat-content">
-              <h3>{stats?.totalSuccess || 0}</h3>
-              <p>Students Got Scholarship</p>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* MAIN DASHBOARD */}
-      <section className="dashboard-main">
-
-        {/* LEFT COLUMN */}
-        <div className="dashboard-column">
-
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h4>Admin Controls</h4>
-              <span className="status-badge active">Active</span>
-            </div>
-
-            <p className="card-description">
-              Manage scholarships, users and applications manually.
-            </p>
-
-            <div className="btn-group">
-              <button
-                className="btn-primary"
-                onClick={() => navigate("/admin/scholarships")}
-              >
-                ➕ Manage Scholarships
-              </button>
-
-              <button
-                className="btn-primary secondary"
-                onClick={() => navigate("/admin/students")}
-              >
-                👨‍🎓 View Students
-              </button>
-            </div>
-          </div>
-
-        </div>
-
-        {/* RIGHT COLUMN */}
-        <div className="dashboard-column">
-
-          <div className="dashboard-card">
-            <h4>System Status</h4>
-
-            <div className="status-grid">
-              <div className="status-item active">
-                ✅ {systemStatus || "Backend Running"}
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
+  <div className="stats-grid">
+    <div className="stat-card">
+      <h3>Total Users</h3>
+      <p>{stats.totalUsers}</p>
     </div>
+
+    <div className="stat-card">
+      <h3>Total Scholarships</h3>
+      <p>{stats.totalScholarships}</p>
+    </div>
+
+    <div className="stat-card">
+      <h3>Total Applications</h3>
+      <p>{stats.totalApplied}</p>
+    </div>
+
+    <div className="stat-card">
+      <h3>Scholarships Approved</h3>
+      <p>{stats.totalApproved}</p>
+    </div>
+  </div>
+
+  {/* SCHOLARSHIP MANAGEMENT */}
+  <h2 className="section-title">Scholarship Management</h2>
+
+  <div className="admin-grid">
+    <div className="admin-card" onClick={() => navigate("/admin/scholarships")}>
+      View All Scholarships
+    </div>
+
+    <div className="admin-card" onClick={() => navigate("/admin/add-scholarship")}>
+      Add Scholarship
+    </div>
+
+    <div className="admin-card" onClick={() => navigate("/admin/edit-scholarships")}>
+      Edit Scholarship
+    </div>
+  </div>
+
+  {/* STUDENT MANAGEMENT */}
+  <h2 className="section-title">Student Management</h2>
+
+  <div className="admin-grid">
+    <div className="admin-card" onClick={() => navigate("/admin/students")}>
+      View All Students
+    </div>
+
+    <div className="admin-card" onClick={() => navigate("/admin/applications-status")}>
+  View By Scholarship Status
+</div>
+
+    <div className="admin-card" onClick={() => navigate("/admin/remove-user")}>
+      Remove Suspicious User
+    </div>
+  </div>
+
+  {/* ANALYTICS */}
+  <h2 className="section-title">Analytics</h2>
+
+  <div className="admin-grid">
+    <div className="admin-card" onClick={() => navigate("/admin/usability-graph")}>
+      Website Usability Graph
+    </div>
+
+    <div className="admin-card" onClick={() => navigate("/admin/response-time")}>
+      Response Time Graph
+    </div>
+  </div>
+
+</div>
   );
 }

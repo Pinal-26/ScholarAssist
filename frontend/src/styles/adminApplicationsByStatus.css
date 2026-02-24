@@ -1,0 +1,134 @@
+/* ================= THEME VARIABLES ================= */
+
+:root {
+  --primary: #00c6ff;
+
+  --text: #ffffff;
+  --text-light: #cbd5e1;
+  --muted: #94a3b8;
+
+  --card: #1e293b;
+  --bg-alt: #0f172a;
+
+  --border: #334155;
+  --border-light: #1e293b;
+
+  --success: #22c55e;
+  --warning: #facc15;
+  --danger: #ef4444;
+
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  --transition: 0.3s ease;
+}
+
+/* ================= PAGE ================= */
+
+.status-page {
+  padding: 40px;
+  background-color: var(--bg-alt);
+  min-height: 100vh;
+  color: var(--text);
+}
+
+/* ================= TITLE ================= */
+
+.status-title {
+  font-size: 28px;
+  margin-bottom: 30px;
+  font-weight: bold;
+  color: var(--text);
+}
+
+/* ================= FILTER ================= */
+
+.status-filter {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+/* Dropdown */
+
+.status-select {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  transition: var(--transition);
+}
+
+.status-select:hover {
+  border-color: var(--primary);
+}
+
+/* Button */
+
+.status-button {
+  padding: 10px 20px;
+  background: linear-gradient(45deg, var(--primary), #0072ff);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.status-button:hover {
+  transform: scale(1.05);
+}
+
+/* ================= TABLE ================= */
+
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--card);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Table Header */
+
+.status-table th {
+  background-color: var(--border);
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+  color: var(--text);
+}
+
+/* Table Rows */
+
+.status-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-light);
+}
+
+.status-table tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* ================= STATUS COLORS ================= */
+
+.status-approved {
+  color: var(--success);
+  font-weight: bold;
+}
+
+.status-pending {
+  color: var(--warning);
+  font-weight: bold;
+}
+
+.status-rejected {
+  color: var(--danger);
+  font-weight: bold;
+}
