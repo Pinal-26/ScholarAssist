@@ -44,9 +44,9 @@ public class UserService implements UserDetailsService {
 
             User user = existingUser.get();
 
-            if (user.isEmailVerified()) {
-                return "Email already registered";
-            }
+           if (repository.existsByEmail(user.getEmail())) {
+             throw new IllegalStateException("Email already registered");
+}
 
             String otp = generateOtp();
             user.setOtp(otp);
