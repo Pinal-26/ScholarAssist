@@ -383,32 +383,41 @@ const filteredAll = scholarships.filter(
         </div>
 
         {missingEligibilityFields.length > 0 && (
-          <div className="eligibility-alert">
-            <div className="alert-header">
-              ⚠ <strong>Important Eligibility Criteria Missing</strong>
-            </div>
+  <div className="eligibility-alert">
 
-            <p>
-              To accurately determine your scholarship eligibility, please
-              complete the following required fields:
-            </p>
+    <div className="alert-content">
 
-            <ul>
-              {missingEligibilityFields.map((field, index) => (
-                <li key={index}>{field}</li>
-              ))}
-            </ul>
+      <div className="alert-icon">⚠️</div>
 
-            <p className="alert-note">
-              Incomplete profile information may affect scholarship
-              recommendations.
-            </p>
+      <div className="alert-text">
+        <h4>Profile Information Required</h4>
 
-            <button className="profile-btn" onClick={() => navigate("/profile")}>
-              Complete Profile
-            </button>
-          </div>
-        )}
+        <p>
+          Complete the following details to get accurate scholarship
+          recommendations:
+        </p>
+
+        <ul>
+          {missingEligibilityFields.map((field, index) => (
+            <li key={index}>{field}</li>
+          ))}
+        </ul>
+
+        <span className="alert-note">
+          Missing information may affect eligibility results.
+        </span>
+      </div>
+    </div>
+
+    <button
+      className="profile-btn"
+      onClick={() => navigate("/profile")}
+    >
+      Complete Profile →
+    </button>
+
+  </div>
+)}
 
         <div className="eligible-filter-bar" style={{ display: "flex", gap: "10px", marginBottom: "15px", flexWrap: "wrap" }}>
   
