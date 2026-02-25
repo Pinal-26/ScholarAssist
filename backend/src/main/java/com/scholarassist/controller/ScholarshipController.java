@@ -9,7 +9,6 @@ import com.scholarassist.service.ScholarshipService;
 
 @RestController
 @RequestMapping("/api/scholarships")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ScholarshipController {
 
     private final ScholarshipService service;

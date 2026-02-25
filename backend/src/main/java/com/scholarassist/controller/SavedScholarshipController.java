@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/saved")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class SavedScholarshipController {
 
     private final SavedScholarshipRepository repository;

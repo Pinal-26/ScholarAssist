@@ -17,7 +17,6 @@ import com.scholarassist.service.ProfileService;
 
 @RestController
 @RequestMapping("/api/profile")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ProfileController {
 
     @Autowired

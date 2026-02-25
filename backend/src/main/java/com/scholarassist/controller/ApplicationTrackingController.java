@@ -15,7 +15,6 @@ import com.scholarassist.service.ApplicationTrackingService;
 
 @RestController
 @RequestMapping("/api/applications")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ApplicationTrackingController {
 
     @Autowired

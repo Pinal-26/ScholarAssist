@@ -5,7 +5,6 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/admin/performance")
-@CrossOrigin(origins = "http://localhost:5173")
 public class AdminPerformanceController {
 
     @GetMapping("/response-time")

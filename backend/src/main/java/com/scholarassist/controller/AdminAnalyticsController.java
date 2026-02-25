@@ -11,7 +11,6 @@ import com.scholarassist.repository.ApplicationTrackingRepository;
 
 @RestController
 @RequestMapping("/api/admin/analytics")
-@CrossOrigin(origins = "http://localhost:5173")
 public class AdminAnalyticsController {
 
     private final UserRepository userRepository;
