@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import API_BASE_URL from "../config";
 
 ChartJS.register(
   CategoryScale,
@@ -28,7 +29,7 @@ export default function WebsiteUsabilityGraph() {
   });
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/admin/analytics/usability")
+    fetch(`${API_BASE_URL}/api/admin/analytics/usability`)
       .then(res => res.json())
       .then(data => setAnalytics(data))
       .catch(err => console.error(err));

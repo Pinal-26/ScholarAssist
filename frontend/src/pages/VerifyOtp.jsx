@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/verifyOtp.css";
+import API_BASE_URL from "../config";
 
 export default function VerifyOtp() {
 
@@ -25,7 +26,7 @@ export default function VerifyOtp() {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/users/verify-otp?email=${email}&otp=${otp.trim()}`,
+        `${API_BASE_URL}/api/users/verify-otp?email=${email}&otp=${otp.trim()}`,
         {
           method: "POST",
         }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/adminDashboard.css";
+import API_BASE_URL from "../config";
 
 export default function EditScholarshipList() {
 
@@ -8,7 +9,7 @@ export default function EditScholarshipList() {
   const [scholarships, setScholarships] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/scholarships")
+    fetch(`${API_BASE_URL}/api/scholarships`)
       .then(res => res.json())
       .then(data => setScholarships(data))
       .catch(err => console.error(err));

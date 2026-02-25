@@ -3,6 +3,7 @@ import "../styles/dashboard.css";
 import { useEffect, useState, useCallback } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import Navbar from "./Navbar";
+import API_BASE_URL from "../config";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const loadSaved = async () => {
 
   try {
    const res = await fetch(
-  `http://localhost:8080/api/saved/${user.id}`,
+  `${API_BASE_URL}/api/saved/${user.id}`,
   {
     credentials: "include"
   }
@@ -61,7 +62,7 @@ const applyScholarship = async (scholarship) => {
   }
 
   try {
-    const response = await fetch("http://localhost:8080/api/applications", {
+    const response = await fetch(`${API_BASE_URL}/api/applications`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +93,7 @@ const applyScholarship = async (scholarship) => {
 
       // If confirmed → force save in DB
       const forceResponse = await fetch(
-        "http://localhost:8080/api/applications/force",
+        `${API_BASE_URL}/api/applications/force`,
         {
           method: "POST",
           headers: {
@@ -199,7 +200,7 @@ const applyScholarship = async (scholarship) => {
   useEffect(() => {
     const loadScholarships = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/scholarships");
+        const response = await fetch(`${API_BASE_URL}/api/scholarships`);
         if (!response.ok) throw new Error("Failed to fetch scholarships");
 
         const data = await response.json();
@@ -217,7 +218,7 @@ const applyScholarship = async (scholarship) => {
   useEffect(() => {
     if (!user) return;
 
-    safeFetchJSON(`http://localhost:8080/api/profile/${user.id}`).then(
+    safeFetchJSON(`${API_BASE_URL}/api/profile/${user.id}`).then(
       (data) => {
         if (!data) return;
         setProfile(data);
@@ -232,7 +233,7 @@ const applyScholarship = async (scholarship) => {
     if (!user) return;
 
     safeFetchJSON(
-      `http://localhost:8080/api/scholarships/eligible/${user.id}`
+      `${API_BASE_URL}/api/scholarships/eligible/${user.id}`
     ).then((data) => {
       if (data) setEligibleScholarships(data);
     });
@@ -244,7 +245,7 @@ const applyScholarship = async (scholarship) => {
   useEffect(() => {
     if (!user) return;
 
-    safeFetchJSON(`http://localhost:8080/api/applications/user/${user.id}`).then(
+    safeFetchJSON(`${API_BASE_URL}/api/applications/user/${user.id}`).then(
       (data) => setApplications(data || [])
     );
   }, [user, safeFetchJSON]);
@@ -253,7 +254,7 @@ const applyScholarship = async (scholarship) => {
 const toggleSave = async (scholarshipId) => {
   console.log(
   "DELETE URL:",
-  `http://localhost:8080/api/saved/${user.id}/${scholarshipId}`
+  `${API_BASE_URL}/api/saved/${user.id}/${scholarshipId}`
 );
   if (!user) {
     alert("Please login first.");
@@ -265,7 +266,7 @@ const toggleSave = async (scholarshipId) => {
   try {
     if (isSaved) {
       const res = await fetch(
-        `http://localhost:8080/api/saved/${user.id}/${scholarshipId}`,
+        `${API_BASE_URL}/api/saved/${user.id}/${scholarshipId}`,
         {
           method: "DELETE",
           credentials: "include"   // ⭐ THIS IS THE FIX
@@ -277,7 +278,7 @@ const toggleSave = async (scholarshipId) => {
 
     } else {
       const res = await fetch(
-  "http://localhost:8080/api/saved",
+  `${API_BASE_URL}/api/saved`,
   {
     method: "POST",
     credentials: "include",

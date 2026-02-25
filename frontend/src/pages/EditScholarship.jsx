@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../styles/adminDashboard.css";
+import API_BASE_URL from "../config";
 
 export default function EditScholarship() {
 
@@ -21,7 +22,7 @@ export default function EditScholarship() {
   });
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/scholarships/${id}`)
+    fetch(`${API_BASE_URL}/api/scholarships/${id}`)
       .then(res => res.json())
       .then(data => setFormData(data))
       .catch(err => console.error(err));
@@ -37,7 +38,7 @@ export default function EditScholarship() {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    await fetch(`http://localhost:8080/api/scholarships/${id}`, {
+    await fetch(`${API_BASE_URL}/api/scholarships/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)

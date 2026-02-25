@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/adminDashboard.css";
+import API_BASE_URL from "../config";
 
 export default function AdminDashboard() {
 
@@ -34,7 +35,7 @@ const handleImport = async () => {
     setMessage("");
 
     const response = await fetch(
-      "http://localhost:8080/api/admin/import",
+      `${API_BASE_URL}/api/admin/import`,
       {
         method: "POST"
       }
@@ -61,7 +62,7 @@ const handleImport = async () => {
     return;
   }
 
-  fetch("http://localhost:8080/api/admin/stats")
+  fetch(`${API_BASE_URL}/api/admin/stats`)
     .then(res => {
       if (!res.ok) {
         throw new Error("Failed to fetch stats");

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import "../styles/adminDashboard.css";
+import API_BASE_URL from "../config";
 
 export default function ViewStudents() {
 
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/users/all")
+    fetch(`${API_BASE_URL}/api/users/all`)
       .then(res => res.json())
       .then(data => {
         console.log("Users Data:", data);   // Debug

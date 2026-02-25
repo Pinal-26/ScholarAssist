@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import API_BASE_URL from "../config";
 
 ChartJS.register(
   CategoryScale,
@@ -26,7 +27,7 @@ export default function ResponseTimeGraph() {
   const [times, setTimes] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/admin/performance/response-time")
+    fetch(`${API_BASE_URL}/api/admin/performance/response-time`)
       .then(res => res.json())
       .then(data => setTimes(data.responseTimes))
       .catch(err => console.error(err));

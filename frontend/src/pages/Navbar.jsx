@@ -3,6 +3,7 @@ import "../styles/dashboard.css";
 import { FiLogOut } from "react-icons/fi";
 import { FaBell } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import API_BASE_URL from "../config";
 
 export default function Navbar({ searchTerm, setSearchTerm, showSearch = true }) {
 
@@ -17,12 +18,12 @@ export default function Navbar({ searchTerm, setSearchTerm, showSearch = true })
   useEffect(() => {
     if (!user) return;
 
-    fetch(`http://localhost:8080/api/notifications/count/${user.id}`)
+    fetch(`${API_BASE_URL}/api/notifications/count/${user.id}`)
       .then(res => res.json())
       .then(data => setUnreadCount(data))
       .catch(err => console.error("Count error:", err));
 
-    fetch(`http://localhost:8080/api/notifications/${user.id}`)
+    fetch(`${API_BASE_URL}/api/notifications/${user.id}`)
       .then(res => res.json())
       .then(data => setNotifications(data))
       .catch(err => console.error("Notification error:", err));
@@ -31,7 +32,7 @@ export default function Navbar({ searchTerm, setSearchTerm, showSearch = true })
 
   // ================= MARK AS READ =================
   const markAsRead = async (id) => {
-    await fetch(`http://localhost:8080/api/notifications/read/${id}`, {
+    await fetch(`${API_BASE_URL}/api/notifications/read/${id}`, {
       method: "PUT",
     });
 

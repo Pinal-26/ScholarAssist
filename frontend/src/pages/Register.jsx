@@ -3,6 +3,7 @@ import { useState } from "react";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../firebase";
 import "../styles/authSplit.css";
+import API_BASE_URL from "../config";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export default function Register() {
 
     try {
       const res = await fetch(
-        "http://localhost:8080/api/users/register",
+        `${API_BASE_URL}/api/users/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -56,7 +57,7 @@ export default function Register() {
 
       // 3️⃣ Send token to backend
       const res = await fetch(
-        "http://localhost:8080/api/users/firebase-login",
+        `${API_BASE_URL}/api/users/firebase-login`,
         {
           method: "POST",
           headers: {

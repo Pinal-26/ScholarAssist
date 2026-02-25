@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "../styles/applications.css";
 import Navbar from "./Navbar";
+import API_BASE_URL from "../config";
 
 export default function Applications() {
-  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
   const [applications, setApplications] = useState([]);
 
@@ -12,7 +11,7 @@ export default function Applications() {
 useEffect(() => {
   if (!user || !user.id) return;
 
-  fetch(`http://localhost:8080/api/applications/user/${user.id}`)
+  fetch(`${API_BASE_URL}/api/applications/user/${user.id}`)
     .then(async (res) => {
       if (!res.ok) return [];
 
@@ -29,7 +28,7 @@ useEffect(() => {
   const updateStatus = async (id, newStatus) => {
     try {
       await fetch(
-        `http://localhost:8080/api/applications/${id}/status?status=${newStatus}`,
+        `${API_BASE_URL}/api/applications/${id}/status?status=${newStatus}`,
         { method: "PUT" }
       );
 

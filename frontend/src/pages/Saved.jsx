@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/dashboard.css";
 import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
+import API_BASE_URL from "../config";
 
 export default function Saved() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function Saved() {
   useEffect(() => {
   if (!user) return;
 
-  fetch(`http://localhost:8080/api/saved/${user.id}`)
+  fetch(`${API_BASE_URL}/api/saved/${user.id}`)
     .then(res => res.json())
     .then(data => {
 const ids = data.map(item => Number(item.scholarshipId));
@@ -27,7 +28,7 @@ const ids = data.map(item => Number(item.scholarshipId));
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/scholarships");
+        const res = await fetch(`${API_BASE_URL}/api/scholarships`);
         if (!res.ok) throw new Error("Failed");
 
         const data = await res.json();
@@ -50,7 +51,7 @@ const ids = data.map(item => Number(item.scholarshipId));
 
   try {
     const res = await fetch(
-      `http://localhost:8080/api/saved/${user.id}/${scholarshipId}`,
+      `${API_BASE_URL}/api/saved/${user.id}/${scholarshipId}`,
       {
         method: "DELETE",
         credentials: "include"

@@ -1,6 +1,7 @@
 import { useParams, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/dashboard.css";
+import API_BASE_URL from "../config";
 
 export default function ScholarshipDetails() {
   const { id } = useParams();
@@ -8,7 +9,7 @@ export default function ScholarshipDetails() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/scholarships/${id}`)
+    fetch(`${API_BASE_URL}/api/scholarships/${id}`)
       .then(res => {
         if (!res.ok) {
           throw new Error("Scholarship not found");

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import API_BASE_URL from "../config";
 
 export default function AdminStudents() {
 
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
-  fetch("http://localhost:8080/api/admin/students")
+  fetch(`${API_BASE_URL}/api/admin/students`)
     .then(res => res.json())
     .then(data => {
       // Filter only USER role

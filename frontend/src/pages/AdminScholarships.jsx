@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "../styles/adminDashboard.css";
+import API_BASE_URL from "../config";
 
 export default function AdminScholarships() {
 
@@ -9,7 +10,7 @@ export default function AdminScholarships() {
 
   // ================= FETCH SCHOLARSHIPS =================
   useEffect(() => {
-    fetch("http://localhost:8080/api/scholarships")
+    fetch(`${API_BASE_URL}/api/scholarships`)
       .then(res => res.json())
       .then(data => setScholarships(data || []))
       .catch(err => console.error("Error loading scholarships:", err));

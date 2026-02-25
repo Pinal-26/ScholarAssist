@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "../styles/authSplit.css";
+import API_BASE_URL from "../config";
 
 export default function ResetPassword() {
 
@@ -17,7 +18,7 @@ export default function ResetPassword() {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/users/reset-password?email=${email}&otp=${otp}&newPassword=${newPassword}`,
+        `${API_BASE_URL}/api/users/reset-password?email=${email}&otp=${otp}&newPassword=${newPassword}`,
         { method: "POST" }
       );
 

@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../firebase";
+import API_BASE_URL from "../config";
 
 export default function GoogleLogin() {
 
@@ -20,7 +21,7 @@ export default function GoogleLogin() {
 
       // 3️⃣ Send token to Spring Boot
       const response = await fetch(
-        "http://localhost:8080/api/users/firebase-login",
+        `${API_BASE_URL}/api/users/firebase-login`,
         {
           method: "POST",
           headers: {

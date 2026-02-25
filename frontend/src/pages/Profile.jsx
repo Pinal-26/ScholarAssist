@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/profile.css";
 import Navbar from "./Navbar";
+import API_BASE_URL from "../config";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ export default function Profile() {
   useEffect(() => {
     if (!user || loaded) return;
 
-    fetch(`http://localhost:8080/api/profile/${user.id}`)
+    fetch(`${API_BASE_URL}/api/profile/${user.id}`)
       .then(res => res.json())
       .then(data => {
         if (!data) return;
@@ -68,7 +69,7 @@ export default function Profile() {
 
   // ================= SAVE PROFILE =================
   const handleSave = async () => {
-    const res = await fetch("http://localhost:8080/api/profile", {
+    const res = await fetch(`${API_BASE_URL}/api/profile`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

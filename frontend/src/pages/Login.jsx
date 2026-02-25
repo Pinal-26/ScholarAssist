@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../firebase";
 import "../styles/authSplit.css";
+import API_BASE_URL from "../config";
 
 export default function Login() {
 
@@ -24,7 +25,7 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:8080/api/users/login", {
+      const res = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -72,7 +73,7 @@ export default function Login() {
 
       // 3️⃣ Send token to backend
       const res = await fetch(
-        "http://localhost:8080/api/users/firebase-login",
+        `${API_BASE_URL}/api/users/firebase-login`,
         {
           method: "POST",
           headers: {

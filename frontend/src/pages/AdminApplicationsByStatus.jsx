@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import "../styles/adminApplicationsByStatus.css";
+import API_BASE_URL from "../config";
+
 
 export default function AdminApplicationsByStatus() {
 
@@ -7,7 +9,7 @@ export default function AdminApplicationsByStatus() {
   const [allApplications, setAllApplications] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/admin/applications")
+    fetch(`${API_BASE_URL}/api/admin/applications`)
       .then(res => res.json())
       .then(data => {
         console.log("Fetched Data:", data);

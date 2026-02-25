@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "../styles/authSplit.css";
+import API_BASE_URL from "../config";
 
 export default function AdminLogin() {
 
@@ -22,7 +23,7 @@ export default function AdminLogin() {
 
     try {
       const res = await fetch(
-        "http://localhost:8080/api/users/admin-login",
+        `${API_BASE_URL}/api/users/admin-login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

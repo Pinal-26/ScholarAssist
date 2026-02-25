@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/authSplit.css";
+import API_BASE_URL from "../config";
 
 export default function ForgotPassword() {
 
@@ -12,7 +13,7 @@ export default function ForgotPassword() {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/users/forgot-password?email=${email}`,
+        `${API_BASE_URL}/api/users/forgot-password?email=${email}`,
         { method: "POST" }
       );
 

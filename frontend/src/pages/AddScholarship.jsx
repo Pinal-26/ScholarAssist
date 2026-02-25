@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/adminDashboard.css";
+import API_BASE_URL from "../config";
 
 export default function AddScholarship() {
 
@@ -32,7 +33,7 @@ export default function AddScholarship() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/api/scholarships", {
+      const response = await fetch(`${API_BASE_URL}/api/scholarships`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
