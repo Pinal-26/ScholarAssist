@@ -17,54 +17,61 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    http
-        .csrf(csrf -> csrf.disable())
-        .cors(Customizer.withDefaults())
-        .authorizeHttpRequests(auth -> auth
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(Customizer.withDefaults()) // 🔥 Enables CORS
+            .authorizeHttpRequests(auth -> auth
 
-            // PUBLIC ENDPOINTS
-            .requestMatchers(
-                "/api/users/register",
-                "/api/users/login",
-                "/api/users/admin-login",
-                "/api/users/firebase-login",
-                "/api/users/verify-otp",
-                "/api/users/forgot-password",
-                "/api/users/reset-password",
-                "/api/scholarships/**",
-                "/api/applications/**",
-                "/api/admin/applications",
-                "/api/users/all",
-                "/api/admin/analytics/**",
-                "/api/admin/performance/**",
-                "/api/profile/**",
-                "/api/admin/stats",
-                "/api/admin/import", 
-                "/api/saved/**",
-                "/api/notifications/**"
-            ).permitAll()
+                // PUBLIC ENDPOINTS
+                .requestMatchers(
+                        "/api/users/register",
+                        "/api/users/login",
+                        "/api/users/admin-login",
+                        "/api/users/firebase-login",
+                        "/api/users/verify-otp",
+                        "/api/users/forgot-password",
+                        "/api/users/reset-password",
+                        "/api/scholarships/**",
+                        "/api/applications/**",
+                        "/api/admin/applications",
+                        "/api/users/all",
+                        "/api/admin/analytics/**",
+                        "/api/admin/performance/**",
+                        "/api/profile/**",
+                        "/api/admin/stats",
+                        "/api/admin/import",
+                        "/api/saved/**",
+                        "/api/notifications/**"
+                ).permitAll()
 
-            // ADMIN PROTECTED
-            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                // ADMIN PROTECTED
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-            // EVERYTHING ELSE
-            .anyRequest().authenticated()
-        )
-        .formLogin(form -> form.disable());
+                // EVERYTHING ELSE
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form.disable());
 
-    return http.build();
-}
-        
-    // CORS configuration
+        return http.build();
+    }
+
+    // ✅ Global CORS configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:5173",
+                "https://*.vercel.app"
+        ));
+
+        configuration.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
+        ));
+
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
