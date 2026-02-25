@@ -1406,3 +1406,71 @@ body.dark .eligible-filter-bar select:focus {
 .notification-wrapper svg:hover {
   color: #22d3ee;
 }
+
+/* Main Alert Card */
+.eligibility-alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff7ed;
+  border-left: 6px solid #f97316;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+/* Left Section */
+.alert-content {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+/* Icon */
+.alert-icon {
+  font-size: 28px;
+}
+
+/* Text Area */
+.alert-text h4 {
+  margin: 0;
+  color: #c2410c;
+}
+
+.alert-text p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+/* Missing Fields */
+.alert-text ul {
+  margin: 8px 0;
+  padding-left: 18px;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* Note */
+.alert-note {
+  font-size: 13px;
+  color: #666;
+}
+
+/* Button */
+.profile-btn {
+  background: #f97316;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.profile-btn:hover {
+  background: #ea580c;
+  transform: translateY(-1px);
+}
