@@ -34,7 +34,12 @@ public class UserController {
     // ================= REGISTER =================
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(userService.registerUser(request));
+      try {
+        userService.registerUser(request);
+        return ResponseEntity.ok("User registered successfully");
+    } catch (IllegalStateException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
     }
 
     // ================= LOGIN =================

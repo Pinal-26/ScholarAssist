@@ -34,7 +34,6 @@ public class SavedScholarshipController {
     }
 
     // REMOVE
-    
     @DeleteMapping("/{userId}/{scholarshipId}")
     public void delete(@PathVariable Long userId,
                        @PathVariable Long scholarshipId) {
