@@ -2,9 +2,7 @@ package com.scholarassist.controller;
 
 import java.util.Collections;
 import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +30,7 @@ public class UserController {
 
     // ================= REGISTER =================
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) throws Exception {
       try {
         userService.registerUser(request);
         return ResponseEntity.ok("User registered successfully");
@@ -43,7 +41,7 @@ public class UserController {
 
     // ================= LOGIN =================
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest req) throws Exception {
         try {
             User user = userService.login(req.getEmail(), req.getPassword());
 
@@ -128,7 +126,7 @@ public class UserController {
 
     // ================= FORGOT PASSWORD =================
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+    public ResponseEntity<String> forgotPassword(@RequestParam String email) throws Exception {
         return ResponseEntity.ok(userService.forgotPassword(email));
     }
 
@@ -145,7 +143,7 @@ public class UserController {
     }
 
     @PostMapping("/admin-login")
-public ResponseEntity<?> adminLogin(@RequestBody LoginRequest req) {
+public ResponseEntity<?> adminLogin(@RequestBody LoginRequest req) throws Exception {
 
     try {
         User user = userService.login(req.getEmail(), req.getPassword());

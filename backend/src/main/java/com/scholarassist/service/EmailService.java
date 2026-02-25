@@ -1,25 +1,50 @@
 package com.scholarassist.service;
 
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    @Value("${BREVO_API_KEY}")
+    private String apiKey;
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
+    private final OkHttpClient client = new OkHttpClient();
 
-    public void sendOtpEmail(String toEmail, String otp) {
+    public void sendOtpEmail(String toEmail, String otp) throws Exception {
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("ScholarAssist Email Verification OTP");
-        message.setText("Your OTP for email verification is: " + otp);
+        String json = """
+        {
+          "sender": {
+            "name": "ScholarAssist",
+            "email": "scholarassist0326@gmail.com"
+          },
+          "to": [{
+            "email": "%s"
+          }],
+          "subject": "ScholarAssist Email Verification OTP",
+          "htmlContent": "<h3>Your OTP for email verification is: <strong>%s</strong></h3><p>This OTP is valid for 5 minutes.</p>"
+        }
+        """.formatted(toEmail, otp);
 
-        mailSender.send(message);
+        RequestBody body = RequestBody.create(
+                json,
+                MediaType.parse("application/json")
+        );
+
+        Request request = new Request.Builder()
+                .url("https://api.brevo.com/v3/smtp/email")
+                .addHeader("api-key", apiKey)
+                .addHeader("Content-Type", "application/json")
+                .post(body)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+
+            if (!response.isSuccessful()) {
+                throw new RuntimeException("Failed to send email: " + response.body().string());
+            }
+        }
     }
 }

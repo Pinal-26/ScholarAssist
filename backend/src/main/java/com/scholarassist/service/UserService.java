@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
     }
 
     // ================= REGISTER =================
-    public String registerUser(RegisterRequest request) {
+    public String registerUser(RegisterRequest request) throws Exception {
 
         Optional<User> existingUser =
                 repository.findByEmail(request.getEmail());
@@ -80,7 +80,7 @@ public class UserService implements UserDetailsService {
     }
 
     // ================= LOGIN =================
-    public User login(String email, String rawPassword) {
+    public User login(String email, String rawPassword) throws Exception {
 
         User user = repository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -168,7 +168,7 @@ public class UserService implements UserDetailsService {
     private String generateOtp() {
         return String.valueOf(100000 + new Random().nextInt(900000));
     }
-    public String forgotPassword(String email) {
+    public String forgotPassword(String email) throws Exception {
 
     User user = repository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
