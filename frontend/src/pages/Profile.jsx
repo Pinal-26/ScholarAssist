@@ -253,7 +253,10 @@ export default function Profile() {
 
         {/* ================= ACTIONS ================= */}
         <div className="profile-actions">
-          <button className="btn-secondary">Cancel</button>
+          <button className="btn-secondary"
+           onClick={() => navigate("/dashboard")}
+           >
+            Cancel</button>
           <button type="button" className="btn-primary" onClick={handleSave}>
             Save Changes
           </button>
