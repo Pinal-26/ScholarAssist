@@ -602,3 +602,56 @@ body:not(.dark) .text-gradient-auth {
   -webkit-text-fill-color: transparent;
 }
 
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(20, 20, 40, 0.45);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loading-box {
+  background: white;
+  padding: 35px;
+  border-radius: 20px;
+  text-align: center;
+  width: 320px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.3s ease;
+}
+
+.loading-box h3 {
+  margin-top: 15px;
+  color: #4a4aff;
+}
+
+.loading-box p {
+  margin-top: 8px;
+  color: #555;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #eee;
+  border-top: 5px solid #4a4aff;
+  border-radius: 50%;
+  margin: auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
