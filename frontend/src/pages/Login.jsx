@@ -4,7 +4,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../firebase";
 import "../styles/authSplit.css";
 import API_BASE_URL from "../config";
-
+import LoadingDialog from "./LoadingDialog";
 export default function Login() {
 
   const navigate = useNavigate();
@@ -101,26 +101,9 @@ export default function Login() {
     }
   };
 
-  // ================= LOADING DIALOG =================
-  const LoadingDialog = () => {
-    if (!loading) return null;
-
-    return (
-      <div className="loading-overlay">
-        <div className="loading-box">
-          <div className="spinner"></div>
-          <h3>✨ Signing You In...</h3>
-          <p>Our server is preparing your dashboard.</p>
-          <small>Please wait patiently 🤍</small>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
-      <LoadingDialog />
-
+      <LoadingDialog show={loading} />  
       <div className="auth-page">
         <div className="split-auth">
 

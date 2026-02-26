@@ -6,7 +6,8 @@ import API_BASE_URL from "../config";
 export default function AdminDashboard() {
 
   const navigate = useNavigate();
-
+const [statsError, setStatsError] = useState("");
+const [retryTrigger, setRetryTrigger] = useState(0);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalScholarships: 0,
@@ -54,29 +55,35 @@ const handleImport = async () => {
   }
 };
 
-  useEffect(() => {
+ useEffect(() => {
   const admin = JSON.parse(localStorage.getItem("admin"));
 
   if (!admin || admin.role !== "ADMIN") {
-    navigate("/admin-login");
+    navigate("/admin/login");
     return;
   }
+
+  setStatsError("");
 
   fetch(`${API_BASE_URL}/api/admin/stats`)
     .then(res => {
       if (!res.ok) {
-        throw new Error("Failed to fetch stats");
+        throw new Error("Unable to load dashboard data");
       }
       return res.json();
     })
     .then(data => {
-      setStats(data); // no need to manually map
+      setStats(data);
     })
-    .catch(err => {
-      console.error("Error fetching stats:", err);
-    });
+    .catch(() => {
+  if (!navigator.onLine) {
+    setStatsError("You appear to be offline. Please check your internet connection.");
+  } else {
+    setStatsError("We’re having trouble loading dashboard data. The server may be waking up.");
+  }
+});
 
-}, [navigate]);
+}, [navigate, retryTrigger]);
 
   const handleLogout = () => {
   localStorage.removeItem("admin");
@@ -91,7 +98,14 @@ const handleImport = async () => {
     <h1>ScholarAssist Admin</h1>
     <button className="logout-btn" onClick={handleLogout}>Logout</button>
   </div>
-
+{statsError && (
+  <div className="error-box">
+    <p>{statsError}</p>
+    <button onClick={() => setRetryTrigger(prev => prev + 1)}>
+      Retry
+    </button>
+  </div>
+)}
   {/* STATISTICS SECTION */}
   <h2 className="section-title">Statistics Overview</h2>
 
