@@ -1,175 +1,224 @@
-/* ===============================
-   Applications Page - Dark Theme
-   ScholarAssist
-================================= */
+/* =========================================
+   ScholarAssist - Applications Page
+   Proper Light & Dark Theme
+========================================= */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ================= THEME VARIABLES ================= */
+
+/* LIGHT MODE (default) */
+:root {
+  --bg-page: #f5f7fb;
+  --bg-card: #ffffff;
+  --bg-header: #ffffff;
+  --bg-hover: #f1f5f9;
+
+  --text-primary: #0f172a;
+  --text-secondary: #1e293b;
+  --text-muted: #64748b;
+
+  --border-color: #e2e8f0;
+  --accent: #6366f1;
+
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
 }
 
-/* Page Background */
+/* DARK MODE */
+body.dark {
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --bg-header: #111827;
+  --bg-hover: #273549;
+
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+
+  --border-color: rgba(255, 255, 255, 0.08);
+  --accent: #8b5cf6;
+
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* ================= PAGE ================= */
+
 .applications-page {
-  background: #0f172a;   /* deep navy */
+  background: var(--bg-page);
   min-height: 100vh;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: background 0.3s ease;
 }
 
-/* ========== NAVBAR ========== */
-
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: #111827;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.nav-item {
-  padding: 0.5rem 0;
-  cursor: pointer;
-  color: #94a3b8;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  border-bottom: 2px solid transparent;
-}
-
-.nav-item:hover {
-  color: #ffffff;
-}
-
-.nav-item.active {
-  color: #ffffff;
-  border-bottom-color: #6366f1;
-}
-
-/* ========== CONTAINER ========== */
+/* ================= CONTAINER ================= */
 
 .applications-container {
   padding: 2rem;
-  max-width: 1400px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 
 .applications-title {
-  font-size: 1.75rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
   position: relative;
-  padding-bottom: 0.75rem;
 }
 
 .applications-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 60px;
+  content: "";
+  width: 50px;
   height: 4px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: var(--accent);
+  position: absolute;
+  bottom: -10px;
+  left: 0;
   border-radius: 2px;
 }
 
-/* ========== TABLE ========== */
+/* ================= TABLE ================= */
 
 .applications-table {
   width: 100%;
   border-collapse: collapse;
-  background: #1e293b;
-  border-radius: 12px;
+  background: var(--bg-card);
+  border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
 }
 
+/* HEADER */
 .applications-table thead {
-  background: #1e293b;
+  background: var(--bg-header);
 }
 
 .applications-table th {
-  padding: 1rem 1.5rem;
+  padding: 1.2rem 1.5rem;
   text-align: left;
-  font-weight: 600;
   font-size: 0.85rem;
+  font-weight: 700;
   text-transform: uppercase;
-  color: #94a3b8;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  letter-spacing: 0.5px;
 }
 
+/* BODY CELLS */
 .applications-table td {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  color: #e2e8f0;
   font-size: 0.95rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
 }
 
-/* Remove last border */
 .applications-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* Hover effect */
+/* ROW HOVER */
 .applications-table tbody tr {
   transition: background 0.25s ease;
 }
 
 .applications-table tbody tr:hover {
-  background: #273549;
+  background: var(--bg-hover);
 }
 
-/* ========== STATUS BADGES ========== */
+/* ================= STATUS BADGES ================= */
 
 .status-badge {
-  padding: 0.35rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
   font-weight: 600;
   display: inline-block;
-  text-align: center;
   min-width: 100px;
+  text-align: center;
 }
 
+/* APPLIED */
 .status-applied {
-  background: rgba(16,185,129,0.15);
-  color: #10b981;
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
 }
 
+/* UNDER REVIEW */
 .status-under-review {
-  background: rgba(245,158,11,0.15);
-  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
 }
 
+/* APPROVED */
 .status-approved {
-  background: rgba(59,130,246,0.15);
-  color: #3b82f6;
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
 }
 
+/* REJECTED */
 .status-rejected {
-  background: rgba(239,68,68,0.15);
-  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
 }
 
-/* ========== NO APPLICATIONS ========== */
+/* Dark adjustments */
+body.dark .status-applied {
+  background: rgba(59, 130, 246, 0.25);
+}
+
+body.dark .status-under-review {
+  background: rgba(245, 158, 11, 0.25);
+}
+
+body.dark .status-approved {
+  background: rgba(16, 185, 129, 0.25);
+}
+
+body.dark .status-rejected {
+  background: rgba(239, 68, 68, 0.25);
+}
+
+/* ================= STATUS DROPDOWN ================= */
+
+.status-select {
+  padding: 0.45rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary) !important;
+  font-size: 0.85rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  opacity: 1 !important;
+}
+
+.status-select:hover {
+  border-color: var(--accent);
+}
+
+.status-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+.status-select option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+/* ================= EMPTY STATE ================= */
 
 .no-applications {
-  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   padding: 3rem;
-  background: #1e293b;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.05);
-  color: #94a3b8;
+  border-radius: 16px;
+  text-align: center;
+  color: var(--text-muted);
   font-size: 1.1rem;
+  box-shadow: var(--shadow);
 }
 
-/* ========== RESPONSIVE ========== */
+/* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {
   .applications-table {

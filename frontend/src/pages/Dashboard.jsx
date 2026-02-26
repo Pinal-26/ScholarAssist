@@ -420,7 +420,7 @@ const filteredAll = scholarships.filter(
   </div>
 )}
 
-        <div className="eligible-filter-bar" style={{ display: "flex", gap: "10px", marginBottom: "15px", flexWrap: "wrap" }}>
+        <div className="eligible-filter-bar" >
   
   <input
     type="number"
@@ -469,7 +469,7 @@ const filteredAll = scholarships.filter(
                 </span>
 
                 <span className="tag">{s.type}</span>
-                <h4>{s.title}</h4>
+                <h4 >{s.title}</h4>
                 <p className="amount">₹{s.amount}</p>
                 <p className="deadline">Deadline: {s.deadline}</p>
 

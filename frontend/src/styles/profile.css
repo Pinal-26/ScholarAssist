@@ -12,18 +12,6 @@ body {
 }
 
 /* ================= DASHBOARD NAVBAR ================= */
-.dash-navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 40px;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-
-  position: sticky;   /* 👈 IMPORTANT */
-  top: 0;
-  z-index: 5;
-}
 
 
 .dash-logo {
@@ -41,18 +29,7 @@ body {
   gap: 28px;
 }
 
-.dash-link {
-  text-decoration: none;
-  font-size: 15px;
-  color: #475569;
-  padding-bottom: 6px;
-}
 
-.dash-link.active {
-  color: #2563eb;
-  font-weight: 600;
-  border-bottom: 2px solid #2563eb;
-}
 
 /* ================= PROFILE PAGE ================= */
 .profile-container {
@@ -67,7 +44,7 @@ body {
 .profile-container h2 {
   font-size: 28px;
   margin-bottom: 6px;
-  color: #e5e7eb;
+  color: #305091;
 }
 
 .subtitle {
