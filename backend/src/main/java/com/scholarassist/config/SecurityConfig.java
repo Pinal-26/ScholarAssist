@@ -88,4 +88,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-} rewrite whole file and make decision which api should be a ccesses by whom
+}
