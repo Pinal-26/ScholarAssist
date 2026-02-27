@@ -1,134 +1,203 @@
-/* ================= THEME VARIABLES ================= */
+/* ===============================
+   THEME VARIABLES
+================================= */
 
+/* ---------- LIGHT MODE (DEFAULT) ---------- */
 :root {
-  --primary: #00c6ff;
+  --bg-page: #f4f6f9;
+  --bg-card: #ffffff;
+  --bg-header: #e2e8f0;
+  --bg-hover: #f1f5f9;
 
-  --text: #ffffff;
-  --text-light: #cbd5e1;
-  --muted: #94a3b8;
+  --text-main: #1e293b;
+  --text-muted: #334155;
+  --text-soft: #64748b;
 
-  --card: #1e293b;
-  --bg-alt: #0f172a;
+  --border: #cbd5e1;
+
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  /* Status */
+  --approved-bg: #dcfce7;
+  --approved-text: #166534;
+  --approved-border: #22c55e;
+
+  --pending-bg: #fef9c3;
+  --pending-text: #92400e;
+  --pending-border: #facc15;
+
+  --rejected-bg: #fee2e2;
+  --rejected-text: #991b1b;
+  --rejected-border: #ef4444;
+}
+
+/* ---------- DARK MODE ---------- */
+body.dark {
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --bg-header: #162033;
+  --bg-hover: rgba(255, 255, 255, 0.04);
+
+  --text-main: #f1f5f9;
+  --text-muted: #cbd5e1;
+  --text-soft: #94a3b8;
 
   --border: #334155;
-  --border-light: #1e293b;
 
-  --success: #22c55e;
-  --warning: #facc15;
-  --danger: #ef4444;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  /* Status */
+  --approved-bg: rgba(34, 197, 94, 0.15);
+  --approved-text: #22c55e;
+  --approved-border: rgba(34, 197, 94, 0.4);
 
-  --transition: 0.3s ease;
+  --pending-bg: rgba(250, 204, 21, 0.15);
+  --pending-text: #facc15;
+  --pending-border: rgba(250, 204, 21, 0.4);
+
+  --rejected-bg: rgba(239, 68, 68, 0.15);
+  --rejected-text: #ef4444;
+  --rejected-border: rgba(239, 68, 68, 0.4);
 }
 
-/* ================= PAGE ================= */
+/* ===============================
+   PAGE
+================================= */
 
 .status-page {
-  padding: 40px;
-  background-color: var(--bg-alt);
+  padding: 50px;
   min-height: 100vh;
-  color: var(--text);
+  background: var(--bg-page);
+  color: var(--text-main);
+  font-family: "Inter", sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* ================= TITLE ================= */
+/* ===============================
+   TITLE
+================================= */
 
 .status-title {
   font-size: 28px;
+  font-weight: 700;
   margin-bottom: 30px;
-  font-weight: bold;
-  color: var(--text);
+  color: var(--text-main);
 }
 
-/* ================= FILTER ================= */
+/* ===============================
+   FILTER
+================================= */
 
 .status-filter {
-  display: flex;
-  gap: 15px;
-  align-items: center;
   margin-bottom: 30px;
 }
 
-/* Dropdown */
-
 .status-select {
-  padding: 10px 15px;
+  padding: 10px 16px;
   border-radius: 8px;
   border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  font-size: 16px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.status-select:hover,
+.status-select:focus {
+  border-color: #0072ff;
   outline: none;
-  transition: var(--transition);
+  box-shadow: 0 0 0 2px rgba(0, 114, 255, 0.15);
 }
 
-.status-select:hover {
-  border-color: var(--primary);
+/* ===============================
+   TABLE WRAPPER
+================================= */
+
+.status-table-wrapper {
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: background 0.3s ease;
 }
 
-/* Button */
-
-.status-button {
-  padding: 10px 20px;
-  background: linear-gradient(45deg, var(--primary), #0072ff);
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.status-button:hover {
-  transform: scale(1.05);
-}
-
-/* ================= TABLE ================= */
+/* ===============================
+   TABLE
+================================= */
 
 .status-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: var(--card);
-  border-radius: 10px;
-  overflow: hidden;
 }
-
-/* Table Header */
 
 .status-table th {
-  background-color: var(--border);
-  padding: 12px;
+  background: var(--bg-header);
+  padding: 14px;
   text-align: left;
-  font-weight: bold;
-  color: var(--text);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border);
 }
 
-/* Table Rows */
-
 .status-table td {
-  padding: 12px;
-  border-bottom: 1px solid var(--border-light);
-  color: var(--text-light);
+  padding: 14px;
+  font-size: 14px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.status-table tr:last-child td {
+  border-bottom: none;
 }
 
 .status-table tr:hover {
-  background-color: rgba(255, 255, 255, 0.03);
+  background: var(--bg-hover);
+  transition: background 0.2s ease;
 }
 
-/* ================= STATUS COLORS ================= */
+/* ===============================
+   STATUS BADGES
+================================= */
 
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+/* Approved */
 .status-approved {
-  color: var(--success);
-  font-weight: bold;
+  background: var(--approved-bg);
+  color: var(--approved-text);
+  border: 1px solid var(--approved-border);
 }
 
+/* Pending */
 .status-pending {
-  color: var(--warning);
-  font-weight: bold;
+  background: var(--pending-bg);
+  color: var(--pending-text);
+  border: 1px solid var(--pending-border);
 }
 
+/* Rejected */
 .status-rejected {
-  color: var(--danger);
-  font-weight: bold;
+  background: var(--rejected-bg);
+  color: var(--rejected-text);
+  border: 1px solid var(--rejected-border);
+}
+
+/* ===============================
+   EMPTY STATE
+================================= */
+
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-soft);
+  font-style: italic;
 }

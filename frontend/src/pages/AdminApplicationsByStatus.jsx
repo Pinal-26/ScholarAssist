@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import "../styles/adminApplicationsByStatus.css";
 import API_BASE_URL from "../config";
 
-
 export default function AdminApplicationsByStatus() {
 
   const [status, setStatus] = useState("");
@@ -18,7 +17,6 @@ export default function AdminApplicationsByStatus() {
       .catch(err => console.error("Error fetching applications:", err));
   }, []);
 
-  // ✅ DEFINE filteredApplications HERE
   const filteredApplications = status
     ? allApplications.filter(app =>
         app.status?.toUpperCase() === status.toUpperCase()
@@ -80,7 +78,7 @@ export default function AdminApplicationsByStatus() {
             ) : (
               <tr>
                 <td colSpan="4" className="no-data">
-                  No applications found.
+                  🚫 No applications found.
                 </td>
               </tr>
             )}
