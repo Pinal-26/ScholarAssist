@@ -305,15 +305,16 @@ const toggleSave = async (scholarshipId) => {
 const matchesSearch = (text) => {
   if (!searchTerm.trim()) return true;
 
-  const words = text.toLowerCase().split(" ");
-  const search = searchTerm.toLowerCase();
-
-  return words.some((word) => word.startsWith(search));
+  return text
+    ?.toLowerCase()
+    .includes(searchTerm.toLowerCase());
 };
 
 // ================= FILTER ELIGIBLE =================
 const filteredEligible = eligibleScholarships.filter(
-  (s) => matchesSearch(s.title) || matchesSearch(s.category)
+  (s) =>
+    matchesSearch(s.title || "") ||
+    matchesSearch(s.category || "")
 );
 
 // Make safe copy
@@ -335,9 +336,10 @@ if (amountSort === "low") {
 
 // ================= FILTER ALL =================
 const filteredAll = scholarships.filter(
-  (s) => matchesSearch(s.title) || matchesSearch(s.type)
+  (s) =>
+    matchesSearch(s.title || "") ||
+    matchesSearch(s.type || "")
 );
-
 
 // ================= FILTER ALL =================
 
