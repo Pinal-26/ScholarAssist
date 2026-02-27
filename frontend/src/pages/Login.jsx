@@ -5,10 +5,10 @@ import { auth, provider } from "../firebase";
 import "../styles/authSplit.css";
 import API_BASE_URL from "../config";
 import LoadingDialog from "./LoadingDialog";
+
 export default function Login() {
 
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -25,8 +25,10 @@ export default function Login() {
   // ================= NORMAL LOGIN =================
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
+
     setLoading(true);
-    
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: "POST",
@@ -40,8 +42,9 @@ export default function Login() {
         throw new Error(data?.message || "Login failed");
       }
 
-      // If email not verified
+      // Email not verified
       if (!data.emailVerified) {
+        setLoading(false);
         navigate(`/verify-otp?email=${formData.email}`);
         return;
       }
@@ -63,6 +66,8 @@ export default function Login() {
 
   // ================= GOOGLE LOGIN =================
   const handleGoogleLogin = async () => {
+    if (loading) return;
+
     setLoading(true);
 
     try {

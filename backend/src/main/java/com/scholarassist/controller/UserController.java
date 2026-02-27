@@ -40,26 +40,37 @@ public class UserController {
     }
 
     // ================= LOGIN =================
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) throws Exception {
-        try {
-            User user = userService.login(req.getEmail(), req.getPassword());
+@PostMapping("/login")
+public ResponseEntity<?> login(@RequestBody LoginRequest req) throws Exception {
 
-            UserResponse res = new UserResponse();
-            res.setId(user.getId());
-            res.setName(user.getName());
-            res.setEmail(user.getEmail());
-            res.setRole(user.getRole());
-            res.setEmailVerified(user.isEmailVerified());
+    try {
+        User user = userService.login(req.getEmail(), req.getPassword());
 
-            return ResponseEntity.ok(res);
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest()
-                    .body(Collections.singletonMap("message", e.getMessage()));
+        // 🚫 If ADMIN tries to login from USER login
+        if (!"USER".equalsIgnoreCase(user.getRole())) {
+            return ResponseEntity.status(400)
+                    .body(Collections.singletonMap("message", "No user found"));
         }
-    }
 
+        if (!user.isEmailVerified()) {
+            return ResponseEntity.status(403)
+                    .body(Collections.singletonMap("message", "Please verify email first."));
+        }
+
+        UserResponse res = new UserResponse();
+        res.setId(user.getId());
+        res.setName(user.getName());
+        res.setEmail(user.getEmail());
+        res.setRole(user.getRole());
+        res.setEmailVerified(user.isEmailVerified());
+
+        return ResponseEntity.ok(res);
+
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(400)
+                .body(Collections.singletonMap("message", "No user found"));
+    }
+}
     // ================= FIREBASE LOGIN =================
     @PostMapping("/firebase-login")
     public ResponseEntity<?> firebaseLogin(@RequestBody Map<String, String> request) {

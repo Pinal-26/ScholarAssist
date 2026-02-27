@@ -21,10 +21,10 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
-            .cors(Customizer.withDefaults()) // 🔥 Enables CORS
+            .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
 
-                // PUBLIC ENDPOINTS
+                // ================= PUBLIC =================
                 .requestMatchers(
                         "/api/users/register",
                         "/api/users/login",
@@ -32,24 +32,27 @@ public class SecurityConfig {
                         "/api/users/firebase-login",
                         "/api/users/verify-otp",
                         "/api/users/forgot-password",
-                        "/api/users/reset-password",
-                        "/api/scholarships/**",
-                        "/api/applications/**",
-                        "/api/admin/applications",
-                        "/api/users/all",
-                        "/api/admin/analytics/**",
-                        "/api/admin/performance/**",
-                        "/api/profile/**",
-                        "/api/admin/stats",
-                        "/api/admin/import",
-                        "/api/saved/**",
-                        "/api/notifications/**"
+                        "/api/users/reset-password"
                 ).permitAll()
 
-                // ADMIN PROTECTED
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                // Public scholarship viewing
+                .requestMatchers("/api/scholarships/**").permitAll()
 
-                // EVERYTHING ELSE
+                // ================= ADMIN ONLY =================
+                .requestMatchers(
+                        "/api/admin/**",
+                        "/api/users/all"
+                ).hasRole("ADMIN")
+
+                // ================= USER + ADMIN =================
+                .requestMatchers(
+                        "/api/profile/**",
+                        "/api/saved/**",
+                        "/api/applications/**",
+                        "/api/notifications/**"
+                ).hasAnyRole("USER", "ADMIN")
+
+                // Everything else requires authentication
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form.disable());
@@ -57,7 +60,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // ✅ Global CORS configuration
+    // ================= CORS CONFIG =================
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
@@ -65,7 +68,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-            "https://scholarassist.vercel.app"
+                "https://scholarassist.vercel.app"
         ));
 
         configuration.setAllowedMethods(List.of(
@@ -83,7 +86,7 @@ public class SecurityConfig {
         return source;
     }
 
-    // Password encoder
+    // ================= PASSWORD ENCODER =================
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

@@ -926,35 +926,39 @@ body.dark .hero-content p {
   text-shadow: 0 2px 5px rgba(0,0,0,0.6);
 }
 
-/* Badge - LIGHT MODE WITH COLOR VARIATIONS */
+/*notification*/
+/* ===== Clean Minimal Notification Count ===== */
+
 .badge {
-  display: inline-block;
-  background: rgba(31, 108, 108, 0.08);
-  color: var(--primary);
-  padding: 12px 22px;
-  border-radius: 100px;
-  font-weight: 800;
-  font-size: 15px;
-  margin-bottom: 22px;
-  border: 1px solid var(--border);
-  backdrop-filter: blur(12px);
+  position: absolute;
+  top: -6px;
+  right: -6px;
+
+  background: none !important;   /* force remove */
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  color: #22d3ee;   /* cyan accent */
+  pointer-events: none;
 }
 
+/* Light mode */
 body:not(.dark) .badge {
-  background: rgba(31, 108, 108, 0.1);
   color: #1f6c6c;
-  border: 1px solid rgba(31, 108, 108, 0.2);
-  border-left: 4px solid #b86b5e;
 }
 
+/* Dark mode */
 body.dark .badge {
-  background: rgba(158, 255, 240, 0.18);
-  color: #ffffff;
-  border: 1px solid rgba(158, 255, 240, 0.6);
-  text-shadow: 0 1px 3px black;
-  font-weight: 900;
-  letter-spacing: 1px;
-  box-shadow: 0 0 20px rgba(158, 255, 240, 0.25);
+  color: #22d3ee;
+  text-shadow: 0 0 6px rgba(34, 211, 238, 0.6);
+}
+
+.notification-wrapper svg {
+  font-size: 28px;
 }
 
 /* HERO BUTTONS */
