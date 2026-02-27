@@ -39,7 +39,8 @@ private String title;
 
     private String eligibleLocality;       // Gujarat / All India
 
-
+    @OneToMany(mappedBy = "scholarship", cascade = CascadeType.ALL)
+    private List<DocumentRequirement> documentRequirements;
     // ================= GETTERS & SETTERS =================
 
     public Long getId() {
