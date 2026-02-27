@@ -72,36 +72,37 @@ export default function Navbar({ searchTerm, setSearchTerm, showSearch = true })
 
       {/* 🔔 Notification Bell */}
       {user && (
-        <div className="notification-wrapper">
-          <FaBell
-            size={20}
-            onClick={() => setShowDropdown(!showDropdown)}
-            style={{ cursor: "pointer" }}
-          />
+  <div className="notification-wrapper">
+    <div
+      onClick={() => setShowDropdown(!showDropdown)}
+      style={{ position: "relative", cursor: "pointer" }}
+    >
+      <FaBell size={20} />
 
-          {unreadCount > 0 && (
-            <span className="badge">{unreadCount}</span>
-          )}
-
-          {showDropdown && (
-            <div className="notification-dropdown">
-              {notifications.length === 0 ? (
-                <p style={{ padding: "10px" }}>No notifications</p>
-              ) : (
-                notifications.map((n) => (
-                  <div
-                    key={n.id}
-                    className={`notification-item ${n.read ? "read" : "unread"}`}
-                    onClick={() => markAsRead(n.id)}
-                  >
-                    {n.message}
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-        </div>
+      {unreadCount > 0 && (
+        <span className="badge">{unreadCount}</span>
       )}
+    </div>
+
+    {showDropdown && (
+      <div className="notification-dropdown">
+        {notifications.length === 0 ? (
+          <p style={{ padding: "10px" }}>No notifications</p>
+        ) : (
+          notifications.map((n) => (
+            <div
+              key={n.id}
+              className={`notification-item ${n.read ? "read" : "unread"}`}
+              onClick={() => markAsRead(n.id)}
+            >
+              {n.message}
+            </div>
+          ))
+        )}
+      </div>
+    )}
+  </div>
+)}
 
       <div className="dash-nav-links">
         <NavLink to="/dashboard" className="dash-link">Dashboard</NavLink>
