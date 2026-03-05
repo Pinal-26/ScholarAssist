@@ -159,3 +159,33 @@ button {
   user-select: auto !important;
   z-index: 20;
 }
+
+.document-table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+.document-table th,
+.document-table td{
+border:1px solid #ddd;
+padding:10px;
+text-align:left;
+}
+
+.document-table th{
+background:#f4f4f4;
+}
+
+.btn-danger{
+background:#e53935;
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:6px;
+cursor:pointer;
+}
+
+.btn-danger:hover{
+background:#c62828;
+}
