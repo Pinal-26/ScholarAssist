@@ -43,14 +43,15 @@ public class SecurityConfig {
                         "/api/admin/stats",
                         "/api/admin/import",
                         "/api/saved/**",
-                        "/api/notifications/**"
+                        "/api/notifications/**",
+                        "/api/documents/**"
                 ).permitAll()
 
                 // ADMIN PROTECTED
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                 // EVERYTHING ELSE
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
             )
             .formLogin(form -> form.disable());
 
