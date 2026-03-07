@@ -42,6 +42,7 @@ public class ScholarshipImportService {
 
                 Scholarship scholarship = new Scholarship();
 
+                // BASIC INFO
                 scholarship.setTitle(card.select("h3").text());
                 scholarship.setProvider(card.select(".provider").text());
                 scholarship.setType(card.select(".type").text());
@@ -50,7 +51,7 @@ public class ScholarshipImportService {
 
                 scholarship.setAmount(parseInteger(card.select(".amount").text()));
 
-                // Deadline parsing SAFE
+                // DEADLINE
                 try {
                     String deadlineText = card.select(".deadline").text();
                     if (!deadlineText.isEmpty()) {
@@ -60,8 +61,11 @@ public class ScholarshipImportService {
                     scholarship.setDeadline(null);
                 }
 
+                // ELIGIBILITY BLOCK
                 Element eligibility = card.selectFirst(".eligibility");
-
+                System.out.println("COURSE -> " + eligibility.select(".course").text());
+                System.out.println("CGPA -> " + eligibility.select(".min-cgpa").text());
+                System.out.println("HOSTEL -> " + eligibility.select(".hostel-amount").text());
                 if (eligibility != null) {
 
                     scholarship.setMaxIncome(
@@ -75,14 +79,49 @@ public class ScholarshipImportService {
 
                     scholarship.setEligibleLocality(
                             eligibility.select(".state").text());
+
+                    scholarship.setCourse(
+                            eligibility.select(".course").text());
+
+                    scholarship.setQuota(
+                            eligibility.select(".quota").text());
+
+                    scholarship.setHostelAmount(
+                            parseInteger(eligibility.select(".hostel-amount").text()));
+
+                    scholarship.setTuitionSupport(
+                            parseInteger(eligibility.select(".tuition-support").text()));
+
+                    scholarship.setMedicalSupport(
+                            parseInteger(eligibility.select(".medical-support").text()));
+
+                    scholarship.setField(
+                            eligibility.select(".field").text());
+
+                    scholarship.setMinCgpa(
+                            parseDouble(eligibility.select(".min-cgpa").text()));
+
+                    scholarship.setMinTenthPercentage(
+                            parseDouble(eligibility.select(".min-tenth-percentage").text()));
+
+                    scholarship.setMinTwelfthPercentage(
+                            parseDouble(eligibility.select(".min-twelfth-percentage").text()));
                 }
 
-                list.add(scholarship);
+                // list.add(scholarship);
 
-                System.out.println("Imported: " + scholarship.getTitle());
+                // System.out.println("Imported: " + scholarship.getTitle());
+                if (!scholarshipRepository.existsByTitle(scholarship.getTitle())) {
+        list.add(scholarship);
+        System.out.println("Imported: " + scholarship.getTitle());
+    } else {
+        System.out.println("Skipped duplicate: " + scholarship.getTitle());
+    }
             }
 
-            scholarshipRepository.saveAll(list);
+            // remove old data
+          scholarshipRepository.deleteAllInBatch();
+scholarshipRepository.saveAll(list);
 
             return "Imported " + list.size() + " scholarships";
 

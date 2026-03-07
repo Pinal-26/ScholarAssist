@@ -9,5 +9,6 @@ import com.scholarassist.entity.Scholarship;
 public interface ScholarshipRepository extends JpaRepository<Scholarship, Long> {
 
 Optional<Scholarship> findByTitle(String title);
+boolean existsByTitle(String title);
 
 }
