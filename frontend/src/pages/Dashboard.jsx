@@ -252,10 +252,9 @@ const applyScholarship = async (scholarship) => {
 
 // ================= SAVE / UNSAVE =================
 const toggleSave = async (scholarshipId) => {
-  console.log(
-  "DELETE URL:",
-  `${API_BASE_URL}/api/saved/${user.id}/${scholarshipId}`
-);
+
+  console.log("Saving scholarship:", scholarshipId);
+
   if (!user) {
     alert("Please login first.");
     return;
@@ -264,40 +263,32 @@ const toggleSave = async (scholarshipId) => {
   const isSaved = savedIds.includes(scholarshipId);
 
   try {
+
     if (isSaved) {
-      const res = await fetch(
-        `${API_BASE_URL}/api/saved/${user.id}/${scholarshipId}`,
-        {
-          method: "DELETE",
-          credentials: "include"   // ⭐ THIS IS THE FIX
 
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to unsave");
+      await fetch(`${API_BASE_URL}/api/saved/${user.id}/${scholarshipId}`, {
+        method: "DELETE"
+      });
 
     } else {
-      const res = await fetch(
-  `${API_BASE_URL}/api/saved`,
-  {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      userId: user.id,
-      scholarshipId: scholarshipId
-    })
-  }
-);
-      if (!res.ok) throw new Error("Failed to save");
+
+      await fetch(`${API_BASE_URL}/api/saved`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: Number(user.id),
+          scholarshipId: Number(scholarshipId)
+        })
+      });
+
     }
 
     await loadSaved();
 
   } catch (error) {
-    console.error("Save/Unsave error:", error);
+    console.error("Save error:", error);
   }
 };
 
@@ -536,3 +527,4 @@ const filteredAll = scholarships.filter(
     </>
   );
 }
+

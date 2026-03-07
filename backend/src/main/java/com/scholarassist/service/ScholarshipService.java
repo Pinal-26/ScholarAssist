@@ -1,6 +1,5 @@
 package com.scholarassist.service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -85,60 +84,33 @@ private final NotificationRepository notificationRepo;
     }
     
     // ================= CORE ELIGIBILITY CHECK =================
-    private boolean isEligible(Profile profile, Scholarship scholarship) {
-    // Skip expired scholarships
-    if (scholarship.getDeadline() != null &&
-        scholarship.getDeadline().isBefore(LocalDate.now())) {
-        return false;
-    }
-        // ---------- INCOME CHECK ----------
-        if (profile.getParentIncome() != null &&
-            scholarship.getMaxIncome() != null) {
+    // ================= CORE ELIGIBILITY CHECK =================
+private boolean isEligible(Profile profile, Scholarship scholarship) {
 
-            if (profile.getParentIncome() > scholarship.getMaxIncome()) {
-                return false;
-            }
+    // income check
+    if (profile.getParentIncome() != null &&
+        scholarship.getMaxIncome() != null) {
+
+        if (profile.getParentIncome() > scholarship.getMaxIncome()) {
+            return false;
         }
+    }
 
-        // ---------- PERCENTAGE CHECK ----------
-        if (profile.getTwelfthPercentage() != null &&
-            scholarship.getMinPercentage() != null) {
+    // field / course check
+    if (scholarship.getField() != null) {
 
-            if (profile.getTwelfthPercentage() < scholarship.getMinPercentage()) {
-                return false;
-            }
+        String scholarshipField = scholarship.getField().toLowerCase();
+
+        String studentCourse = profile.getCourse() != null
+                ? profile.getCourse().toLowerCase()
+                : "";
+
+        if (!scholarshipField.equals("all") &&
+            !studentCourse.contains(scholarshipField)) {
+            return false;
         }
-
-        // ---------- CASTE CHECK ----------
-        if (scholarship.getEligibleCaste() != null) {
-
-    String scholarshipCaste = scholarship.getEligibleCaste().trim().toLowerCase();
-    String studentCaste = profile.getCaste() != null
-            ? profile.getCaste().trim().toLowerCase()
-            : "";
-
-    if (!scholarshipCaste.equals("all") &&
-        !scholarshipCaste.equals(studentCaste)) {
-        return false;
     }
+
+    return true;
 }
-
-        // ---------- LOCALITY CHECK ----------
-      if (scholarship.getEligibleLocality() != null) {
-
-    String scholarshipState = scholarship.getEligibleLocality().trim().toLowerCase();
-    String studentState = profile.getLocality() != null
-            ? profile.getLocality().trim().toLowerCase()
-            : "";
-
-    // Allow ALL / All India
-    if (!scholarshipState.equals("all india") &&
-        !scholarshipState.equals("all") &&
-        !scholarshipState.equals(studentState)) {
-        return false;
-    }
-}
-
-        return true;
-    }
 }

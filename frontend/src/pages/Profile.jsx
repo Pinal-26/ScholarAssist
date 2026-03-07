@@ -34,6 +34,12 @@ export default function Profile() {
   const [caste,setCaste] = useState("");
   const [locality,setLocality] = useState("");
 
+  // ===== NEW FIELDS =====
+  const [branch,setBranch] = useState("");
+  const [quota,setQuota] = useState("");
+  const [collegeFees,setCollegeFees] = useState("");
+  const [hostelFees,setHostelFees] = useState("");
+
   // ================= DOCUMENT UPLOAD =================
   const [documentType,setDocumentType] = useState("");
   const [documentFile,setDocumentFile] = useState(null);
@@ -46,7 +52,6 @@ export default function Profile() {
 
     if(!user || loaded) return;
 
-    // LOAD PROFILE
     fetch(`${API_BASE_URL}/api/profile/${user.id}`)
       .then(res => res.json())
       .then(data => {
@@ -74,11 +79,16 @@ export default function Profile() {
         setCaste(data.caste || "");
         setLocality(data.locality || "");
 
+        // ===== NEW FIELDS LOAD =====
+        setBranch(data.branch || "");
+        setQuota(data.quota || "");
+        setCollegeFees(data.collegeFees || "");
+        setHostelFees(data.hostelFees || "");
+
         setLoaded(true);
 
       });
 
-    // LOAD DOCUMENTS
     fetch(`${API_BASE_URL}/api/documents/user/${user.id}`)
       .then(res => res.json())
       .then(data => {
@@ -117,22 +127,24 @@ export default function Profile() {
         twelfthPercentage,
         parentIncome,
         caste,
-        locality
+        locality,
+
+        // ===== NEW FIELDS =====
+        branch,
+        quota,
+        collegeFees,
+        hostelFees
 
       })
 
     });
 
     if(res.ok){
-
       alert("Profile saved successfully");
       navigate("/dashboard");
-
     }
     else{
-
       alert("Save failed");
-
     }
 
   };
@@ -142,17 +154,13 @@ export default function Profile() {
   const handleDocumentUpload = async () => {
 
     if(!documentType || !documentFile){
-
       alert("Select document type and PDF");
       return;
-
     }
 
     if(documentFile.type !== "application/pdf"){
-
       alert("Only PDF allowed");
       return;
-
     }
 
     const formData = new FormData();
@@ -162,10 +170,8 @@ export default function Profile() {
     formData.append("file",documentFile);
 
     const res = await fetch(`${API_BASE_URL}/api/documents/upload`,{
-
       method:"POST",
       body:formData
-
     });
 
     if(res.ok){
@@ -175,22 +181,18 @@ export default function Profile() {
       setDocumentFile(null);
       setDocumentType("");
 
-      // reload documents
       fetch(`${API_BASE_URL}/api/documents/user/${user.id}`)
         .then(res=>res.json())
         .then(data=>setDocuments(data));
 
     }
     else{
-
       alert("Upload failed");
-
     }
 
   };
 
 
-  // ================= VIEW DOCUMENT =================
   const handleViewDocument = (docId) => {
 
     window.open(
@@ -200,11 +202,10 @@ export default function Profile() {
 
   };
 
-  // ================= DELETE DOCUMENT =================
+
 const handleDeleteDocument = async (docId) => {
 
   const confirmDelete = window.confirm("Are you sure you want to delete this document?");
-
   if (!confirmDelete) return;
 
   const res = await fetch(`${API_BASE_URL}/api/documents/${docId}`, {
@@ -215,7 +216,6 @@ const handleDeleteDocument = async (docId) => {
 
     alert("Document deleted");
 
-    // reload document list
     fetch(`${API_BASE_URL}/api/documents/user/${user.id}`)
       .then(res => res.json())
       .then(data => setDocuments(data));
@@ -227,22 +227,20 @@ const handleDeleteDocument = async (docId) => {
   }
 
 };
-  // ================= DELETE DOCUMENT =================
+
+
   return(
 
   <>
 
-  {/* NAVBAR */}
   <Navbar showSearch={false}/>
 
   <div className="profile-container">
 
   <h2>Profile Settings</h2>
 
-  {/* ================= PERSONAL ================= */}
-
+  {/* PERSONAL */}
   <div className="profile-card">
-
   <h3>Personal Information</h3>
 
   <div className="form-grid">
@@ -271,8 +269,7 @@ const handleDeleteDocument = async (docId) => {
   </div>
 
 
-  {/* ================= ADDRESS ================= */}
-
+  {/* ADDRESS */}
   <div className="profile-card">
 
   <h3>Address</h3>
@@ -303,8 +300,7 @@ const handleDeleteDocument = async (docId) => {
   </div>
 
 
-  {/* ================= ACADEMIC ================= */}
-
+  {/* ACADEMIC */}
   <div className="profile-card">
 
   <h3>Academic Information</h3>
@@ -319,6 +315,77 @@ const handleDeleteDocument = async (docId) => {
   <div>
   <label>Course</label>
   <input value={course} onChange={e=>setCourse(e.target.value)}/>
+  </div>
+
+  <div>
+    
+  <label>Field of Study</label>
+
+<select value={branch} onChange={e=>setBranch(e.target.value)}>
+
+<option value="">Select</option>
+
+{/* School Level */}
+<option value="10th">10th</option>
+<option value="12th">12th</option>
+
+{/* Diploma */}
+<option value="Diploma Engineering">Diploma Engineering</option>
+<option value="Diploma Medical">Diploma Medical</option>
+<option value="Diploma Pharmacy">Diploma Pharmacy</option>
+
+{/* Undergraduate */}
+<option value="BTech">B.Tech</option>
+<option value="BE">B.E</option>
+<option value="BSc">B.Sc</option>
+<option value="BCom">B.Com</option>
+<option value="BA">B.A</option>
+<option value="BCA">BCA</option>
+<option value="BBA">BBA</option>
+<option value="MBBS">MBBS</option>
+<option value="BDS">BDS</option>
+<option value="BPharm">B.Pharm</option>
+<option value="LLB">LLB</option>
+<option value="CA">CA</option>
+
+{/* Postgraduate */}
+<option value="MTech">M.Tech</option>
+<option value="MSc">M.Sc</option>
+<option value="MCom">M.Com</option>
+<option value="MA">M.A</option>
+<option value="MCA">MCA</option>
+<option value="MBA">MBA</option>
+<option value="MD">MD</option>
+<option value="MS">MS</option>
+<option value="LLM">LLM</option>
+
+{/* Doctorate */}
+<option value="PhD">PhD</option>
+
+</select>
+
+  </div>
+
+  <div>
+  <label>Quota</label>
+
+  <select value={quota} onChange={e=>setQuota(e.target.value)}>
+  <option value="">Select</option>
+  <option value="TFW">TFW</option>
+  <option value="Government">Government</option>
+  <option value="SFI">SFI</option>
+  </select>
+
+  </div>
+
+  <div>
+  <label>College Fees</label>
+  <input value={collegeFees} onChange={e=>setCollegeFees(e.target.value)}/>
+  </div>
+
+  <div>
+  <label>Hostel Fees</label>
+  <input value={hostelFees} onChange={e=>setHostelFees(e.target.value)}/>
   </div>
 
   <div>

@@ -1,11 +1,9 @@
 package com.scholarassist.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -42,6 +40,12 @@ public class Profile {
     private Long parentIncome;
     private String caste;
     private String locality;
+
+    private String branch;
+    private String quota;
+    private double familyIncome;
+    private double collegeFees;
+    private double hostelFees;
     
     // ===== GETTERS & SETTERS =====
 
@@ -109,5 +113,45 @@ public class Profile {
     public String getLocality() { return locality; }
     public void setLocality(String locality) {
         this.locality = locality;
+    }
+
+    public String getQuota() {
+        return quota;
+    }
+
+    public void setQuota(String quota) {
+        this.quota = quota;
+    }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
+    }
+
+    public double getFamilyIncome() {
+        return familyIncome;
+    }
+
+    public void setFamilyIncome(double familyIncome) {
+        this.familyIncome = familyIncome;
+    }
+
+    public double getCollegeFees() {
+        return collegeFees;
+    }
+
+    public void setCollegeFees(double collegeFees) {
+        this.collegeFees = collegeFees;
+    }
+
+    public double getHostelFees() {
+        return hostelFees;
+    }
+
+    public void setHostelFees(double hostelFees) {
+        this.hostelFees = hostelFees;
     }
 }
