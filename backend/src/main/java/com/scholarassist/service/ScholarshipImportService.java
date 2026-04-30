@@ -119,9 +119,10 @@ public class ScholarshipImportService {
     }
             }
 
-            // remove old data
-          scholarshipRepository.deleteAllInBatch();
-scholarshipRepository.saveAll(list);
+            
+if (!list.isEmpty()) {
+    scholarshipRepository.saveAll(list);
+}
 
             return "Imported " + list.size() + " scholarships";
 
