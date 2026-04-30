@@ -147,13 +147,11 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="hero-stats"
-
+          <div className="hero-stats">
             <div className="hero-stat">
               <h3>50+</h3>
               <p>Scholarships</p>
             </div>
-        
         </div>
 
         <div className="hero-cards">
