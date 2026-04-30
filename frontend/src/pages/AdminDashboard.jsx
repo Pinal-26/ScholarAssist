@@ -198,9 +198,9 @@ const handleImport = async () => {
   View By Scholarship Status
 </div>
 
-    <div className="admin-card" onClick={() => navigate("/admin/remove-user")}>
+    {/* <div className="admin-card" onClick={() => navigate("/admin/remove-user")}>
       Remove Suspicious User
-    </div>
+    </div> */}
   </div>
 
   {/* ANALYTICS */}
