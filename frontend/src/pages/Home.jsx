@@ -147,20 +147,11 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="hero-stats">
-            <div className="hero-stat">
-              <h3>50K+</h3>
-              <p>Students Helped</p>
-            </div>
+          <div className="hero-stats"
 
             <div className="hero-stat">
-              <h3>2K+</h3>
+              <h3>50+</h3>
               <p>Scholarships</p>
-            </div>
-
-            <div className="hero-stat">
-              <h3>95%</h3>
-              <p>Success Rate</p>
             </div>
           </div>
         </div>
