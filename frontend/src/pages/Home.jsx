@@ -153,7 +153,7 @@ export default function Home() {
               <h3>50+</h3>
               <p>Scholarships</p>
             </div>
-          </div>
+        
         </div>
 
         <div className="hero-cards">
