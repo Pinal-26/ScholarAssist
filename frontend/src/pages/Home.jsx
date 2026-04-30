@@ -271,15 +271,15 @@ export default function Home() {
           <div className="footer-col">
             <h3>For General Query</h3>
             <div className="footer-line"></div>
-            <p>📧 support@scholarassist.com</p>
-            <p>📞 +91 11 2345 6789</p>
+            <p>📧 scholarassist0326@gmail.com</p>
+            <p>📞 +91 9081853952</p>
           </div>
 
           <div className="footer-col">
             <h3>For Technical Query</h3>
             <div className="footer-line"></div>
-            <p>📧 tech@scholarassist.com</p>
-            <p>📞 +91 79 1234 5678</p>
+            <p>📧 scholarassist0326@gmail.com</p>
+            <p>📞 +91 6352174737</p>
           </div>
 
           <div className="footer-col">
