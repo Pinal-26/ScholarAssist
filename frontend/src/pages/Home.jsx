@@ -153,7 +153,7 @@ export default function Home() {
               <p>Scholarships</p>
             </div>
         </div>
-
+  </div>
         <div className="hero-cards">
           <div className="floating-card">
             <h3>📌 Personalized Matches</h3>
