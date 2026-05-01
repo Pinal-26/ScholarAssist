@@ -16,25 +16,29 @@ export default function Navbar({ searchTerm, setSearchTerm, showSearch = true })
 
   // ================= FETCH NOTIFICATIONS =================
   useEffect(() => {
-    if (!user) return;
+  if (!user) return;
 
-    fetch(`${API_BASE_URL}/api/notifications/count/${user.id}`)
-      .then(res => res.json())
-      .then(data => setUnreadCount(data))
-      .catch(err => console.error("Count error:", err));
+  fetch(`${API_BASE_URL}/api/notifications/${user.id}`)
+    .then(res => res.json())
+    .then(data => {
+      const uniqueMap = new Map();
 
-    fetch(`${API_BASE_URL}/api/notifications/${user.id}`)
-      .then(res => res.json())
-      .then(data => {
-  const uniqueNotifications = Array.from(
-    new Map(data.map(n => [n.message, n])).values()
-  );
-  setNotifications(uniqueNotifications);
-})
-      .catch(err => console.error("Notification error:", err));
+      // ✅ Keep latest notification per message
+      data.forEach(n => {
+        uniqueMap.set(n.message, n);
+      });
 
-  }, []);
+      const uniqueList = Array.from(uniqueMap.values());
 
+      setNotifications(uniqueList);
+
+      // ✅ Correct unread count
+      const unread = uniqueList.filter(n => n.read === false).length;
+      setUnreadCount(unread);
+    })
+    .catch(err => console.error("Notification error:", err));
+
+}, []);
   // ================= MARK AS READ =================
   const markAsRead = async (id) => {
     await fetch(`${API_BASE_URL}/api/notifications/read/${id}`, {
