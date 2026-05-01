@@ -39,18 +39,6 @@ export default function Navbar({ searchTerm, setSearchTerm, showSearch = true })
     .catch(err => console.error("Notification error:", err));
 
 }, []);
-
-      const uniqueList = Array.from(uniqueMap.values());
-
-      setNotifications(uniqueList);
-
-      // ✅ Correct unread count
-      const unread = uniqueList.filter(n => n.read === false).length;
-      setUnreadCount(unread);
-    })
-    .catch(err => console.error("Notification error:", err));
-
-}, []);
   // ================= MARK AS READ =================
   const markAsRead = async (id) => {
     await fetch(`${API_BASE_URL}/api/notifications/read/${id}`, {
