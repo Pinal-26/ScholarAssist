@@ -24,15 +24,21 @@ export default function Navbar({ searchTerm, setSearchTerm, showSearch = true })
       const uniqueMap = new Map();
 
       // ✅ Keep latest notification per message
-   data.forEach(n => {
-  if (n.message.includes("profile")) {
-    // group by time (new event = new key)
-    const key = n.message + "_" + new Date(n.createdAt).getTime();
-    uniqueMap.set(key, n);
-  } else {
-    uniqueMap.set(n.id, n);
-  }
-});
+      data.forEach(n => {
+        uniqueMap.set(n.message, n);
+      });
+
+      const uniqueList = Array.from(uniqueMap.values());
+
+      setNotifications(uniqueList);
+
+      // ✅ Correct unread count
+      const unread = uniqueList.filter(n => n.read === false).length;
+      setUnreadCount(unread);
+    })
+    .catch(err => console.error("Notification error:", err));
+
+}, []);
 
       const uniqueList = Array.from(uniqueMap.values());
 
