@@ -25,7 +25,12 @@ export default function Navbar({ searchTerm, setSearchTerm, showSearch = true })
 
     fetch(`${API_BASE_URL}/api/notifications/${user.id}`)
       .then(res => res.json())
-      .then(data => setNotifications(data))
+      .then(data => {
+  const uniqueNotifications = Array.from(
+    new Map(data.map(n => [n.message, n])).values()
+  );
+  setNotifications(uniqueNotifications);
+})
       .catch(err => console.error("Notification error:", err));
 
   }, []);
